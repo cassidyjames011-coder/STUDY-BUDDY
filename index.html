@@ -2141,7 +2141,7 @@
         remainingSprintSeconds = Math.min(totalSprintSeconds, Math.max(0, Number.isFinite(savedRemaining) ? savedRemaining : totalSprintSeconds));
         elapsedSprintSeconds = Math.max(0, Number(saved.elapsedSprintSeconds) || 0);
         isSprintFinished = !!saved.isSprintFinished || remainingSprintSeconds === 0;
-        hasSprintStarted = !!saved.hasSprintStarted || Object.keys(userAnswers).length > 0 || isSprintFinished;
+        hasSprintStarted = !!saved.hasSprintStarted || isSprintFinished;
         isTimerPaused = true;
         syncSprintSettingInputs();
         const scopeSelect = document.getElementById('scope-filter-select');
