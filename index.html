@@ -12,6 +12,59 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    (() => {
+      const state = { token: '', resolver: null, widgetId: null };
+      window.onTurnstileSuccess = token => {
+        if (state.resolver) {
+          const resolve = state.resolver;
+          state.resolver = null;
+          resolve(token);
+        } else {
+          state.token = token;
+        }
+      };
+      window.onTurnstileExpired = () => { state.token = ''; };
+      window.onTurnstileError = () => {
+        state.token = '';
+        const status = document.getElementById('ai-gen-status');
+        if (status) status.textContent = 'Security verification had a problem. Please retry the check.';
+      };
+      window.resetTurnstileWidget = () => {
+        state.token = '';
+        if (window.turnstile && state.widgetId) window.turnstile.reset(state.widgetId);
+      };
+      window.getTurnstileToken = () => {
+        if (state.token) {
+          const token = state.token;
+          state.token = '';
+          return Promise.resolve(token);
+        }
+        const status = document.getElementById('ai-gen-status');
+        if (status) status.textContent = 'Complete the Cloudflare security check to continue…';
+        return new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            state.resolver = null;
+            reject(new Error('Security check timed out. Complete the Cloudflare check and try again.'));
+          }, 120000);
+          state.resolver = token => {
+            clearTimeout(timeout);
+            resolve(token);
+          };
+        });
+      };
+      window.onTurnstileLoad = () => {
+        state.widgetId = window.turnstile.render('#turnstile-widget', {
+          sitekey: '0x4AAAAAAFnDFAKMEwULwt1q',
+          action: 'generate',
+          theme: 'dark',
+          callback: window.onTurnstileSuccess,
+          'expired-callback': window.onTurnstileExpired,
+          'error-callback': window.onTurnstileError
+        });
+      };
+    })();
+  </script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onTurnstileLoad" defer></script>
 
   <script>
@@ -2856,55 +2909,6 @@
         const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
         updateFilterPills();
       } catch(e) { setAiStatus('Saved AI customisation could not be loaded. The built-in question bank is ready.'); }
-    }
-    let turnstileToken = '';
-    let turnstileTokenResolver = null;
-    let turnstileWidgetId = null;
-    window.onTurnstileLoad = () => {
-      turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
-        sitekey: '0x4AAAAAAFnDFAKMEwULwt1q',
-        action: 'generate',
-        theme: 'dark',
-        callback: window.onTurnstileSuccess,
-        'expired-callback': window.onTurnstileExpired,
-        'error-callback': window.onTurnstileError
-      });
-    };
-    window.onTurnstileSuccess = token => {
-      if (turnstileTokenResolver) {
-        const resolve = turnstileTokenResolver;
-        turnstileTokenResolver = null;
-        resolve(token);
-      } else {
-        turnstileToken = token;
-      }
-    };
-    window.onTurnstileExpired = () => { turnstileToken = ''; };
-    window.onTurnstileError = () => {
-      turnstileToken = '';
-      setAiStatus('Security verification had a problem. Please retry the check.');
-    };
-    function resetTurnstileWidget() {
-      turnstileToken = '';
-      if (window.turnstile && turnstileWidgetId) window.turnstile.reset(turnstileWidgetId);
-    }
-    function getTurnstileToken() {
-      if (turnstileToken) {
-        const token = turnstileToken;
-        turnstileToken = '';
-        return Promise.resolve(token);
-      }
-      setAiStatus('Complete the Cloudflare security check to continue…');
-      return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          turnstileTokenResolver = null;
-          reject(new Error('Security check timed out. Complete the Cloudflare check and try again.'));
-        }, 120000);
-        turnstileTokenResolver = token => {
-          clearTimeout(timeout);
-          resolve(token);
-        };
-      });
     }
     async function callGemini(prompt, schema, modelId) {
       const requestBody = { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
