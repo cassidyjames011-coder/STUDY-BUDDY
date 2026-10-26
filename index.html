@@ -3119,7 +3119,8 @@
       } catch(err) {
         console.error('Theory reskin error:',err);
         const detail=err.message||'AI customisation failed.';
-        setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+' Your existing questions remain available.');
+        const recovery = /your existing questions remain available/i.test(detail) ? '' : ' Your existing questions remain available.';
+        setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+recovery);
       } finally {button.disabled=false;button.classList.remove('opacity-50');}
     }
     async function generateNextBatchWithGemini(batchSize=10) {
