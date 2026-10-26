@@ -1,1 +1,30 @@
-
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "floral-wood-c42bbaa1118-gemini-proxy",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-26",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DAILY_QUOTA",
+        "class_name": "DailyQuota"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DailyQuota"]
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    }
+  ]
+}
