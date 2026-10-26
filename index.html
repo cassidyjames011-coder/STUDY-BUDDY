@@ -2058,6 +2058,7 @@
     let isSingleCardView = true;          // Single Card Focus vs Scrollable List
     let isInstantStudyMode = true;        // Instant Study Feedback vs Exam Simulation Mode
     let isSprintFinished = false;
+    let isSprintStateReady = false;
 
     let activeQuestions = [];             // Array of question objects in current sprint
     let currentQIndex = 0;                // Active question index in Single Card Focus
@@ -2085,6 +2086,76 @@
     // ========================================================================
     // INITIALIZATION
     // ========================================================================
+    function persistSprintState() {
+      if (!isSprintStateReady || !activeQuestions.length) return;
+      try {
+        const activeIds = new Set(activeQuestions.map(q => q.id));
+        const state = {
+          version: 1,
+          questionIds: activeQuestions.map(q => q.id),
+          currentQIndex,
+          activeSprintSize,
+          activeSprintMinutes,
+          isCustomSprint,
+          activeLectureFilter,
+          isShuffled,
+          isSingleCardView,
+          isInstantStudyMode,
+          userAnswers: Object.fromEntries(Object.entries(userAnswers).filter(([id]) => activeIds.has(id))),
+          flaggedQuestions: Object.fromEntries(Object.entries(flaggedQuestions).filter(([id]) => activeIds.has(id))),
+          timeSpentPerQuestion: Object.fromEntries(Object.entries(timeSpentPerQuestion).filter(([id]) => activeIds.has(id))),
+          isSprintFinished,
+          hasSprintStarted,
+          totalSprintSeconds,
+          remainingSprintSeconds,
+          elapsedSprintSeconds
+        };
+        localStorage.setItem('exam_sprint_progress_v1', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function restoreSprintState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('exam_sprint_progress_v1') || 'null');
+        if (!saved || saved.version !== 1 || !Array.isArray(saved.questionIds) || !saved.questionIds.length) return false;
+        const questionById = new Map(QUESTION_BANK.map(q => [q.id, q]));
+        const restoredQuestions = saved.questionIds.map(id => questionById.get(id));
+        if (restoredQuestions.some(q => !q)) return false;
+        const validIds = new Set(saved.questionIds);
+        activeQuestions = restoredQuestions;
+        activeSprintSize = Math.min(100, Math.max(1, Number(saved.activeSprintSize) || restoredQuestions.length));
+        activeSprintMinutes = Math.min(90, Math.max(1, Number(saved.activeSprintMinutes) || 6));
+        isCustomSprint = !!saved.isCustomSprint;
+        const allowedScopes = ['all', '1', '2', '3', '4', '5', 'analogy', 'scenario', 'sample', 'weak', 'ai'];
+        const scope = String(saved.activeLectureFilter ?? 'all');
+        activeLectureFilter = allowedScopes.includes(scope) && ['1', '2', '3', '4', '5'].includes(scope) ? Number(scope) : allowedScopes.includes(scope) ? scope : 'all';
+        isShuffled = !!saved.isShuffled;
+        isSingleCardView = saved.isSingleCardView !== false;
+        isInstantStudyMode = saved.isInstantStudyMode !== false;
+        currentQIndex = Math.min(restoredQuestions.length - 1, Math.max(0, Number(saved.currentQIndex) || 0));
+        userAnswers = Object.fromEntries(Object.entries(saved.userAnswers || {}).filter(([id, value]) => validIds.has(id) && Number.isInteger(value) && value >= 0 && value < 4));
+        flaggedQuestions = Object.fromEntries(Object.entries(saved.flaggedQuestions || {}).filter(([id, value]) => validIds.has(id) && value === true));
+        timeSpentPerQuestion = Object.fromEntries(Object.entries(saved.timeSpentPerQuestion || {}).filter(([id, value]) => validIds.has(id) && Number.isFinite(value) && value >= 0));
+        totalSprintSeconds = Math.min(5400, Math.max(60, Number(saved.totalSprintSeconds) || activeSprintMinutes * 60));
+        remainingSprintSeconds = Math.min(totalSprintSeconds, Math.max(0, Number(saved.remainingSprintSeconds) || 0));
+        elapsedSprintSeconds = Math.max(0, Number(saved.elapsedSprintSeconds) || 0);
+        isSprintFinished = !!saved.isSprintFinished || remainingSprintSeconds === 0;
+        hasSprintStarted = !!saved.hasSprintStarted || Object.keys(userAnswers).length > 0 || isSprintFinished;
+        isTimerPaused = true;
+        syncSprintSettingInputs();
+        const scopeSelect = document.getElementById('scope-filter-select');
+        const orderSelect = document.getElementById('order-select');
+        const viewSelect = document.getElementById('view-select');
+        if (scopeSelect) scopeSelect.value = String(activeLectureFilter);
+        if (orderSelect) orderSelect.value = isShuffled ? 'shuffled' : 'sequential';
+        if (viewSelect) viewSelect.value = isSingleCardView ? 'single' : 'all';
+        updateFilterPills();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     function initEngine() {
       try {
         const savedWeak = localStorage.getItem('baa1118_weak_ids_v1');
@@ -2121,6 +2192,7 @@
             }
           }
           updateLiveTelemetryUI();
+          if (tickCounter === 0) persistSprintState();
         }
       }, 100);
 
@@ -2328,6 +2400,7 @@
       renderQuestionNavGrid();
       renderQuestionDeck();
       renderLectureBreakdown();
+      persistSprintState();
     }
 
     function toggleFlag(qId) {
@@ -2340,6 +2413,7 @@
       updateFilterPills();
       renderQuestionNavGrid();
       renderQuestionDeck();
+      persistSprintState();
     }
 
     function persistWeakIds() {
@@ -2357,6 +2431,7 @@
     function jumpToQuestion(idx) {
       if (idx < 0 || idx >= activeQuestions.length) return;
       currentQIndex = idx;
+      persistSprintState();
       renderQuestionNavGrid();
       if (isSingleCardView) {
         renderQuestionDeck();
@@ -2370,6 +2445,7 @@
       const nextIdx = currentQIndex + delta;
       if (nextIdx >= 0 && nextIdx < activeQuestions.length) {
         currentQIndex = nextIdx;
+        persistSprintState();
         renderQuestionNavGrid();
         renderQuestionDeck();
       }
@@ -2410,6 +2486,7 @@
       if (icon) icon.setAttribute('data-lucide', isTimerPaused || isSprintFinished ? 'play' : 'pause');
       if (status) status.textContent = isSprintFinished ? 'Run complete' : (!hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Timer paused' : getPaceTargetSeconds().toFixed(1) + 's / question');
       if (window.lucide) lucide.createIcons();
+      persistSprintState();
     }
 
     function togglePauseTimer() {
@@ -3073,6 +3150,9 @@
     window.addEventListener('DOMContentLoaded', () => {
       initEngine();
       loadSavedAiQuestionsAndKey();
+      restoreSprintState();
+      isSprintStateReady = true;
+      renderAll();
       document.addEventListener('click', (event) => {
         const picker = document.getElementById('brain-hook-picker');
         const panel = document.getElementById('brain-hook-options');
