@@ -243,7 +243,7 @@
     <div class="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div><h2 class="text-lg font-bold text-emerald-200">Sprint complete</h2><p id="sprint-completion-copy" class="mt-1 text-sm text-slate-200"></p></div>
-        <button type="button" onclick="resetCurrentSprint()" class="min-h-11 px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-sm">Start another sprint</button>
+        <button type="button" onclick="resetCurrentSprint()" class="min-h-11 px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-sm">Restart this sprint</button>
       </div>
     </div>
   </section>
@@ -2514,7 +2514,7 @@
         const unanswered = Math.max(0, activeQuestions.length - answeredCount);
         completionCopy.textContent = unanswered
           ? `You answered ${answeredCount} of ${activeQuestions.length} questions and got ${correctCount} correct. ${unanswered} unanswered ${unanswered === 1 ? 'question was' : 'questions were'} not scored. Review explanations below.`
-          : `You answered all ${activeQuestions.length} questions and got ${correctCount} correct. Review explanations below or start another sprint.`;
+          : `You answered all ${activeQuestions.length} questions and got ${correctCount} correct. Review explanations below or restart this sprint.`;
       }
     }
 
