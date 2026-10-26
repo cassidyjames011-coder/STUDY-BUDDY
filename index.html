@@ -239,6 +239,15 @@
     </div>
   </details>
 
+  <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="max-w-7xl w-full mx-auto px-4 pt-4">
+    <div class="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div><h2 class="text-lg font-bold text-emerald-200">Sprint complete</h2><p id="sprint-completion-copy" class="mt-1 text-sm text-slate-200"></p></div>
+        <button type="button" onclick="resetCurrentSprint()" class="min-h-11 px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-sm">Start another sprint</button>
+      </div>
+    </div>
+  </section>
+
   <!-- MAIN WORKSPACE -->
   <main class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 flex flex-col gap-4 study-workspace">
 
@@ -375,9 +384,9 @@
           <!-- Populated dynamically by JS -->
         </div>
 
-        <button onclick="finishAndGradeSprint()" class="w-full mt-2 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10">
-          <i data-lucide="clipboard-check" class="w-4 h-4"></i>
-          <span>Finish Run &amp; Build Results Table</span>
+        <button id="btn-finish-sprint" onclick="finishAndGradeSprint()" class="hidden w-full mt-2 min-h-11 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200 font-bold text-sm transition flex items-center justify-center gap-1.5">
+          <i data-lucide="flag" class="w-4 h-4"></i>
+          <span>Finish sprint early</span>
         </button>
       </div>
 
@@ -2370,7 +2379,6 @@
       isSprintFinished = true;
       isTimerPaused = true;
       syncTimerControls();
-      syncTimerControls();
       playHarmonicChime('complete');
       renderAll();
 
@@ -2391,6 +2399,8 @@
       const label = document.getElementById('label-pause-timer');
       const icon = document.getElementById('icon-pause-timer');
       const status = document.getElementById('timer-status-sub');
+      const finishButton = document.getElementById('btn-finish-sprint');
+      if (finishButton) finishButton.classList.toggle('hidden', !hasSprintStarted || isSprintFinished);
       if (label) label.textContent = isSprintFinished ? 'Sprint complete' : (!hasSprintStarted ? 'Start sprint' : isTimerPaused ? 'Resume' : 'Pause');
       if (button) {
         button.disabled = isSprintFinished;
@@ -2497,6 +2507,15 @@
       document.getElementById('label-answered-count').textContent = `${answeredCount} / ${activeQuestions.length} Answered`;
       const compPct = activeQuestions.length > 0 ? (answeredCount / activeQuestions.length) * 100 : 0;
       document.getElementById('bar-sprint-completion').style.width = `${compPct}%`;
+      const completion = document.getElementById('sprint-completion-summary');
+      const completionCopy = document.getElementById('sprint-completion-copy');
+      if (completion) completion.hidden = !isSprintFinished;
+      if (completionCopy && isSprintFinished) {
+        const unanswered = Math.max(0, activeQuestions.length - answeredCount);
+        completionCopy.textContent = unanswered
+          ? `You answered ${answeredCount} of ${activeQuestions.length} questions and got ${correctCount} correct. ${unanswered} unanswered ${unanswered === 1 ? 'question was' : 'questions were'} not scored. Review explanations below.`
+          : `You answered all ${activeQuestions.length} questions and got ${correctCount} correct. Review explanations below or start another sprint.`;
+      }
     }
 
     // ========================================================================
@@ -2507,6 +2526,7 @@
       renderQuestionNavGrid();
       renderLectureBreakdown();
       renderQuestionDeck();
+      syncTimerControls();
 
       lucide.createIcons();
     }
@@ -2701,7 +2721,7 @@
                     Next Question (→) <i data-lucide="arrow-right" class="w-4 h-4"></i>
                   </button>`
                 : `<button onclick="finishAndGradeSprint()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow">
-                    Finish Run &amp; Build Results Table ✓
+                    Finish sprint ✓
                   </button>`
             }
           </div>`
@@ -3044,7 +3064,7 @@
         QUESTION_BANK.push(...cleaned);
         try { localStorage.setItem('baa1118_ai_questions_v1',JSON.stringify(QUESTION_BANK.filter(q=>q.isAI))); } catch(e) {}
         const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
-        activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; isTimerPaused=false; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
+        activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; hasSprintStarted=false; isTimerPaused=true; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
         setAiStatus(`Loaded ${cleaned.length} personalised questions with the Gemini Worker. Start your Exam Sprint when ready.`); playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch(err) { console.error('Gemini API Error:',err); setAiStatus(err.message || 'AI generation failed. Your current question bank remains ready.'); }
       finally { button.disabled=false; button.classList.remove('opacity-50'); }
