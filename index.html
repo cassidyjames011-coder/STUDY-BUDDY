@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAA1118 Test 1 Interactive MCQ Exam & Telemetry Engine — Lectures 1–5</title>
+  <title>Exam Sprint — BAA1118 Python</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -83,6 +83,7 @@
     .animate-soft-pulse {
       animation: softPulse 2.2s infinite ease-in-out;
     }
+      .options-popout button { width: 100%; justify-content: flex-start; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
@@ -98,143 +99,74 @@
         </div>
         <div>
           <div class="flex items-center flex-wrap gap-2">
-            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">BAA1118 Python Test 1 Engine</h1>
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">⚡ Exam Sprint</h1>
             <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              60 Code Scenarios + 40 ⛳🏉✈️ Theory Analogies • 36s/Q
+              BAA1118 Python • 10Q / 6m • 36s/Q
             </span>
           </div>
-          <p class="text-xs text-slate-400">Damien Dupré Style (Read-the-Code + Golf, Rugby &amp; Aviation Theory Mediums) • Sprint Telemetry</p>
+          <p class="text-xs text-slate-400">Personalised micro-sprints for university exams • BAA1118 Test 1</p>
         </div>
       </div>
 
-      <!-- Sprint Length Switcher (Maintains 36s/Q Ratio) -->
-      <div class="flex items-center flex-wrap bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
-        <button id="btn-sprint-10" onclick="startNewSprint(10)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white" title="10 Questions in 6:00 (36s/Q)">
-          10Q (6m)
-        </button>
-        <button id="btn-sprint-20" onclick="startNewSprint(20)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-sky-500 text-slate-950 shadow" title="20 Questions in 12:00 (36s/Q)">
-          20Q (12m)
-        </button>
-        <button id="btn-sprint-25" onclick="startNewSprint(25)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white" title="25 Questions in 15:00 (36s/Q)">
-          25Q (15m)
-        </button>
-        <button id="btn-sprint-40" onclick="startNewSprint(40)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white" title="40 Questions in 24:00 (36s/Q)">
-          40Q (24m)
-        </button>
-        <button id="btn-sprint-50" onclick="startNewSprint(50)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white" title="50 Questions in 30:00 (36s/Q)">
-          50Q (30m)
-        </button>
-        <button id="btn-sprint-100" onclick="startNewSprint(100)" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white" title="All 100 Questions in 60:00 (36s/Q)">
-          100Q (60m)
-        </button>
-      </div>
-
-      <!-- Assistive & Audio Controls -->
-      <div class="flex items-center flex-wrap gap-2">
-        <button id="btn-feedback-mode" onclick="toggleFeedbackMode()" title="Switch between Instant Study Feedback and Exam Simulation Mode" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 text-indigo-300 transition">
-          <i data-lucide="zap" class="w-4 h-4"></i>
-          <span id="label-feedback-mode">Mode: Instant Study</span>
-        </button>
-
-        <button id="btn-chime-toggle" onclick="toggleChimes()" title="Toggle Harmonic Audio Chimes" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition">
-          <i data-lucide="bell" class="w-4 h-4 text-sky-400"></i>
-          <span id="label-chime" class="hidden sm:inline">Chimes On</span>
-        </button>
-
-        <button id="btn-noise-toggle" onclick="toggleBrownNoise()" title="Toggle Warm Brown Noise (ADD Distraction Shield)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition">
-          <i data-lucide="waves" class="w-4 h-4 text-amber-400"></i>
-          <span id="label-noise" class="hidden sm:inline">Focus Noise: Off</span>
-        </button>
-
-        <button id="btn-dyslexia-toggle" onclick="toggleDyslexiaMode()" title="Toggle Dyslexia-Friendly Warm Cream Contrast & Expanded Spacing" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition">
-          <i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i>
-          <span id="label-dyslexia" class="hidden sm:inline">Dyslexia Mode</span>
-        </button>
-      </div>
+      <!-- Study and accessibility options -->
+      <details id="options-menu" class="relative ml-auto">
+        <summary class="list-none cursor-pointer select-none px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-100 flex items-center gap-2 [&::-webkit-details-marker]:hidden"><i data-lucide="settings-2" class="w-4 h-4 text-sky-300"></i> Options <span aria-hidden="true" class="text-slate-400">▾</span></summary>
+        <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">
+          <p class="px-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Study and accessibility</p>
+          <button id="btn-feedback-mode" onclick="toggleFeedbackMode()" title="Switch between Instant Study Feedback and Exam Simulation Mode" class="px-2.5 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 text-indigo-300 transition"><i data-lucide="zap" class="w-4 h-4"></i><span id="label-feedback-mode">Mode: Instant Study</span></button>
+          <button id="btn-chime-toggle" onclick="toggleChimes()" title="Toggle Harmonic Audio Chimes" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="bell" class="w-4 h-4 text-sky-400"></i><span id="label-chime">Chimes On</span></button>
+          <button id="btn-noise-toggle" onclick="toggleBrownNoise()" title="Toggle Warm Brown Noise (ADD Distraction Shield)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="waves" class="w-4 h-4 text-amber-400"></i><span id="label-noise">Focus Noise: Off</span></button>
+          <button id="btn-dyslexia-toggle" onclick="toggleDyslexiaMode()" title="Toggle Dyslexia-Friendly Warm Cream Contrast & Expanded Spacing" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i><span id="label-dyslexia">Dyslexia Mode</span></button>
+        </div>
+      </details>
     </div>
   </header>
 
-  <!-- FILTER & CONTROL SUB-BAR -->
-  <section class="bg-slate-900/60 border-b border-slate-800/80 px-4 py-2.5">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Lecture & Question Format Filter Pills -->
-      <div class="flex flex-wrap items-center gap-1.5">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
-          <i data-lucide="filter" class="w-3.5 h-3.5 text-sky-400"></i> Scope:
-        </span>
-        <button onclick="setLectureFilter('all')" id="flt-all" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-500 text-slate-950 transition">All (100)</button>
-        <button onclick="setLectureFilter(1)" id="flt-1" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition" title="12 Code Scenarios + 8 Golf/Rugby/Aviation Theory Qs">L1: Intro &amp; Errors (20)</button>
-        <button onclick="setLectureFilter(2)" id="flt-2" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition" title="12 Code Scenarios + 8 Golf/Rugby/Aviation Theory Qs">L2: Types &amp; Strings (20)</button>
-        <button onclick="setLectureFilter(3)" id="flt-3" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition" title="12 Code Scenarios + 8 Golf/Rugby/Aviation Theory Qs">L3: Collections (20)</button>
-        <button onclick="setLectureFilter(4)" id="flt-4" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition" title="12 Code Scenarios + 8 Golf/Rugby/Aviation Theory Qs">L4: Control Flow (20)</button>
-        <button onclick="setLectureFilter(5)" id="flt-5" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition" title="12 Code Scenarios + 8 Golf/Rugby/Aviation Theory Qs">L5: Functions &amp; Files (20)</button>
-        <button onclick="setLectureFilter('analogy')" id="flt-analogy" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition" title="All 40 Golf, Rugby & Aviation Conceptual Theory Questions">⛳🏉✈️ Theory Mediums (40)</button>
-        <button onclick="setLectureFilter('scenario')" id="flt-scenario" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500/30 transition" title="All 60 Specific Code-Tracing Scenario Questions">💻 Code Scenarios (60)</button>
-        <button onclick="setLectureFilter('sample')" id="flt-sample" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition">Sample PDF (5)</button>
-        <button onclick="setLectureFilter('weak')" id="flt-weak" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30 transition">Missed / Flagged</button>
-      </div>
-
-      <!-- Order & Layout Controls -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="toggleShuffleOrder()" id="btn-shuffle" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition">
-          <i data-lucide="shuffle" class="w-3.5 h-3.5 text-sky-400"></i>
-          <span id="label-shuffle">Order: Sequential</span>
-        </button>
-        <button onclick="toggleViewLayout()" id="btn-layout" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition">
-          <i data-lucide="layout-list" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span id="label-layout">View: Single Card Focus</span>
-        </button>
-        <button onclick="scrollToExportTable()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1 transition">
-          <i data-lucide="table" class="w-3.5 h-3.5"></i>
-          <span>Jump to Gemini Table</span>
-        </button>
-      </div>
+  <!-- FULL-WIDTH SCOPE CONTROLS -->
+  <section class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 py-3">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
+      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question scope</span>
+        <select id="scope-filter-select" onchange="applyScopeFilter(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          <option value="all">All questions (100)</option><option value="1">L1 · Intro &amp; Errors</option><option value="2">L2 · Types &amp; Strings</option><option value="3">L3 · Collections</option><option value="4">L4 · Control Flow</option><option value="5">L5 · Functions &amp; Files</option><option value="analogy">Theory questions</option><option value="scenario">Code scenarios</option><option value="sample">Sample questions</option><option value="weak">Missed / flagged</option><option value="ai">AI questions</option>
+        </select>
+      </label>
+      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question order</span>
+        <select id="order-select" onchange="setOrderMode(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400"><option value="sequential">Sequential</option><option value="shuffled">Shuffled</option></select>
+      </label>
+      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question view</span>
+        <select id="view-select" onchange="setQuestionView(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400"><option value="single">Single card focus</option><option value="all">All questions list</option></select>
+      </label>
+    </div>
+  </section>
+  <section class="w-full bg-slate-900/40 border-b border-slate-800/80 px-4 py-3" aria-label="Custom sprint settings">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-end gap-3">
+      <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
+      <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
+      <button type="button" onclick="applyCustomSprintSettings()" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold">Apply custom sprint</button>
+      <span id="custom-sprint-status" class="text-xs text-slate-400" role="status">Set the time and question count, then apply.</span>
     </div>
   </section>
 
-  <!-- GEMINI 3.5 FLASH FREE-TIER QUESTION GENERATOR BAR -->
-  <section class="bg-indigo-950/30 border-b border-indigo-500/30 px-4 py-2.5">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Gemini Live Batch Generator (Scenario + ⛳🏉✈️ Theory Blend)
-        </span>
-        <input
-          id="gemini-api-key-input"
-          type="password"
-          placeholder="Paste AI Studio API Key (auto-saved locally)..."
-          oninput="saveApiKeyLocally(this.value)"
-          class="bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-lg px-3 py-1 text-xs font-mono text-slate-200 w-64 focus:outline-none"
-        />
-        <select
-          id="gemini-model-select"
-          class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-mono text-sky-300 focus:outline-none"
-        >
-          <option value="gemini-2.5-flash">gemini-2.5-flash (Recommended Free Quota)</option>
-          <option value="gemini-3.5-flash">gemini-3.5-flash (Reasoning)</option>
-          <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Fastest)</option>
-        </select>
-        <button
-          onclick="setLectureFilter('ai')"
-          id="flt-ai"
-          class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition"
-        >
-          AI Generated (0)
-        </button>
+  <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
+  <section class="bg-indigo-950/30 border-b border-indigo-500/30 px-4 py-3">
+    <div class="max-w-7xl mx-auto space-y-3">
+      <div class="space-y-2">
+        <div><h2 class="text-sm font-bold text-indigo-200">🧠 Make the questions yours</h2><p class="text-xs text-slate-400">Choose at least one interest. Select up to 3, or add your own.</p></div>
+        <div id="brain-hook-picker" class="relative w-full">
+          <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
+          <div class="flex gap-2"><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search sports, hobbies, planes, ships, trains…" aria-label="Search interests" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /><button id="brain-hook-add-selected" type="button" onclick="addSelectedBrainHooks()" disabled class="shrink-0 px-3 py-2 rounded-lg bg-sky-600 border border-sky-500 text-xs font-bold text-white disabled:opacity-40">Add selected</button><button type="button" onclick="addCustomBrainHook()" class="shrink-0 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 hover:bg-slate-700">Add other</button></div>
+          <div id="brain-hook-options" role="listbox" class="hidden absolute z-30 top-full mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 shadow-2xl p-2"></div>
+        </div>
+        <p id="brain-hook-requirement" class="text-xs text-amber-300">Select at least one interest to enable AI customisation. The question bank and sprints work without it.</p>
       </div>
-
-      <div class="flex flex-wrap items-center gap-2">
-        <span id="ai-gen-status" class="text-xs font-mono text-slate-400">Ready (Paste key once)</span>
-        <button
-          id="btn-generate-ai-batch"
-          onclick="generateNextBatchWithGemini(20)"
-          class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md"
-        >
-          <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-          <span>Generate Next 20Q Batch (Code + Golf/Rugby/Planes Theory)</span>
-        </button>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. The question bank works without AI.</span>
+          <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🔥 Reskin My Theory Questions</button>
+          <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold text-xs">✨ Generate My Next Weak-Spot Sprint</button>
+        </div>
       </div>
+      <p class="text-xs text-slate-500">AI personalisation uses the configured beta Worker. If it is unavailable, your built-in question bank and sprints remain ready.</p>
     </div>
   </section>
 
@@ -265,10 +197,10 @@
         <div class="my-4 flex items-center justify-between gap-4">
           <div>
             <div id="metric-time-remaining" class="font-mono text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              12:00
+              06:00
             </div>
             <div id="metric-time-elapsed-label" class="text-xs text-slate-300 mt-1 font-medium">
-              00:00 elapsed of 12:00 sprint
+              00:00 elapsed of 06:00 sprint
             </div>
           </div>
 
@@ -286,8 +218,8 @@
             <div id="bar-timer-remaining" class="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-300" style="width: 100%"></div>
           </div>
           <div class="flex justify-between items-center text-[11px] font-mono text-slate-400 mt-1.5">
-            <span id="label-sprint-size">20 Questions</span>
-            <span class="text-amber-300 font-semibold">Target: 36.0s / Q</span>
+            <span id="label-sprint-size">10 Questions</span>
+            <span id="label-pace-target" class="text-amber-300 font-semibold">Target: 36.0s / Q</span>
             <button onclick="resetCurrentSprint()" class="text-rose-400 hover:underline">Restart</button>
           </div>
         </div>
@@ -380,7 +312,7 @@
 
         <button onclick="finishAndGradeSprint()" class="w-full mt-2 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10">
           <i data-lucide="clipboard-check" class="w-4 h-4"></i>
-          <span>Finish Run &amp; Build Gemini Table</span>
+          <span>Finish Run &amp; Build Results Table</span>
         </button>
       </div>
 
@@ -398,7 +330,6 @@
         <div class="flex items-center gap-3 text-[11px]">
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Correct</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Incorrect</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> Answered (Exam Mode)</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Flagged 🚩</span>
         </div>
       </div>
@@ -412,84 +343,12 @@
       <!-- Populated dynamically -->
     </section>
 
-    <!-- 4. GEMINI FEEDBACK & COPYABLE RESULTS TABLE SECTION -->
-    <section id="gemini-export-section" class="prose-card bg-gradient-to-br from-slate-900 via-slate-900 to-slate-850 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-              POST-RUN GEMINI TELEMETRY EXPORT
-            </span>
-            <span id="export-summary-pill" class="text-xs font-mono text-emerald-400 font-semibold">
-              Live Table Ready
-            </span>
-          </div>
-          <h2 class="text-lg sm:text-xl font-bold text-white mt-1">
-            Copyable Results Table for Gemini Chat Review
-          </h2>
-          <p class="text-xs text-slate-400">
-            Click <strong>"Copy Markdown Table for Gemini"</strong> below and paste directly into our Gemini chat. It includes your score, pacing telemetry, and every question/answer for targeted coaching.
-          </p>
-        </div>
-
-        <!-- Export Filter & Copy Buttons -->
-        <div class="flex flex-wrap items-center gap-2">
-          <select id="export-filter-select" onchange="renderExportSection()" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-sky-500">
-            <option value="all_answered">Include: All Answered Questions</option>
-            <option value="mistakes_flagged">Include: Incorrect &amp; Flagged Only (Fast Review)</option>
-            <option value="entire_sprint">Include: Entire Sprint (Including Unanswered)</option>
-          </select>
-
-          <button onclick="copyGeminiMarkdown()" id="btn-copy-gemini" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-sky-500/20">
-            <i data-lucide="copy" class="w-4 h-4"></i>
-            <span id="label-copy-gemini">Copy Markdown Table for Gemini</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Copyable Raw Markdown Box (Ready to Paste into Gemini) -->
-      <div>
-        <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-          <span class="font-semibold uppercase tracking-wider">Raw Markdown Payload (Auto-Formatted for Gemini Chat):</span>
-          <span id="copy-toast" class="text-emerald-400 font-mono font-bold hidden">Copied to clipboard! Paste into Gemini chat ✓</span>
-        </div>
-        <textarea id="gemini-markdown-textarea" readonly rows="10" class="w-full font-mono text-xs bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-slate-200 focus:outline-none focus:border-sky-500 selection:bg-sky-500 selection:text-slate-950"></textarea>
-      </div>
-
-      <!-- Visual HTML Preview Table -->
-      <div class="overflow-x-auto border border-slate-800 rounded-xl bg-slate-950/60 max-h-[460px]">
-        <table class="w-full text-left border-collapse text-xs">
-          <thead class="sticky top-0 bg-slate-900 border-b border-slate-800 text-slate-400 uppercase font-mono text-[11px]">
-            <tr>
-              <th class="py-2.5 px-3">#</th>
-              <th class="py-2.5 px-3">ID &amp; Lec</th>
-              <th class="py-2.5 px-3">Format &amp; Topic</th>
-              <th class="py-2.5 px-3">Question &amp; Code Snippet</th>
-              <th class="py-2.5 px-3">Your Ans</th>
-              <th class="py-2.5 px-3">Correct</th>
-              <th class="py-2.5 px-3">Status</th>
-              <th class="py-2.5 px-3">Time</th>
-            </tr>
-          </thead>
-          <tbody id="export-html-table-body" class="divide-y divide-slate-800/80 text-slate-200">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
   </main>
 
   <!-- FOOTER -->
   <footer class="bg-slate-950 border-t border-slate-900 px-4 py-4 mt-8">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-      <div>
-        <strong>BAA1118 Foundations of Programming for Analytics &amp; AI</strong> • 60 Specific Code Scenarios + 40 Golf, Rugby &amp; Aviation Theory Mediums (100 MCQs)
-      </div>
-      <div class="flex items-center gap-4">
-        <span>Missed/Flagged history saved locally across runs</span>
-        <button onclick="clearSavedWeakHistory()" class="text-rose-400 hover:underline">Clear Saved Weak-Spot History</button>
-      </div>
+    <div class="max-w-7xl mx-auto flex justify-center">
+      <button onclick="clearSavedWeakHistory()" class="px-3 py-2 rounded-lg border border-rose-500/40 bg-rose-500/10 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 hover:border-rose-400 transition">Clear Saved Weak-Spot History</button>
     </div>
   </footer>
 
@@ -501,7 +360,7 @@
       // ======================================================================
       // LECTURE 1: GETTING STARTED WITH PYTHON (20 QUESTIONS: Q01 – Q20)
       // - Q01 to Q12: Specific Code-Tracing & Scenario Questions (12)
-      // - Q13 to Q20: Golf, Rugby & Aviation Theory Medium Questions (8)
+      // - Q13 to Q20: Personalised Theory Questions (8)
       // ======================================================================
       {
         id: "L1-Q01",
@@ -824,7 +683,7 @@
       // ======================================================================
       // LECTURE 2: VARIABLES, TYPES AND OPERATORS (20 QUESTIONS: Q21 – Q40)
       // - Q21 to Q32: Specific Code-Tracing & Scenario Questions (12)
-      // - Q33 to Q40: Golf, Rugby & Aviation Theory Medium Questions (8)
+      // - Q33 to Q40: Personalised Theory Questions (8)
       // ======================================================================
       {
         id: "L2-Q21",
@@ -1147,7 +1006,7 @@
       // ======================================================================
       // LECTURE 3: COLLECTIONS (20 QUESTIONS: Q41 – Q60)
       // - Q41 to Q52: Specific Code-Tracing & Scenario Questions (12)
-      // - Q53 to Q60: Golf, Rugby & Aviation Theory Medium Questions (8)
+      // - Q53 to Q60: Personalised Theory Questions (8)
       // ======================================================================
       {
         id: "L3-Q41",
@@ -1470,7 +1329,7 @@
       // ======================================================================
       // LECTURE 4: CONTROL FLOW (20 QUESTIONS: Q61 – Q80)
       // - Q61 to Q72: Specific Code-Tracing & Scenario Questions (12)
-      // - Q73 to Q80: Golf, Rugby & Aviation Theory Medium Questions (8)
+      // - Q73 to Q80: Personalised Theory Questions (8)
       // ======================================================================
       {
         id: "L4-Q61",
@@ -1793,7 +1652,7 @@
       // ======================================================================
       // LECTURE 5: FUNCTIONS, MODULES AND PACKAGES (20 QUESTIONS: Q81 – Q100)
       // - Q81 to Q92: Specific Code-Tracing & Scenario Questions (12)
-      // - Q93 to Q100: Golf, Rugby & Aviation Theory Medium Questions (8)
+      // - Q93 to Q100: Personalised Theory Questions (8)
       // ======================================================================
       {
         id: "L5-Q81",
@@ -2117,7 +1976,9 @@
     // ========================================================================
     // STATE MANAGEMENT & ENGINE VARIABLES
     // ========================================================================
-    let activeSprintSize = 20;            // Default 20Q (12m at 36s/Q)
+    let activeSprintSize = 10;            // Default 10Q (6m at 36s/Q)
+    let activeSprintMinutes = 6;
+    let isCustomSprint = false;
     let activeLectureFilter = 'all';      // 'all', 1, 2, 3, 4, 5, 'analogy', 'scenario', 'sample', 'weak', 'ai'
     let isShuffled = false;
     let isSingleCardView = true;          // Single Card Focus vs Scrollable List
@@ -2133,8 +1994,9 @@
 
     // Timer State (36 seconds per question)
     const SECONDS_PER_QUESTION_TARGET = 36;
-    let totalSprintSeconds = 20 * SECONDS_PER_QUESTION_TARGET;
-    let remainingSprintSeconds = 20 * SECONDS_PER_QUESTION_TARGET;
+    const GEMINI_MODEL_ID = 'gemini-3.8-flash';
+    let totalSprintSeconds = 10 * SECONDS_PER_QUESTION_TARGET;
+    let remainingSprintSeconds = 10 * SECONDS_PER_QUESTION_TARGET;
     let elapsedSprintSeconds = 0;
     let isTimerPaused = false;
 
@@ -2248,18 +2110,34 @@
       isSprintFinished = false;
       isTimerPaused = false;
 
-      totalSprintSeconds = count * SECONDS_PER_QUESTION_TARGET;
+      totalSprintSeconds = isCustomSprint ? activeSprintMinutes * 60 : count * SECONDS_PER_QUESTION_TARGET;
       remainingSprintSeconds = totalSprintSeconds;
       elapsedSprintSeconds = 0;
+      if (!isCustomSprint) activeSprintMinutes = totalSprintSeconds / 60;
+      syncSprintSettingInputs();
 
-      updateSprintHeaderButtons();
       updateFilterPills();
     }
 
+    function syncSprintSettingInputs() {
+      const minutes=document.getElementById('custom-test-minutes'), questions=document.getElementById('custom-test-questions');
+      if(minutes) minutes.value=String(activeSprintMinutes);
+      if(questions) questions.value=String(activeSprintSize);
+      const status=document.getElementById('custom-sprint-status');
+      if(status) status.textContent=(isCustomSprint?'Custom sprint: ':'Preset sprint: ')+activeSprintMinutes+' min · '+activeSprintSize+' questions';
+    }
+    function applyCustomSprintSettings() {
+      const minutes=Number(document.getElementById('custom-test-minutes')?.value), questions=Number(document.getElementById('custom-test-questions')?.value);
+      const status=document.getElementById('custom-sprint-status');
+      if(!Number.isInteger(minutes)||minutes<1||minutes>90||!Number.isInteger(questions)||questions<1||questions>100) { if(status) status.textContent='Enter whole numbers: 1–90 minutes and 1–100 questions.'; return; }
+      activeSprintMinutes=minutes; activeSprintSize=questions; isCustomSprint=true;
+      if(typeof activeLectureFilter==='number') activeLectureFilter='all';
+      const scope=document.getElementById('scope-filter-select'); if(scope) scope.value=String(activeLectureFilter);
+      buildSprintPool(); renderAll(); syncSprintSettingInputs();
+    }
     function startNewSprint(size) {
-      activeSprintSize = size;
-      buildSprintPool();
-      renderAll();
+      activeSprintSize=size; activeSprintMinutes=size*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false;
+      syncSprintSettingInputs(); buildSprintPool(); renderAll();
     }
 
     function resetCurrentSprint() {
@@ -2267,19 +2145,32 @@
       renderAll();
     }
 
+    function applyScopeFilter(value) {
+      const filter = ['1','2','3','4','5'].includes(value) ? Number(value) : value;
+      setLectureFilter(filter);
+    }
     function setLectureFilter(filterVal) {
       activeLectureFilter = filterVal;
-      if (typeof filterVal === 'number') {
-        activeSprintSize = 20;
-      } else if (filterVal === 'analogy') {
-        activeSprintSize = 40;
-      } else if (filterVal === 'scenario') {
-        activeSprintSize = 50;
+      if (!isCustomSprint) {
+        if (typeof filterVal === 'number') activeSprintSize = 20;
+        else if (filterVal === 'analogy') activeSprintSize = 40;
+        else if (filterVal === 'scenario') activeSprintSize = 50;
+        else if (filterVal === 'all') { activeSprintSize = 10; activeSprintMinutes = 6; }
       }
-      buildSprintPool();
-      renderAll();
+      const select = document.getElementById('scope-filter-select');
+      if (select) select.value = String(filterVal);
+      buildSprintPool(); renderAll();
     }
-
+    function setOrderMode(value) {
+      isShuffled = value === 'shuffled';
+      const label = document.getElementById('label-shuffle'); if (label) label.textContent = isShuffled ? 'Order: Shuffled' : 'Order: Sequential';
+      buildSprintPool(); renderAll();
+    }
+    function setQuestionView(value) {
+      isSingleCardView = value !== 'all';
+      const label = document.getElementById('label-layout'); if (label) label.textContent = isSingleCardView ? 'View: Single Card Focus' : 'View: All Questions List';
+      renderQuestionDeck();
+    }
     function toggleShuffleOrder() {
       isShuffled = !isShuffled;
       document.getElementById('label-shuffle').textContent = isShuffled ? 'Order: Shuffled' : 'Order: Sequential';
@@ -2305,18 +2196,6 @@
         btn.className = 'px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5 text-amber-300 transition';
       }
       renderAll();
-    }
-
-    function updateSprintHeaderButtons() {
-      [10, 20, 25, 40, 50, 100].forEach(sz => {
-        const btn = document.getElementById(`btn-sprint-${sz}`);
-        if (!btn) return;
-        if (sz === activeSprintSize) {
-          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-sky-500 text-slate-950 shadow';
-        } else {
-          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
-        }
-      });
     }
 
     function updateFilterPills() {
@@ -2368,11 +2247,11 @@
         persistWeakIds();
       }
 
+      updateLiveTelemetryUI();
       updateFilterPills();
       renderQuestionNavGrid();
       renderQuestionDeck();
       renderLectureBreakdown();
-      renderExportSection();
     }
 
     function toggleFlag(qId) {
@@ -2381,10 +2260,10 @@
         savedWeakIds[qId] = true;
       }
       persistWeakIds();
+      updateLiveTelemetryUI();
       updateFilterPills();
       renderQuestionNavGrid();
       renderQuestionDeck();
-      renderExportSection();
     }
 
     function persistWeakIds() {
@@ -2425,14 +2304,7 @@
       isTimerPaused = true;
       playHarmonicChime('complete');
       renderAll();
-      if (!autoTriggeredByTimer) {
-        scrollToExportTable();
-      }
-    }
 
-    function scrollToExportTable() {
-      const el = document.getElementById('gemini-export-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
 
     // ========================================================================
@@ -2448,7 +2320,7 @@
     function togglePauseTimer() {
       isTimerPaused = !isTimerPaused;
       document.getElementById('label-pause-timer').textContent = isTimerPaused ? 'Resume' : 'Pause';
-      document.getElementById('timer-status-sub').textContent = isTimerPaused ? 'Timer Paused' : '36s / question exam constraint';
+      document.getElementById('timer-status-sub').textContent = isTimerPaused ? 'Timer Paused' : getPaceTargetSeconds().toFixed(1) + 's / question target';
     }
 
     function addExtraMinute() {
@@ -2456,6 +2328,8 @@
       totalSprintSeconds += 60;
       updateLiveTelemetryUI();
     }
+
+    function getPaceTargetSeconds() { return activeQuestions.length > 0 ? totalSprintSeconds / activeQuestions.length : SECONDS_PER_QUESTION_TARGET; }
 
     function updateLiveTelemetryUI() {
       // 1. Sprint Timer Card
@@ -2479,28 +2353,30 @@
       const qSecs = currentQ ? (timeSpentPerQuestion[currentQ.id] || 0) : 0;
       document.getElementById('metric-current-q-time').textContent = `${qSecs.toFixed(1)}s`;
 
-      const qPacePct = Math.min(100, (qSecs / SECONDS_PER_QUESTION_TARGET) * 100);
+      const paceTarget = getPaceTargetSeconds();
+      const qPacePct = Math.min(100, (qSecs / paceTarget) * 100);
       const qBar = document.getElementById('bar-current-q-pace');
       if (qBar) {
         qBar.style.width = `${qPacePct}%`;
-        qBar.className = qSecs <= 36
+        qBar.className = qSecs <= paceTarget
           ? 'h-full bg-emerald-400 transition-all duration-150'
           : 'h-full bg-rose-500 transition-all duration-150';
       }
 
       const answeredCount = Object.keys(userAnswers).length;
       const avgSecs = answeredCount > 0 ? (elapsedSprintSeconds / answeredCount) : qSecs;
-      document.getElementById('metric-avg-q-time').textContent = `${avgSecs.toFixed(1)}s / 36.0s`;
+      document.getElementById('metric-avg-q-time').textContent = `${avgSecs.toFixed(1)}s / ${paceTarget.toFixed(1)}s`;
+      const targetLabel=document.getElementById('label-pace-target'); if(targetLabel) targetLabel.textContent=`Target: ${paceTarget.toFixed(1)}s / Q`;
 
       const paceBadge = document.getElementById('badge-pace-status');
-      if (avgSecs <= 32) {
+      if (avgSecs <= paceTarget * 0.9) {
         paceBadge.textContent = 'AHEAD OF PACE ⚡';
         paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-      } else if (avgSecs <= 37) {
-        paceBadge.textContent = 'ON 36s PACE ✓';
+      } else if (avgSecs <= paceTarget * 1.03) {
+        paceBadge.textContent = 'ON PACE ✓';
         paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30';
       } else {
-        paceBadge.textContent = 'OVER 36s TARGET ⚠️';
+        paceBadge.textContent = 'OVER TARGET ⚠️';
         paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30';
       }
 
@@ -2541,7 +2417,7 @@
       renderQuestionNavGrid();
       renderLectureBreakdown();
       renderQuestionDeck();
-      renderExportSection();
+
       lucide.createIcons();
     }
 
@@ -2735,7 +2611,7 @@
                     Next Question (→) <i data-lucide="arrow-right" class="w-4 h-4"></i>
                   </button>`
                 : `<button onclick="finishAndGradeSprint()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow">
-                    Finish &amp; Generate Gemini Table ✓
+                    Finish Run &amp; Build Results Table ✓
                   </button>`
             }
           </div>`
@@ -2751,7 +2627,6 @@
               <span class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 Lecture ${q.lecture} • ${q.id}
               </span>
-              ${getFormatBadgeHTML(q)}
               <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
                 ${escapeHtml(q.topic)}
               </span>
@@ -2803,130 +2678,6 @@
         container.innerHTML = activeQuestions.map((q, idx) => buildSingleQuestionCardHTML(q, idx)).join('');
       }
       lucide.createIcons();
-    }
-
-    // ========================================================================
-    // GEMINI COPYABLE MARKDOWN & HTML TABLE GENERATOR
-    // ========================================================================
-    function renderExportSection() {
-      const filterMode = document.getElementById('export-filter-select').value;
-      const letters = ['A', 'B', 'C', 'D'];
-
-      let rowsToExport = activeQuestions.map((q, idx) => ({ q, idx }));
-      if (filterMode === 'all_answered') {
-        rowsToExport = rowsToExport.filter(item => userAnswers[item.q.id] !== undefined || flaggedQuestions[item.q.id]);
-      } else if (filterMode === 'mistakes_flagged') {
-        rowsToExport = rowsToExport.filter(item => {
-          const ans = userAnswers[item.q.id];
-          const isWrong = ans !== undefined && ans !== item.q.correct;
-          return isWrong || !!flaggedQuestions[item.q.id];
-        });
-      }
-
-      const answeredCount = Object.keys(userAnswers).length;
-      let correctCount = 0;
-      activeQuestions.forEach(q => {
-        if (userAnswers[q.id] === q.correct) correctCount++;
-      });
-      const accuracyPct = answeredCount > 0 ? ((correctCount / answeredCount) * 100).toFixed(1) : '0.0';
-      const avgTime = answeredCount > 0 ? (elapsedSprintSeconds / answeredCount).toFixed(1) : '0.0';
-
-      // Build Lecture 1-5 summary line
-      const lecSummaries = [1, 2, 3, 4, 5].map(lec => {
-        const qs = activeQuestions.filter(q => q.lecture === lec && userAnswers[q.id] !== undefined);
-        const corr = qs.filter(q => userAnswers[q.id] === q.correct);
-        return `L${lec}: ${corr.length}/${qs.length}`;
-      }).join(' | ');
-
-      // Build Markdown Table String for Gemini
-      let md = `### BAA1118 Python Test 1 Sprint Results (Review Request for Gemini)\n`;
-      md += `- **Sprint Scope:** ${activeQuestions.length} Questions (Filter: ${activeLectureFilter}) | **Score:** ${correctCount}/${answeredCount} (${accuracyPct}%)\n`;
-      md += `- **Pacing Telemetry:** ${formatMinSec(elapsedSprintSeconds)} elapsed | **Avg Time/Q:** ${avgTime}s (Exam Target: 36.0s/Q)\n`;
-      md += `- **Lecture Breakdown:** ${lecSummaries}\n\n`;
-      md += `Please review my results table below, explain the Python logic behind any ❌ Incorrect or 🚩 Flagged questions (using Golf, Rugby, or Aviation analogies where helpful), and give me 2–3 quick follow-up drill questions on my weakest topics:\n\n`;
-      md += `| # | ID | Lec | Format & Topic | Question & Code | My Ans | Correct | Status | Time |\n`;
-      md += `|---|---|---|---|---|---|---|---|---|\n`;
-
-      const htmlRows = [];
-
-      rowsToExport.forEach(({ q, idx }) => {
-        const ansIdx = userAnswers[q.id];
-        const isAnswered = ansIdx !== undefined;
-        const isCorrect = isAnswered && ansIdx === q.correct;
-        const isFlagged = !!flaggedQuestions[q.id];
-
-        const myAnsText = isAnswered ? `${letters[ansIdx]} (${q.options[ansIdx]})` : 'Unanswered';
-        const correctText = `${letters[q.correct]} (${q.options[q.correct]})`;
-        const statusText = !isAnswered
-          ? (isFlagged ? '🚩 Unanswered' : '⚪ Skipped')
-          : isCorrect
-          ? (isFlagged ? '✅ Correct 🚩' : '✅ Correct')
-          : (isFlagged ? '❌ Wrong 🚩' : '❌ Wrong');
-
-        const timeStr = `${(timeSpentPerQuestion[q.id] || 0).toFixed(1)}s`;
-        const compactCode = q.code ? ` \`${q.code.replace(/\n/g, ' ; ')}\`` : '';
-        const formatPrefix = q.isAnalogyTheory ? `[${q.analogyTheme} Theory] ` : '[Scenario] ';
-        const cleanTopic = `${formatPrefix}${q.topic}`.replace(/\|/g, '\\|');
-        const cleanQAndCode = `${q.prompt}${compactCode}`.replace(/\|/g, '\\|');
-        const cleanMyAns = myAnsText.replace(/\|/g, '\\|');
-        const cleanCorrect = correctText.replace(/\|/g, '\\|');
-
-        md += `| ${idx + 1} | ${q.id} | L${q.lecture} | ${cleanTopic} | ${cleanQAndCode} | ${cleanMyAns} | ${cleanCorrect} | ${statusText} | ${timeStr} |\n`;
-
-        const rowBg = !isAnswered
-          ? 'bg-slate-950/40'
-          : isCorrect
-          ? 'bg-emerald-950/15'
-          : 'bg-rose-950/25';
-
-        htmlRows.push(`
-          <tr class="${rowBg} hover:bg-slate-900/80 transition">
-            <td class="py-2.5 px-3 font-mono font-bold text-slate-400">${idx + 1}</td>
-            <td class="py-2.5 px-3 font-mono text-sky-300 whitespace-nowrap">${q.id} (L${q.lecture})</td>
-            <td class="py-2.5 px-3 font-semibold text-amber-300">${escapeHtml(formatPrefix + q.topic)}</td>
-            <td class="py-2.5 px-3 max-w-md">
-              <div class="text-slate-200">${escapeHtml(q.prompt)}</div>
-              ${q.code ? `<pre class="mt-1 p-1.5 rounded bg-slate-950 border border-slate-800 font-mono text-[11px] text-sky-300 overflow-x-auto">${escapeHtml(q.code)}</pre>` : ''}
-            </td>
-            <td class="py-2.5 px-3 font-mono ${isCorrect ? 'text-emerald-400' : 'text-rose-400'} font-semibold">${escapeHtml(myAnsText)}</td>
-            <td class="py-2.5 px-3 font-mono text-emerald-300 font-semibold">${escapeHtml(correctText)}</td>
-            <td class="py-2.5 px-3 font-mono whitespace-nowrap">${statusText}</td>
-            <td class="py-2.5 px-3 font-mono text-slate-400">${timeStr}</td>
-          </tr>
-        `);
-      });
-
-      if (rowsToExport.length === 0) {
-        md += `| - | - | - | No questions match the selected filter yet | - | - | - | - | - |\n`;
-        htmlRows.push(`
-          <tr>
-            <td colspan="8" class="py-6 text-center text-slate-400">
-              No questions match this filter yet. Answer some questions above or switch the dropdown to "Entire Sprint".
-            </td>
-          </tr>
-        `);
-      }
-
-      document.getElementById('gemini-markdown-textarea').value = md;
-      document.getElementById('export-html-table-body').innerHTML = htmlRows.join('');
-      document.getElementById('export-summary-pill').textContent = `${rowsToExport.length} Rows Formatted • ${correctCount}/${answeredCount} (${accuracyPct}%)`;
-    }
-
-    function copyGeminiMarkdown() {
-      const textarea = document.getElementById('gemini-markdown-textarea');
-      textarea.select();
-      textarea.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(textarea.value).then(() => {
-        const toast = document.getElementById('copy-toast');
-        const label = document.getElementById('label-copy-gemini');
-        toast.classList.remove('hidden');
-        label.textContent = 'Copied! Paste into Gemini ✓';
-        playHarmonicChime('task');
-        setTimeout(() => {
-          toast.classList.add('hidden');
-          label.textContent = 'Copy Markdown Table for Gemini';
-        }, 3500);
-      });
     }
 
     // ========================================================================
@@ -3028,191 +2779,196 @@
     }
 
     // ========================================================================
-    // GEMINI FLASH API LIVE QUESTION GENERATOR (SCENARIO + GOLF/RUGBY/PLANES)
+    // PERSONALISATION + OPTIONAL GEMINI LOCAL BETA
     // ========================================================================
-    function saveApiKeyLocally(val) {
-      try {
-        localStorage.setItem('baa1118_gemini_api_key', val.trim());
-      } catch (e) {}
+    let selectedBrainHooks = [];
+    let pendingBrainHooks = [];
+    const BRAIN_HOOK_GROUPS = {
+      'Sports': ['Soccer', 'Rugby', 'Golf', 'Formula 1'],
+      'Hobbies': ['Painting', 'Gaming', 'MMA'],
+      'Other interests': ['Planes', 'Ships', 'Trains']
+    };
+    function getBrainHooks() { return selectedBrainHooks.slice(); }
+    function saveBrainHooks() {
+      try { localStorage.setItem('exam_sprint_brain_hooks_v1', JSON.stringify(selectedBrainHooks)); } catch (e) {}
+      updateBrainHookUI();
+      setAiStatus(selectedBrainHooks.length ? 'Saved interests: ' + selectedBrainHooks.join(', ') : 'Select at least one interest to use AI customisation. Your question bank still works.');
     }
-
+    function removeBrainHook(name) { selectedBrainHooks=selectedBrainHooks.filter(x=>x!==name); pendingBrainHooks=selectedBrainHooks.slice(); saveBrainHooks(); }
+    function openBrainHookOptions() {
+      const panel=document.getElementById('brain-hook-options');
+      if(panel?.classList.contains('hidden')) pendingBrainHooks=selectedBrainHooks.slice();
+      renderBrainHookOptions();
+    }
+    function renderBrainHookOptions() {
+      const panel=document.getElementById('brain-hook-options'), input=document.getElementById('brain-hook-search');
+      if(!panel||!input) return;
+      const query=input.value.trim().toLowerCase(); panel.innerHTML='';
+      Object.entries(BRAIN_HOOK_GROUPS).forEach(([group,items])=>{
+        const matches=items.filter(item=>item.toLowerCase().includes(query)); if(!matches.length) return;
+        const heading=document.createElement('div'); heading.className='px-2 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500'; heading.textContent=group; panel.appendChild(heading);
+        matches.forEach(item=>{
+          const button=document.createElement('button'); button.type='button'; button.setAttribute('role','option'); button.setAttribute('aria-selected',String(pendingBrainHooks.includes(item)));
+          button.className='w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 '+(pendingBrainHooks.includes(item)?'text-sky-300':'text-slate-200');
+          button.textContent=(pendingBrainHooks.includes(item)?'✓  ':'+  ')+item;
+          button.onclick=()=>{if(pendingBrainHooks.includes(item)) pendingBrainHooks=pendingBrainHooks.filter(x=>x!==item); else if(pendingBrainHooks.length<3) pendingBrainHooks.push(item); else setAiStatus('Choose up to 3 interests. Remove one before adding another.'); renderBrainHookOptions();}; panel.appendChild(button);
+        });
+      });
+      if(query&&!Object.values(BRAIN_HOOK_GROUPS).flat().some(x=>x.toLowerCase()===query)&&!selectedBrainHooks.some(x=>x.toLowerCase()===query)){
+        const custom=document.createElement('button'); custom.type='button'; custom.className='w-full text-left px-2.5 py-2 mt-1 rounded-lg bg-indigo-500/10 text-indigo-200 text-xs hover:bg-indigo-500/20'; custom.textContent='＋ Add “'+input.value.trim().slice(0,40)+'” as a custom interest'; custom.onclick=addCustomBrainHook; panel.appendChild(custom);
+      }
+      const addButton=document.getElementById('brain-hook-add-selected'); if(addButton){addButton.disabled=pendingBrainHooks.length===0; addButton.textContent=pendingBrainHooks.length?'Add selected ('+pendingBrainHooks.length+')':'Add selected';}
+      panel.classList.remove('hidden');
+    }
+    function addSelectedBrainHooks() {
+      selectedBrainHooks=pendingBrainHooks.slice(0,3);
+      saveBrainHooks();
+      document.getElementById('brain-hook-options')?.classList.add('hidden');
+    }
+    function addCustomBrainHook() {
+      const input=document.getElementById('brain-hook-search'), name=(input?.value||'').trim().slice(0,40);
+      if(!name){setAiStatus('Type an interest in the search box, then choose Add other.');return;}
+      if(selectedBrainHooks.some(x=>x.toLowerCase()===name.toLowerCase())){setAiStatus('That interest is already selected.');return;}
+      if(selectedBrainHooks.length>=3){setAiStatus('Choose up to 3 interests. Remove one before adding another.');return;}
+      selectedBrainHooks.push(name); pendingBrainHooks=selectedBrainHooks.slice(); saveBrainHooks(); if(input) input.value=''; document.getElementById('brain-hook-options')?.classList.add('hidden');
+    }
+    function handleBrainHookKey(event) { if(event.key==='Enter'){event.preventDefault();addCustomBrainHook();} else if(event.key==='Escape') document.getElementById('brain-hook-options')?.classList.add('hidden'); }
+    function updateBrainHookUI() {
+      const chips=document.getElementById('brain-hook-chips'), panel=document.getElementById('brain-hook-options'), requirement=document.getElementById('brain-hook-requirement');
+      if(chips){chips.innerHTML='';selectedBrainHooks.forEach(name=>{const chip=document.createElement('span');chip.className='inline-flex items-center gap-1 rounded-full bg-sky-500/15 border border-sky-500/30 px-2.5 py-1 text-xs text-sky-200';const label=document.createElement('span');label.textContent=name;const remove=document.createElement('button');remove.type='button';remove.setAttribute('aria-label','Remove '+name);remove.className='text-sky-300 hover:text-white';remove.textContent='×';remove.onclick=()=>removeBrainHook(name);chip.append(label,remove);chips.appendChild(chip);});}
+      if(panel&&!panel.classList.contains('hidden')) renderBrainHookOptions();
+      const ready=selectedBrainHooks.length>0; ['btn-reskin-theory','btn-generate-ai-batch'].forEach(id=>{const button=document.getElementById(id);if(button){button.disabled=!ready;button.classList.toggle('opacity-50',!ready);button.title=ready?'':'Choose at least one interest first';}});
+      if(requirement) requirement.textContent=ready?'Selected interests are saved on this device. Choose up to 3.':'Select at least one interest to enable AI customisation. The question bank and sprints work without it.';
+    }
+    function setAiStatus(message) { const el=document.getElementById('ai-gen-status'); if(el) el.textContent=message; }
     function loadSavedAiQuestionsAndKey() {
       try {
-        const savedKey = localStorage.getItem('baa1118_gemini_api_key');
-        if (savedKey) {
-          const inputEl = document.getElementById('gemini-api-key-input');
-          if (inputEl) inputEl.value = savedKey;
-        }
-        const savedAiQs = localStorage.getItem('baa1118_ai_questions_v1');
-        if (savedAiQs) {
-          const parsed = JSON.parse(savedAiQs);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            parsed.forEach(q => {
-              if (!QUESTION_BANK.some(existing => existing.id === q.id)) {
-                QUESTION_BANK.push(q);
-              }
-            });
-            const allBtn = document.getElementById('flt-all');
-            if (allBtn) allBtn.textContent = `All (${QUESTION_BANK.length})`;
-            updateFilterPills();
-          }
-        }
-      } catch (e) {}
-    }
-
-    async function generateNextBatchWithGemini(batchSize = 20) {
-      const apiKey = document.getElementById('gemini-api-key-input').value.trim();
-      const modelId = document.getElementById('gemini-model-select').value;
-      const statusEl = document.getElementById('ai-gen-status');
-      const btnEl = document.getElementById('btn-generate-ai-batch');
-
-      if (!apiKey) {
-        alert('Please paste your free Google AI Studio API key into the top bar first (get one in 30 seconds at aistudio.google.com/apikey)!');
-        document.getElementById('gemini-api-key-input').focus();
-        return;
-      }
-
-      // Grab current missed/flagged questions to guide the next batch
-      const missedOrFlaggedList = QUESTION_BANK.filter(
-        q => (userAnswers[q.id] !== undefined && userAnswers[q.id] !== q.correct) || flaggedQuestions[q.id] || savedWeakIds[q.id]
-      );
-
-      const missedSummary = missedOrFlaggedList
-        .slice(-15)
-        .map(q => `- [Lecture ${q.lecture} • ${q.topic}] ${q.prompt}`)
-        .join('\n');
-
-      const focusContext = missedSummary.length > 0
-        ? `Prioritize generating new variations and deeper traps on these specific topics the student missed or flagged recently:\n${missedSummary}`
-        : typeof activeLectureFilter === 'number'
-        ? `Generate all ${batchSize} questions specifically testing Lecture ${activeLectureFilter} topics and edge cases.`
-        : `Generate a balanced mix of ${batchSize} questions across Lectures 1, 2, 3, 4, and 5 (4 questions per lecture).`;
-
-      const systemPrompt = `You are Damien Dupré, examiner for DCU BAA1118 (Foundations of Programming for Analytics & AI).
-Generate ${batchSize} brand-new, high-yield multiple-choice questions (4 options, 1 correct answer).
-
-CRITICAL FORMAT REQUIREMENT:
-- Make roughly 60% of the questions specific scenario-based code-tracing questions (isAnalogyTheory: false) where the student traces a 2-6 line Python snippet.
-- Make roughly 40% of the questions (at least 1-2 per lecture section) conceptual theory questions (isAnalogyTheory: true) where the student is asked to "Choose the correct statement that explains [Python function/mechanism/trap] through the medium of Golf, Rugby, or Aviation (Planes)" and set analogyTheme to "Golf", "Rugby", or "Aviation".
-
-Strictly restrict all concepts to the BAA1118 Lectures 1–5 syllabus:
-- Lecture 1: Tracebacks (reading bottom-up), SyntaxError vs NameError vs TypeError, case sensitivity, Colab cell execution order [ ], runtime memory vs .ipynb/.py exports.
-- Lecture 2: Assignment snapshots, naming rules, overwriting built-ins (sum, list, max), int/float/str/bool/NoneType, / (always float) vs // vs % vs **, f-strings (:,.2f, :.1%), string immutability (.strip(), .title(), .split()), boolean math (True + True = 2), int("42.5") ValueError trap.
-- Lecture 3: Lists (.append, .insert, .remove, .pop), list.sort() returning None vs sorted(), negative indexing & slicing [start:stop:step] and [::-1], mutability aliasing trap (b = a vs a.copy()), dicts (.get() default vs KeyError, 'in' checks keys), tuple immutability & unpacking, sets (& intersection, - difference), nested list of dicts, CSV/JSON/Excel/Parquet properties.
-- Lecture 4: IndentationError, if/elif/else cut-off ordering trap, falsy values (0, "", [], {}, None) vs truthy [0], for loops, accumulator pattern (+=), AttributeError appending to 0, range(), enumerate(), zip(), while loops, continue vs break on None, list comprehensions.
-- Lecture 5: def, return vs print() returning None trap, positional vs keyword args, default args ordering, local vs global scope, returning multiple values as a tuple, math/random/statistics modules, standard import aliases, ModuleNotFoundError, Colab /content filesystem (!pwd, !ls), Windows backslash \\t path trap, Linux case sensitivity on FileNotFoundError, help() signatures.
-
-${focusContext}`;
-
-      const responseSchema = {
-        type: "ARRAY",
-        items: {
-          type: "OBJECT",
-          properties: {
-            id: { type: "STRING", description: "Unique ID e.g. AI-L3-01" },
-            lecture: { type: "INTEGER", description: "Lecture number 1 to 5" },
-            isAnalogyTheory: { type: "BOOLEAN", description: "True if this is a Golf/Rugby/Aviation conceptual theory question, False if a specific code scenario" },
-            analogyTheme: { type: "STRING", nullable: true, description: "Golf, Rugby, or Aviation if isAnalogyTheory is true" },
-            topic: { type: "STRING", description: "Short concept or trap name" },
-            prompt: { type: "STRING", description: "Question stem" },
-            code: { type: "STRING", nullable: true, description: "2 to 6 line Python snippet, or null if conceptual" },
-            options: {
-              type: "ARRAY",
-              items: { type: "STRING" },
-              description: "Exactly 4 plausible options (do NOT prefix with A., B., C., D.)"
-            },
-            correct: { type: "INTEGER", description: "Index of correct option: 0, 1, 2, or 3" },
-            explanation: { type: "STRING", description: "Clear 1-2 sentence breakdown of why the answer is correct and what the trap is" }
-          },
-          required: ["id", "lecture", "isAnalogyTheory", "topic", "prompt", "options", "correct", "explanation"]
-        }
-      };
-
-      try {
-        btnEl.disabled = true;
-        btnEl.classList.add('opacity-50');
-        const startTime = performance.now();
-        statusEl.textContent = `Generating ${batchSize}Q via ${modelId}... (~12-20s)`;
-
-        const requestBody = {
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts: [{ text: `Generate ${batchSize} new BAA1118 MCQ questions now (blending code scenarios with Golf, Rugby, and Aviation theory questions).` }] }],
-          generationConfig: {
-            temperature: 0.7,
-            responseMimeType: 'application/json',
-            responseSchema: responseSchema
-          }
-        };
-
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${encodeURIComponent(apiKey)}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-          }
-        );
-
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error?.message || `HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        const generatedQuestions = JSON.parse(rawJsonText);
-
-        const batchTimestamp = Date.now().toString().slice(-4);
-        const cleanedQuestions = generatedQuestions.map((q, idx) => ({
-          ...q,
-          id: `AI-L${q.lecture || 1}-${batchTimestamp}-${idx + 1}`,
-          lecture: Math.min(5, Math.max(1, Number(q.lecture) || 1)),
-          options: Array.isArray(q.options) ? q.options.slice(0, 4) : ["Option A", "Option B", "Option C", "Option D"],
-          correct: Math.min(3, Math.max(0, Number(q.correct) || 0)),
-          isAI: true
-        }));
-
-        QUESTION_BANK.push(...cleanedQuestions);
-
-        try {
-          const allAiQuestions = QUESTION_BANK.filter(q => q.isAI);
-          localStorage.setItem('baa1118_ai_questions_v1', JSON.stringify(allAiQuestions));
-        } catch (e) {}
-
-        const allBtn = document.getElementById('flt-all');
-        if (allBtn) allBtn.textContent = `All (${QUESTION_BANK.length})`;
-
-        activeQuestions = cleanedQuestions;
-        activeSprintSize = cleanedQuestions.length;
-        activeLectureFilter = 'ai';
-        currentQIndex = 0;
-        userAnswers = {};
-        flaggedQuestions = {};
-        timeSpentPerQuestion = {};
-        isSprintFinished = false;
-        isTimerPaused = false;
-        totalSprintSeconds = cleanedQuestions.length * SECONDS_PER_QUESTION_TARGET;
-        remainingSprintSeconds = totalSprintSeconds;
-        elapsedSprintSeconds = 0;
-
-        const secsTaken = ((performance.now() - startTime) / 1000).toFixed(1);
-        statusEl.textContent = `Loaded ${cleanedQuestions.length} new AI Qs in ${secsTaken}s ✓`;
-        playHarmonicChime('complete');
+        localStorage.removeItem('baa1118_gemini_api_key');
+        const hooks=JSON.parse(localStorage.getItem('exam_sprint_brain_hooks_v1') || '[]');
+        selectedBrainHooks = Array.isArray(hooks) ? hooks.slice(0,3).filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()) : [];
+        updateBrainHookUI();
+        const savedAiQs=JSON.parse(localStorage.getItem('baa1118_ai_questions_v1') || '[]');
+        if(Array.isArray(savedAiQs)) savedAiQs.forEach(q=>{ if(q && q.id && !QUESTION_BANK.some(existing=>existing.id===q.id)) QUESTION_BANK.push(q); });
+        const savedReskins=JSON.parse(localStorage.getItem('exam_sprint_reskins_v1') || '{}');
+        if(savedReskins && typeof savedReskins==='object') QUESTION_BANK.forEach(q=>{ const x=savedReskins[q.id]; if(x && q.isAnalogyTheory && Array.isArray(x.options) && x.options.length===4) { q.prompt=x.prompt; q.options=x.options; q.explanation=x.explanation || q.explanation; q.analogyTheme=x.analogyTheme || q.analogyTheme; q.isReskinned=true; } });
+        const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
         updateFilterPills();
-        renderAll();
-      } catch (err) {
-        console.error('Gemini API Error:', err);
-        statusEl.textContent = `Error: ${err.message}`;
-        alert(`Gemini API Error: ${err.message}\n\nTip: If a model name hits a quota or version error on your key, switch the dropdown to gemini-2.5-flash or gemini-2.5-flash-lite.`);
-      } finally {
-        btnEl.disabled = false;
-        btnEl.classList.remove('opacity-50');
+      } catch(e) { setAiStatus('Saved AI customisation could not be loaded. The built-in question bank is ready.'); }
+    }
+    async function callGemini(prompt, schema, modelId) {
+      const requestBody={systemInstruction:{parts:[{text:prompt}]},contents:[{role:'user',parts:[{text:'Return the requested JSON now.'}]}],generationConfig:{responseMimeType:'application/json',responseSchema:schema}};
+      const endpoint='https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
+      const maxRetries=3;
+      for(let attempt=0;attempt<=maxRetries;attempt++) {
+        let response;
+        try {
+          response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:requestBody})});
+        } catch(networkError) {
+          if(attempt<maxRetries) {
+            const delay=1000*Math.pow(2,attempt)+Math.floor(Math.random()*350);
+            setAiStatus('Could not reach the Gemini Worker. Retrying in '+(delay/1000).toFixed(1)+'s ('+(attempt+1)+'/'+maxRetries+')…');
+            await new Promise(resolve=>setTimeout(resolve,delay));
+            continue;
+          }
+          throw new Error('Could not reach the Gemini Worker after '+maxRetries+' retries. Check your connection and try again.');
+        }
+        let data={};
+        try { data=await response.json(); } catch(parseError) {
+          if(response.ok) throw new Error('The Gemini Worker returned an unreadable response. Your current questions are unchanged.');
+        }
+        if(response.ok) {
+          const raw=data.candidates?.[0]?.content?.parts?.filter(part=>typeof part.text==='string'&&!part.thought).map(part=>part.text).join('');
+          if(!raw) throw new Error(data.error?.message||'The Gemini Worker returned no question data. Your current questions are unchanged.');
+          try { return JSON.parse(raw); } catch(parseError) { throw new Error('Gemini responded, but its JSON could not be read. Your current questions are unchanged.'); }
+        }
+        const message=data.error?.message||response.statusText||'No error details were returned.';
+        const transient=[408,429,500,502,503,504].includes(response.status);
+        if(transient&&attempt<maxRetries) {
+          const delay=1000*Math.pow(2,attempt)+Math.floor(Math.random()*350);
+          setAiStatus('The Gemini Worker is temporarily unavailable ('+response.status+'). Retrying in '+(delay/1000).toFixed(1)+'s ('+(attempt+1)+'/'+maxRetries+')…');
+          await new Promise(resolve=>setTimeout(resolve,delay));
+          continue;
+        }
+        throw new Error('Gemini Worker returned HTTP '+response.status+(data.error?.status?' '+data.error.status:'')+' after '+(transient?maxRetries+' retries':'')+'. Details: '+message+' Your existing questions remain available.');
       }
+    }
+    async function reskinTheoryQuestions() {
+      const button=document.getElementById('btn-reskin-theory');
+      const originals=QUESTION_BANK.filter(q=>q.isAnalogyTheory&&!q.isAI);
+      const hooks=getBrainHooks();
+      if(!hooks.length){setAiStatus('Select at least one interest before customising theory questions. Existing questions remain ready.');return;}
+      if(!originals.length){setAiStatus('No built-in theory questions were found; the original bank remains available.');return;}
+      button.disabled=true;button.classList.add('opacity-50');
+      let completed=0;
+      const batchSize=8;
+      try {
+        for(let offset=0;offset<originals.length;offset+=batchSize){
+          const batch=originals.slice(offset,offset+batchSize);
+          setAiStatus('Rewriting theory questions '+(offset+1)+'–'+(offset+batch.length)+' of '+originals.length+'…');
+          const input=batch.map(q=>({id:q.id,lecture:q.lecture,topic:q.topic,prompt:q.prompt,options:q.options,correct:q.correct,explanation:q.explanation}));
+          const schema={type:'ARRAY',items:{type:'OBJECT',properties:{id:{type:'STRING'},prompt:{type:'STRING'},options:{type:'ARRAY',items:{type:'STRING'}},explanation:{type:'STRING'},analogyTheme:{type:'STRING'}},required:['id','prompt','options','explanation','analogyTheme']}};
+          const system='Rewrite these BAA1118 Python theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact Python concept, lecture, topic, difficulty, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the Python concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
+          const result=await callGemini(system,schema,GEMINI_MODEL_ID);
+          if(!Array.isArray(result)||result.length!==batch.length)throw new Error('Gemini returned an incomplete reskin for questions '+(offset+1)+'–'+(offset+batch.length)+'.');
+          const byId=new Map(result.map(item=>[item.id,item]));
+          const replacements={};
+          for(const old of batch){
+            const item=byId.get(old.id);
+            if(!item||typeof item.prompt!=='string'||!Array.isArray(item.options)||item.options.length!==4||!item.options.every(option=>typeof option==='string')||typeof item.explanation!=='string')throw new Error('Gemini returned an invalid reskin for '+old.id+'.');
+            replacements[old.id]={prompt:item.prompt,options:item.options,explanation:item.explanation,analogyTheme:item.analogyTheme};
+          }
+          QUESTION_BANK.forEach(q=>{const replacement=replacements[q.id];if(replacement){q.prompt=replacement.prompt;q.options=replacement.options;q.explanation=replacement.explanation;q.analogyTheme=replacement.analogyTheme;q.isReskinned=true;}});
+          const saved=JSON.parse(localStorage.getItem('exam_sprint_reskins_v1')||'{}');
+          localStorage.setItem('exam_sprint_reskins_v1',JSON.stringify(Object.assign(saved,replacements)));
+          completed+=batch.length;
+          renderAll();
+        }
+        setAiStatus('Reskinned all '+completed+' theory questions around '+hooks.join(', ')+'. Concepts and correct answer positions were retained.');
+        updateFilterPills();renderAll();
+      } catch(err) {
+        console.error('Theory reskin error:',err);
+        const detail=err.message||'AI customisation failed.';
+        setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+' Your existing questions remain available.');
+      } finally {button.disabled=false;button.classList.remove('opacity-50');}
+    }
+    async function generateNextBatchWithGemini(batchSize=10) {
+      const button=document.getElementById('btn-generate-ai-batch');
+      const modelId=GEMINI_MODEL_ID;
+      const hooks=getBrainHooks();
+      if(!hooks.length) { setAiStatus('Select at least one interest before generating questions. Your built-in question bank remains ready.'); return; }
+      const weak=QUESTION_BANK.filter(q=>(userAnswers[q.id]!==undefined && userAnswers[q.id]!==q.correct)||flaggedQuestions[q.id]||savedWeakIds[q.id]);
+      const focus=weak.length ? `Focus especially on these weak spots: ${weak.slice(-12).map(q=>`L${q.lecture} ${q.topic}: ${q.prompt}`).join('\n')}` : `Create a balanced personalised weak-spot sprint across BAA1118 Lectures 1–5.`;
+      const hookText=hooks.length ? hooks.join(', ') : 'no interests selected; use clear everyday examples';
+      const system=`You are an accurate DCU BAA1118 exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
+      const schema={type:'ARRAY',items:{type:'OBJECT',properties:{lecture:{type:'INTEGER'},isAnalogyTheory:{type:'BOOLEAN'},analogyTheme:{type:'STRING',nullable:true},topic:{type:'STRING'},prompt:{type:'STRING'},code:{type:'STRING',nullable:true},options:{type:'ARRAY',items:{type:'STRING'}},correct:{type:'INTEGER'},explanation:{type:'STRING'}},required:['lecture','isAnalogyTheory','topic','prompt','options','correct','explanation']}};
+      button.disabled=true; button.classList.add('opacity-50');
+      try {
+        setAiStatus(`Creating a personalised ${batchSize}-question Exam Sprint…`);
+        const generated=await callGemini(system,schema,modelId);
+        if(!Array.isArray(generated)||!generated.length) throw new Error('Gemini returned no questions. Your current sprint is unchanged.');
+        const stamp=Date.now().toString().slice(-5);
+        const cleaned=generated.slice(0,batchSize).filter(q=>q && Array.isArray(q.options)&&q.options.length===4 && Number(q.correct)>=0 && Number(q.correct)<4).map((q,i)=>({...q,id:`AI-${stamp}-${i+1}`,lecture:Math.min(5,Math.max(1,Number(q.lecture)||1)),isAI:true}));
+        if(!cleaned.length) throw new Error('Gemini returned unusable questions. Your current sprint is unchanged.');
+        QUESTION_BANK.push(...cleaned);
+        try { localStorage.setItem('baa1118_ai_questions_v1',JSON.stringify(QUESTION_BANK.filter(q=>q.isAI))); } catch(e) {}
+        const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
+        activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; isTimerPaused=false; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
+        setAiStatus(`Loaded ${cleaned.length} personalised questions with the Gemini Worker. Start your Exam Sprint when ready.`); playHarmonicChime('complete'); updateFilterPills(); renderAll();
+      } catch(err) { console.error('Gemini API Error:',err); setAiStatus(err.message || 'AI generation failed. Your current question bank remains ready.'); }
+      finally { button.disabled=false; button.classList.remove('opacity-50'); }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       initEngine();
       loadSavedAiQuestionsAndKey();
+      document.addEventListener('click', (event) => {
+        const picker = document.getElementById('brain-hook-picker');
+        const panel = document.getElementById('brain-hook-options');
+        if (picker && panel && !picker.contains(event.target)) panel.classList.add('hidden');
+        const options = document.getElementById('options-menu');
+        if (options && !options.contains(event.target)) options.open = false;
+      });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { const options=document.getElementById('options-menu'); if(options) options.open=false; } });
     });
   </script>
 </body>
