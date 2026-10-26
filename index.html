@@ -191,7 +191,7 @@
   </header>
 
   <!-- FULL-WIDTH SCOPE CONTROLS -->
-  <section class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 py-3">
+  <details id="study-options" class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Study options <span class="ml-2 text-xs font-normal text-slate-400">Question scope, order, and view</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
       <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question scope</span>
         <select id="scope-filter-select" onchange="applyScopeFilter(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
@@ -205,18 +205,18 @@
         <select id="view-select" onchange="setQuestionView(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400"><option value="single">Single card focus</option><option value="all">All questions list</option></select>
       </label>
     </div>
-  </section>
-  <section class="w-full bg-slate-900/40 border-b border-slate-800/80 px-4 py-3" aria-label="Custom sprint settings">
+  </details>
+  <details id="custom-sprint-settings" class="w-full bg-slate-900/40 border-b border-slate-800/80 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Set sprint length <span class="ml-2 text-xs font-normal text-slate-400">Optional · adjust time and question count</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto flex flex-wrap items-end gap-3">
       <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
       <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
       <button type="button" onclick="applyCustomSprintSettings()" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold">Apply custom sprint</button>
       <span id="custom-sprint-status" class="text-xs text-slate-400" role="status">Set the time and question count, then apply.</span>
     </div>
-  </section>
+  </details>
 
   <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
-  <section class="bg-indigo-950/30 border-b border-indigo-500/30 px-4 py-3">
+  <details id="ai-personalisation" class="bg-indigo-950/30 border-b border-indigo-500/30 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden">Personalise questions <span class="ml-2 text-xs font-normal text-slate-400">Optional · search interests and request AI help</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto space-y-3">
       <div class="space-y-2">
         <div><h2 class="text-sm font-bold text-indigo-200">🧠 Make the questions yours</h2><p class="text-xs text-slate-400">Choose at least one interest. Select up to 3, or add your own.</p></div>
@@ -237,7 +237,7 @@
       </div>
       <p class="text-xs text-slate-500">AI personalisation uses the configured beta Worker. If it is unavailable, your built-in question bank and sprints remain ready.</p>
     </div>
-  </section>
+  </details>
 
   <!-- MAIN WORKSPACE -->
   <main class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 flex flex-col gap-4 study-workspace">
@@ -384,7 +384,7 @@
     </section>
 
     <!-- 2. QUESTION NAVIGATOR PILL MATRIX -->
-    <section id="question-navigator" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+    <details id="question-navigator" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg"><summary class="cursor-pointer select-none list-none text-sm font-semibold text-slate-200 [&::-webkit-details-marker]:hidden">Jump to a question <span class="ml-2 text-xs font-normal text-slate-400">Open the sprint map</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
       <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
         <div class="flex items-center gap-2">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -401,7 +401,7 @@
       <div id="question-nav-grid" class="flex flex-wrap gap-1.5">
         <!-- Populated dynamically -->
       </div>
-    </section>
+    </details>
 
     <!-- 3. INTERACTIVE QUESTION DECK (SINGLE FOCUS OR FULL LIST) -->
     <section id="question-deck-container" class="space-y-4" aria-label="Sprint questions">
