@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onTurnstileLoad" defer></script>
 
   <script>
     tailwind.config = {
@@ -163,7 +163,7 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
           <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. Complete the security check before AI requests.</span>
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
+          <div id="turnstile-widget" class="shrink-0" aria-label="Cloudflare security check"></div>
           <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🔥 Reskin My Theory Questions</button>
           <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold text-xs">✨ Generate My Next Weak-Spot Sprint</button>
         </div>
@@ -2859,6 +2859,17 @@
     }
     let turnstileToken = '';
     let turnstileTokenResolver = null;
+    let turnstileWidgetId = null;
+    window.onTurnstileLoad = () => {
+      turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
+        sitekey: '0x4AAAAAAFnDFAKMEwULwt1q',
+        action: 'generate',
+        theme: 'dark',
+        callback: window.onTurnstileSuccess,
+        'expired-callback': window.onTurnstileExpired,
+        'error-callback': window.onTurnstileError
+      });
+    };
     window.onTurnstileSuccess = token => {
       if (turnstileTokenResolver) {
         const resolve = turnstileTokenResolver;
@@ -2875,7 +2886,7 @@
     };
     function resetTurnstileWidget() {
       turnstileToken = '';
-      if (window.turnstile) window.turnstile.reset();
+      if (window.turnstile && turnstileWidgetId) window.turnstile.reset(turnstileWidgetId);
     }
     function getTurnstileToken() {
       if (turnstileToken) {
