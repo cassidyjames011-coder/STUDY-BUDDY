@@ -1,7 +1,6 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "floral-wood-c42bbaa1118-gemini-proxy",
-  "main": "src/index.js",
+  "main": "worker.js",
   "compatibility_date": "2026-10-26",
   "durable_objects": {
     "bindings": [
