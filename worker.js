@@ -1,8 +1,9 @@
 import { DurableObject } from "cloudflare:workers";
 
 const MODEL = "gemini-3.5-flash-lite";
-const MAX_BODY_BYTES = 100_000;
 const DAILY_LIMIT = 100;
+const MAX_BODY_BYTES = 100_000;
+const ALLOWED_HOSTNAME = "cassidyjames011-coder.github.io";
 
 function json(data, status, origin) {
   return new Response(JSON.stringify(data), {
@@ -20,7 +21,7 @@ export class DailyQuota extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
 
-    this.ctx.storage.sql.exec(`
+    ctx.storage.sql.exec(`
       CREATE TABLE IF NOT EXISTS daily_quota (
         day TEXT PRIMARY KEY,
         count INTEGER NOT NULL
@@ -33,7 +34,10 @@ export class DailyQuota extends DurableObject {
 
     return this.ctx.storage.transactionSync(() => {
       const row = this.ctx.storage.sql
-        .exec("SELECT count FROM daily_quota WHERE day = ?", day)
+        .exec(
+          "SELECT count FROM daily_quota WHERE day = ?",
+          day
+        )
         .toArray()[0];
 
       const count = row ? row.count : 0;
@@ -45,7 +49,8 @@ export class DailyQuota extends DurableObject {
       this.ctx.storage.sql.exec(
         `INSERT INTO daily_quota (day, count)
          VALUES (?, 1)
-         ON CONFLICT(day) DO UPDATE SET count = count + 1`,
+         ON CONFLICT(day)
+         DO UPDATE SET count = count + 1`,
         day
       );
 
@@ -92,26 +97,43 @@ export default {
     }
 
     if (request.method !== "POST") {
-      return json({ error: "Method not allowed." }, 405, allowedOrigin);
+      return json(
+        { error: "Method not allowed." },
+        405,
+        allowedOrigin
+      );
     }
 
-    if (!env.GEMINI_API_KEY || !env.TURNSTILE_SECRET_KEY) {
-      return json({ error: "Worker secrets are not configured." }, 500, allowedOrigin);
+    if (
+      !env.GEMINI_API_KEY ||
+      !env.TURNSTILE_SECRET_KEY ||
+      !env.DAILY_QUOTA ||
+      !env.RATE_LIMITER
+    ) {
+      return json(
+        { error: "Worker secrets or bindings are missing." },
+        500,
+        allowedOrigin
+      );
     }
 
-    if (!env.DAILY_QUOTA || !env.RATE_LIMITER) {
-      return json({ error: "Worker bindings are not configured." }, 500, allowedOrigin);
+    if (
+      !(request.headers.get("Content-Type") || "")
+        .toLowerCase()
+        .includes("application/json")
+    ) {
+      return json(
+        { error: "Content-Type must be application/json." },
+        415,
+        allowedOrigin
+      );
     }
 
-    const contentType = request.headers.get("Content-Type") || "";
+    const contentLength = Number(
+      request.headers.get("Content-Length") || 0
+    );
 
-    if (!contentType.toLowerCase().includes("application/json")) {
-      return json({ error: "Content-Type must be application/json." }, 415, allowedOrigin);
-    }
-
-    const length = Number(request.headers.get("Content-Length") || 0);
-
-    if (length > MAX_BODY_BYTES) {
+    if (contentLength > MAX_BODY_BYTES) {
       return json({ error: "Request is too large." }, 413, allowedOrigin);
     }
 
@@ -132,15 +154,24 @@ export default {
     const token = payload?.turnstileToken;
     const body = payload?.body;
 
-    if (typeof token !== "string" || token.length < 1 || token.length > 2048) {
-      return json({ error: "Please complete the security check." }, 400, allowedOrigin);
+    if (
+      typeof token !== "string" ||
+      token.length === 0 ||
+      token.length > 2048
+    ) {
+      return json(
+        { error: "Please complete the security check." },
+        400,
+        allowedOrigin
+      );
     }
 
     if (
       !body ||
       typeof body !== "object" ||
       !Array.isArray(body.contents) ||
-      body.contents.length === 0
+      body.contents.length === 0 ||
+      body.contents.length > 100
     ) {
       return json({ error: "Invalid Gemini request." }, 400, allowedOrigin);
     }
@@ -151,37 +182,55 @@ export default {
       .filter(Boolean);
 
     if (!approvedModels.includes(MODEL)) {
-      return json({ error: "The configured model is not approved." }, 500, allowedOrigin);
+      return json(
+        { error: "The configured model is not approved." },
+        500,
+        allowedOrigin
+      );
     }
 
-    // Reject unknown top-level Gemini fields rather than forwarding arbitrary input.
     const permittedFields = new Set([
       "contents",
       "systemInstruction",
       "generationConfig",
       "safetySettings",
       "tools",
-      "toolConfig"
+      "toolConfig",
+      "responseSchema"
     ]);
 
     if (Object.keys(body).some((key) => !permittedFields.has(key))) {
-      return json({ error: "Unsupported request fields." }, 400, allowedOrigin);
+      return json(
+        { error: "Unsupported request fields." },
+        400,
+        allowedOrigin
+      );
     }
 
-    if (body.contents.length > 100) {
-      return json({ error: "Too many content items." }, 400, allowedOrigin);
-    }
+    // Apply burst rate limiting.
+    let rate;
 
-    // Approximate burst protection. Cloudflare rate limits are not a strict global cap.
-    const rate = await env.RATE_LIMITER.limit({
-      key: "exam-study-app"
-    });
+    try {
+      rate = await env.RATE_LIMITER.limit({
+        key: "exam-study-app"
+      });
+    } catch {
+      return json(
+        { error: "Rate-limit service unavailable." },
+        503,
+        allowedOrigin
+      );
+    }
 
     if (!rate.success) {
-      return json({ error: "Too many requests. Please wait a minute." }, 429, allowedOrigin);
+      return json(
+        { error: "Too many requests. Please wait a minute." },
+        429,
+        allowedOrigin
+      );
     }
 
-    // Verify the Turnstile token with Cloudflare.
+    // Verify Cloudflare Turnstile.
     let verification;
 
     try {
@@ -189,7 +238,9 @@ export default {
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
         {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
           body: new URLSearchParams({
             secret: env.TURNSTILE_SECRET_KEY,
             response: token
@@ -198,24 +249,35 @@ export default {
       );
 
       if (!verifyResponse.ok) {
-        return json({ error: "Security verification is temporarily unavailable." }, 502, allowedOrigin);
+        return json(
+          { error: "Security verification is unavailable." },
+          502,
+          allowedOrigin
+        );
       }
 
       verification = await verifyResponse.json();
     } catch {
-      return json({ error: "Security verification is temporarily unavailable." }, 502, allowedOrigin);
+      return json(
+        { error: "Security verification is unavailable." },
+        502,
+        allowedOrigin
+      );
     }
 
     if (
       !verification.success ||
-      verification.hostname !== "cassidyjames011-coder.github.io" ||
+      verification.hostname !== ALLOWED_HOSTNAME ||
       verification.action !== "generate"
     ) {
-      return json({ error: "Security verification failed. Please try again." }, 403, allowedOrigin);
+      return json(
+        { error: "Security verification failed. Please try again." },
+        403,
+        allowedOrigin
+      );
     }
 
-    // Reserve a daily request before calling Gemini.
-    // Failed upstream attempts still count toward the daily cap.
+    // Reserve one request against the shared daily quota.
     const quotaId = env.DAILY_QUOTA.idFromName("global-daily-quota");
     const quota = env.DAILY_QUOTA.get(quotaId);
 
@@ -224,13 +286,22 @@ export default {
     try {
       reservation = await quota.reserve();
     } catch {
-      return json({ error: "Quota service is temporarily unavailable." }, 503, allowedOrigin);
+      return json(
+        { error: "Daily quota service is unavailable." },
+        503,
+        allowedOrigin
+      );
     }
 
     if (!reservation.allowed) {
-      return json({ error: "The daily request limit has been reached. Try again tomorrow." }, 429, allowedOrigin);
+      return json(
+        { error: "The daily request limit has been reached. Try again tomorrow." },
+        429,
+        allowedOrigin
+      );
     }
 
+    // Construct a restricted Gemini request.
     const upstreamBody = {
       contents: body.contents
     };
@@ -245,6 +316,15 @@ export default {
       if (body[field] !== undefined) {
         upstreamBody[field] = body[field];
       }
+    }
+
+    // Support apps that send responseSchema as a separate field.
+    if (body.responseSchema !== undefined) {
+      upstreamBody.generationConfig = {
+        ...(upstreamBody.generationConfig || {}),
+        responseMimeType: "application/json",
+        responseSchema: body.responseSchema
+      };
     }
 
     try {
@@ -265,7 +345,8 @@ export default {
       return new Response(result, {
         status: upstream.status,
         headers: {
-          "Content-Type": upstream.headers.get("Content-Type") || "application/json",
+          "Content-Type":
+            upstream.headers.get("Content-Type") || "application/json",
           "Access-Control-Allow-Origin": allowedOrigin,
           "Vary": "Origin",
           "Cache-Control": "no-store",
@@ -273,7 +354,11 @@ export default {
         }
       });
     } catch {
-      return json({ error: "Gemini is temporarily unavailable. Please try again." }, 502, allowedOrigin);
+      return json(
+        { error: "Gemini is temporarily unavailable." },
+        502,
+        allowedOrigin
+      );
     }
   }
 };
