@@ -17,9 +17,10 @@
       const state = { token: '', resolver: null };
       window.onTurnstileSuccess = token => {
         if (state.resolver) {
-          const resolve = state.resolver;
+          const pending = state.resolver;
           state.resolver = null;
-          resolve(token);
+          clearTimeout(pending.timeout);
+          pending.resolve(token);
         } else {
           state.token = token;
         }
@@ -29,6 +30,12 @@
         state.token = '';
         const status = document.getElementById('ai-gen-status');
         if (status) status.textContent = 'Security verification had a problem. Please retry the check.';
+        if (state.resolver) {
+          const pending = state.resolver;
+          state.resolver = null;
+          clearTimeout(pending.timeout);
+          pending.reject(new Error('Cloudflare security verification failed. Please retry.'));
+        }
       };
       window.resetTurnstileWidget = () => {
         state.token = '';
@@ -42,15 +49,23 @@
         }
         const status = document.getElementById('ai-gen-status');
         if (status) status.textContent = 'Complete the Cloudflare security check to continue…';
+        if (!window.turnstile) {
+          return Promise.reject(new Error('Cloudflare security check did not load. Refresh the page and try again.'));
+        }
         return new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            state.resolver = null;
+          const pending = { resolve, reject, timeout: null };
+          pending.timeout = setTimeout(() => {
+            if (state.resolver === pending) state.resolver = null;
             reject(new Error('Security check timed out. Complete the Cloudflare check and try again.'));
           }, 120000);
-          state.resolver = token => {
-            clearTimeout(timeout);
-            resolve(token);
-          };
+          state.resolver = pending;
+          try {
+            window.turnstile.execute('.cf-turnstile');
+          } catch (error) {
+            clearTimeout(pending.timeout);
+            state.resolver = null;
+            reject(new Error('Cloudflare security check could not start. Refresh the page and try again.'));
+          }
         });
       };
     })();
@@ -206,7 +221,7 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
           <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. Security verification runs automatically when AI is requested.</span>
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-execution="execute" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
           <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🔥 Reskin My Theory Questions</button>
           <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold text-xs">✨ Generate My Next Weak-Spot Sprint</button>
         </div>
