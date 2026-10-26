@@ -2137,7 +2137,8 @@
         flaggedQuestions = Object.fromEntries(Object.entries(saved.flaggedQuestions || {}).filter(([id, value]) => validIds.has(id) && value === true));
         timeSpentPerQuestion = Object.fromEntries(Object.entries(saved.timeSpentPerQuestion || {}).filter(([id, value]) => validIds.has(id) && Number.isFinite(value) && value >= 0));
         totalSprintSeconds = Math.min(5400, Math.max(60, Number(saved.totalSprintSeconds) || activeSprintMinutes * 60));
-        remainingSprintSeconds = Math.min(totalSprintSeconds, Math.max(0, Number(saved.remainingSprintSeconds) || 0));
+        const savedRemaining = Number(saved.remainingSprintSeconds);
+        remainingSprintSeconds = Math.min(totalSprintSeconds, Math.max(0, Number.isFinite(savedRemaining) ? savedRemaining : totalSprintSeconds));
         elapsedSprintSeconds = Math.max(0, Number(saved.elapsedSprintSeconds) || 0);
         isSprintFinished = !!saved.isSprintFinished || remainingSprintSeconds === 0;
         hasSprintStarted = !!saved.hasSprintStarted || Object.keys(userAnswers).length > 0 || isSprintFinished;
@@ -2318,6 +2319,7 @@
       isSingleCardView = value !== 'all';
       const label = document.getElementById('label-layout'); if (label) label.textContent = isSingleCardView ? 'View: Single Card Focus' : 'View: All Questions List';
       renderQuestionDeck();
+      persistSprintState();
     }
     function toggleShuffleOrder() {
       isShuffled = !isShuffled;
@@ -2484,7 +2486,7 @@
         button.classList.toggle('opacity-60', isSprintFinished);
       }
       if (icon) icon.setAttribute('data-lucide', isTimerPaused || isSprintFinished ? 'play' : 'pause');
-      if (status) status.textContent = isSprintFinished ? 'Run complete' : (!hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Timer paused' : getPaceTargetSeconds().toFixed(1) + 's / question');
+      if (status) status.textContent = isSprintFinished ? 'Run complete' : (!hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Saved on this device · resume when ready' : getPaceTargetSeconds().toFixed(1) + 's / question');
       if (window.lucide) lucide.createIcons();
       persistSprintState();
     }
