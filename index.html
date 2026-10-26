@@ -205,8 +205,8 @@
       </div>
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
-          <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. Complete the security check before AI requests.</span>
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
+          <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. Security verification runs automatically when AI is requested.</span>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
           <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🔥 Reskin My Theory Questions</button>
           <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold text-xs">✨ Generate My Next Weak-Spot Sprint</button>
         </div>
