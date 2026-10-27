@@ -160,6 +160,9 @@
     #question-deck-container { grid-area:focus; min-width:0; }
     #telemetry-dashboard { grid-area:insights; grid-template-columns:minmax(0,1fr); align-content:start; min-width:0; }
     #question-navigator { grid-area:navigator; min-width:0; }
+    .telemetry-panel > summary:hover { background:#1e293b; }
+    .telemetry-panel > summary:focus-visible { outline:2px solid #38bdf8; outline-offset:3px; }
+    .telemetry-panel[open] > summary .telemetry-chevron { transform:rotate(180deg); }
     .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
     @media (max-width:1100px) {
       #study-layout { grid-template-columns:minmax(17rem,21rem) minmax(0,1fr); }
@@ -304,12 +307,12 @@
     <section id="telemetry-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       
       <!-- CARD 1: SPRINT COUNTDOWN TIMER + RADIAL RING -->
-      <div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <details id="sprint-timer-panel" open class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-sky-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="timer" class="w-4 h-4"></i> Sprint Timer</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
+        <div class="telemetry-body pt-2">
         <div class="flex items-start justify-between gap-2">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <i data-lucide="timer" class="w-4 h-4"></i> Sprint Timer
-            </span>
+            
             <p id="timer-status-sub" class="text-xs text-slate-400 mt-0.5">Ready when you are</p>
           </div>
           <div class="flex items-center gap-1">
@@ -347,14 +350,15 @@
           </div>
         </div>
       </div>
+      </details>
 
       <!-- CARD 2: PER-QUESTION PACE TELEMETRY (VS 36S TARGET) -->
-      <div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <details id="question-pace-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="gauge" class="w-4 h-4"></i> Question Pace</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
+        <div class="telemetry-body pt-2">
         <div class="flex items-start justify-between gap-2">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <i data-lucide="gauge" class="w-4 h-4"></i> Question Pace
-            </span>
+            
             <p class="text-xs text-slate-400 mt-0.5">Time on active question vs 36s cap</p>
           </div>
           <span id="badge-pace-status" class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -383,14 +387,15 @@
           <span id="metric-projected-100q" class="font-mono font-bold text-sky-300">-- mins (Target &le;60m)</span>
         </div>
       </div>
+      </details>
 
       <!-- CARD 3: LIVE ACCURACY & SCORE TELEMETRY -->
-      <div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <details id="accuracy-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-emerald-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Live Accuracy</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
+        <div class="telemetry-body pt-2">
         <div class="flex items-start justify-between gap-2">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-4 h-4"></i> Live Accuracy
-            </span>
+            
             <p class="text-xs text-slate-400 mt-0.5" id="score-mode-subtitle">Real-time grading telemetry</p>
           </div>
           <span id="badge-flagged-count" class="px-2 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -419,26 +424,29 @@
           </div>
         </div>
       </div>
+      </details>
 
       <!-- CARD 4: DOCUMENT SOURCE BREAKDOWN -->
-      <div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <details id="source-breakdown-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-indigo-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="files" class="w-4 h-4"></i> Source Breakdown</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
+        <div class="telemetry-body pt-2">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-            <i data-lucide="files" class="w-4 h-4"></i> Source Breakdown
-          </span>
+          
           <span class="text-[11px] font-mono text-slate-400">By document</span>
         </div>
 
         <div id="source-mini-bars" class="space-y-1.5 my-1 text-[11px]">
           <!-- Populated dynamically by JS -->
         </div>
+      </div>
+      </details>
+
+      
 
         <button id="btn-finish-sprint" onclick="finishAndGradeSprint()" class="hidden w-full mt-2 min-h-11 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200 font-bold text-sm transition flex items-center justify-center gap-1.5">
           <i data-lucide="flag" class="w-4 h-4"></i>
           <span>Finish sprint early</span>
         </button>
-      </div>
-
     </section>
 
     <!-- 2. QUESTION NAVIGATOR PILL MATRIX -->
@@ -3313,12 +3321,40 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       finally { button.disabled=false; button.classList.remove('opacity-50'); }
     }
 
+    // Make room for a newly opened setup section while keeping that section open.
+    function initSetupPanelSizing() {
+      const setup = document.getElementById('study-setup');
+      const panels = Array.from(setup.querySelectorAll(':scope > details'));
+      let lastOpened = null;
+      panels.forEach(panel => panel.addEventListener('toggle', () => {
+        if (!panel.open) return;
+        lastOpened = panel;
+        requestAnimationFrame(() => {
+          if (lastOpened !== panel || !panel.open || window.matchMedia('(max-width:760px)').matches) return;
+          const expandedHeight = item => item.offsetHeight - item.querySelector('summary').offsetHeight;
+          const others = panels.filter(other => other !== panel && other.open)
+            .sort((left, right) => expandedHeight(right) - expandedHeight(left));
+          while (setup.scrollHeight > setup.clientHeight + 2 && others.length) {
+            others.shift().open = false;
+          }
+          // A section that overflows on its own remains scrollable.
+          setup.scrollTop = 0;
+          const setupBounds = setup.getBoundingClientRect();
+          const headingBounds = panel.querySelector('summary').getBoundingClientRect();
+          if (headingBounds.bottom > setupBounds.bottom) {
+            setup.scrollTop += headingBounds.bottom - setupBounds.bottom;
+          }
+        });
+      }));
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       initEngine();
       loadSavedAiQuestionsAndKey();
       restoreSprintState();
       isSprintStateReady = true;
       renderAll();
+      initSetupPanelSizing();
       document.addEventListener('click', (event) => {
         const picker = document.getElementById('brain-hook-picker');
         const panel = document.getElementById('brain-hook-options');
