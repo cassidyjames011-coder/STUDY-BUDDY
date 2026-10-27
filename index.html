@@ -203,6 +203,63 @@
 }
 @media(max-width:760px){.brand-mark{width:28px;height:28px}.brand-mark svg{width:100%;height:100%}}
 
+
+/* Source browsing uses deliberate two-card pages instead of a vertical source list. */
+.sprint-settings input{text-align:center;padding-left:8px!important;padding-right:8px!important;appearance:textfield;-moz-appearance:textfield}
+.sprint-settings input::-webkit-inner-spin-button,.sprint-settings input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.preferences>summary{border-radius:8px;background:var(--surface)}
+.preferences>summary svg{width:18px;height:18px}
+.source-carousel{position:relative;margin-top:12px;padding:0 19px;min-width:0}
+.source-carousel-window{overflow:hidden;min-width:0}
+#source-carousel-track{display:flex;transition:transform .22s ease;align-items:stretch}
+.source-carousel-page{flex:0 0 100%;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.source-carousel-page:has(>.source-card:only-child){grid-template-columns:1fr}
+.source-card{position:relative;min-width:0;min-height:115px;border:1px solid #786283;border-radius:8px;padding:12px 9px 10px;background:#3a2547}
+.source-card-kind{display:block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#c7b7d0;padding-right:13px}
+.source-card-title{font-size:11px;line-height:1.5;font-weight:500;margin:9px 0 7px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.source-card-meta{font-size:9px;line-height:1.4;color:#c8b9d1}
+.source-card-remove{position:absolute;right:3px;top:3px;width:25px;height:25px;background:none;color:#dfd1e6;border:0;border-radius:4px;font-size:16px}
+.source-arrow{position:absolute;top:50%;transform:translateY(-50%);height:34px;width:25px;border:1px solid #947e9c;background:#50375f;color:var(--surface);border-radius:6px;font-size:23px;line-height:1;z-index:2;display:grid;place-items:center}
+.source-arrow-previous{left:-10px}.source-arrow-next{right:-10px}
+.source-arrow:disabled{opacity:.3;color:#b8a8c1;background:#3a2547;border-color:#786283;cursor:default}
+.source-page-indicator{margin-top:9px;font-size:9px;line-height:1.5;color:#c8b9d1;text-align:center}
+@media(min-width:1191px){
+ #study-layout{--studio-panel-height:max(420px,calc(100svh - 196px));--reading-density:1}
+ #telemetry-dashboard{overflow:visible;padding:18px 16px}
+ #study-session,.question-card{overflow:visible}
+ .question-card{padding:20px 22px}
+ .question-scroll{overflow:visible;padding-right:0}
+ .question-meta{font-size:10px;margin-bottom:6px}
+ .question-source{font-size:10px;margin-bottom:13px;line-height:1.45}
+ .question-prompt{font-size:calc(23px * var(--reading-density));line-height:1.4;letter-spacing:-.4px;margin-bottom:10px}
+ body.dyslexia-mode .question-prompt{line-height:1.5}
+ .answer-hint{font-size:10px;margin-bottom:13px}
+ .answer-list{gap:8px}
+ .answer-option{font-size:calc(14px * var(--reading-density));line-height:1.45;padding:calc(11px * var(--reading-density)) 12px;min-height:48px;gap:10px}
+ .answer-letter{width:23px;height:23px;font-size:10px}
+ .answer-feedback{font-size:9px;margin-top:4px}
+ .question-explanation{font-size:calc(12.5px * var(--reading-density));line-height:1.55;margin-top:13px;padding:12px 14px}
+ .question-explanation h4{font-size:10px;margin-bottom:5px}
+ .question-footer{margin-top:13px;padding-top:11px;gap:9px}
+ .question-next{min-height:40px;padding:9px 13px}
+ .status-section{padding:13px 0}
+ .status-countdown{font-size:34px;margin:7px 0 5px}
+ #timer-status-sub{font-size:10px}
+ .timer-track{margin:11px 0 7px}
+ .timer-secondary{margin-top:6px}
+ .status-stat{font-size:11px;margin-bottom:10px;gap:7px}
+ .status-stat strong{font-size:12px}
+ .status-stat:first-of-type strong{font-size:18px}
+ .status-stat+#metric-score-fraction{margin-top:-8px;margin-bottom:13px}
+ .status-meta{font-size:10px;line-height:1.45}
+ #question-nav-grid{gap:5px;margin:10px 0}
+ .map-question{aspect-ratio:auto;min-height:28px;height:28px;font-size:10px}
+ #btn-finish-sprint{margin-top:13px;min-height:40px}
+ .source-breakdown{margin-top:10px}
+ .source-breakdown summary{min-height:25px}
+ .map-legend{margin-bottom:7px}
+}
+
 </style>
 </head>
 
@@ -231,7 +288,7 @@
     <button onclick="togglePauseTimer()" id="btn-pause-timer" class="header-start" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" aria-hidden="true"></i><span id="label-pause-timer">Start</span></button>
     <button type="button" id="btn-open-study-desk" class="desk-toggle" aria-label="Open study desk" onclick="toggleStudyDesk(true)" aria-controls="study-setup" aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>Study desk</span></button>
     <details id="options-menu" class="preferences">
-      <summary aria-label="Study preferences" title="Study preferences"><i data-lucide="user-round" aria-hidden="true"></i></summary>
+      <summary aria-label="Study menu" title="Study menu"><i data-lucide="menu" aria-hidden="true"></i></summary>
             <div class="preferences-panel">
         <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">
           <p class="px-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Study and accessibility</p>
@@ -267,13 +324,17 @@
     <div id="documents-panel">
       <div id="document-drop-zone" class="desk-source" ondragover="event.preventDefault();this.classList.add('is-drag-over')" ondragleave="this.classList.remove('is-drag-over')" ondrop="event.preventDefault();this.classList.remove('is-drag-over');handleStudyFiles(event.dataTransfer.files)">
         <div class="source-heading"><i data-lucide="file-text" aria-hidden="true"></i><span>Source material</span><button type="button" onclick="openSourcePicker()">Change</button></div>
-        <p id="desk-current-source">Add your material</p>
-        <p id="desk-source-context">Drop notes here, or choose a file below.</p>
+        <div id="source-carousel" class="source-carousel" role="region" aria-roledescription="carousel" aria-label="Study sources" tabindex="0" onkeydown="handleSourceCarouselKey(event)">
+          <button id="source-previous" class="source-arrow source-arrow-previous" type="button" aria-label="Previous sources" onclick="pageStudioSources(-1)" disabled>‹</button>
+          <div class="source-carousel-window"><div id="source-carousel-track"></div></div>
+          <button id="source-next" class="source-arrow source-arrow-next" type="button" aria-label="Next sources" onclick="pageStudioSources(1)" disabled>›</button>
+        </div>
+        <p id="source-page-indicator" class="source-page-indicator" role="status" aria-live="polite">No sources added</p>
       </div>
       <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" tabindex="-1" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)">
       <button type="button" class="desk-upload" onclick="openSourcePicker()"><i data-lucide="upload" aria-hidden="true"></i>Upload source materials</button>
       <p class="desk-file-types">PDF, Word, TXT, Markdown or JSON · 8 MB total</p>
-      <ul id="study-file-list" aria-label="Selected sources"></ul>
+      <ul id="study-file-list" hidden></ul>
       <details class="desk-website"><summary>Add a website <span aria-hidden="true">+</span></summary>
         <form onsubmit="event.preventDefault();addStudyWebsite()"><label for="study-website-url" class="sr-only">Website URL</label><div class="website-input-row"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article"><button id="btn-add-website" type="submit">Add</button></div></form>
       </details>
@@ -1086,7 +1147,7 @@
   const explanation=feedback?`<section class="question-explanation ${answer===q.correct?'':'is-incorrect'}" aria-label="Answer explanation"><h4>${isSprintFinished?'Answer explained':answer===q.correct?'Correct — here’s why':'The reasoning · Correct answer '+letters[q.correct]}</h4><p>${escapeHtml(q.explanation)}</p></section>`:'';
   const code=q.code?`<div class="question-code"><div>Code reference</div><pre><code>${escapeHtml(q.code)}</code></pre></div>`:'';
   return `<article id="q-card-${escapeHtml(q.id)}" class="question-card">
-    <div class="question-scroll" tabindex="0" aria-label="Question and answers"><div class="question-meta">Question ${String(idx+1).padStart(2,'0')} · ${isTheoryQuestion(q)?'Theory':'Practical'}</div>
+    <div class="question-scroll" aria-label="Question and answers"><div class="question-meta">Question ${String(idx+1).padStart(2,'0')} · ${isTheoryQuestion(q)?'Theory':'Practical'}</div>
     <p class="question-source"><strong>${escapeHtml(q.sourceDoc||'Saved study material')}</strong>${q.topic?' · '+escapeHtml(q.topic):''}</p>
     <h3 id="active-question-heading" tabindex="-1" class="question-prompt">${escapeHtml(q.prompt)}</h3>
     <p class="answer-hint">Choose the answer that fits best.</p>${code}
@@ -1109,6 +1170,7 @@
   const newQuestion=activeQuestions[currentQIndex]?.id||'';
   container.dataset.questionId=newQuestion;
   const scroll=container.querySelector('.question-scroll');if(scroll)scroll.scrollTop=oldQuestion===newQuestion?oldScroll:0;
+  scheduleStudioFit();
   syncStudioHeader();
   if(window.lucide)lucide.createIcons();
 }
@@ -1373,32 +1435,10 @@
       if (status) status.textContent = selectedStudyFiles.length ? 'Document removed. Your remaining files are ready.' : 'Upload notes or questions to get started.';
     }
     function renderStudyFiles() {
-      const list = document.getElementById('study-file-list');
-      const button = document.getElementById('btn-generate-document-sprint');
-      if (!list || !button) return;
-      list.replaceChildren();
-      selectedStudyFiles.forEach((file, index) => {
-        const row = document.createElement('li');
-        row.className = 'flex items-center justify-between gap-3 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs';
-        const label = document.createElement('span');
-        label.className = 'min-w-0 truncate text-slate-200';
-        label.textContent = file.name + ' · ' + (file.size / 1024).toFixed(0) + ' KB';
-        const remove = document.createElement('button');
-        remove.type = 'button'; remove.className = 'min-h-9 min-w-9 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white';
-        remove.setAttribute('aria-label', 'Remove ' + file.name); remove.textContent = '×'; remove.onclick = () => removeStudyFile(index);
-        row.append(label, remove); list.appendChild(row);
-      });
-      selectedStudyWebsites.forEach((url,index)=>{
-        const row=document.createElement('li');row.className='flex items-center justify-between gap-2 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs';
-        const label=document.createElement('span');label.className='min-w-0 truncate text-slate-200';label.textContent=url;label.title=url;
-        const remove=document.createElement('button');remove.type='button';remove.className='min-h-9 min-w-9 rounded-lg text-slate-400 hover:bg-slate-800';remove.textContent='×';remove.setAttribute('aria-label','Remove '+url);remove.onclick=()=>removeStudyWebsite(index);
-        row.append(label,remove);list.appendChild(row);
-      });
-      button.disabled = !(selectedStudyFiles.length+selectedStudyWebsites.length) || documentGenerationInProgress || studyFileReadInProgress;
-      ['study-website-url','btn-add-website'].forEach(id=>{const element=document.getElementById(id);if(element)element.disabled=documentGenerationInProgress||studyFileReadInProgress;});
-      const input = document.getElementById('document-upload-input');
-      if (input) input.disabled = documentGenerationInProgress||studyFileReadInProgress;
-      list.querySelectorAll('button').forEach(remove => { remove.disabled = documentGenerationInProgress||studyFileReadInProgress; });
+      const busy=documentGenerationInProgress||studyFileReadInProgress;
+      const button=document.getElementById('btn-generate-document-sprint');
+      if(button)button.disabled=!(selectedStudyFiles.length+selectedStudyWebsites.length)||busy;
+      ['study-website-url','btn-add-website','document-upload-input'].forEach(id=>{const element=document.getElementById(id);if(element)element.disabled=busy;});
       renderStudioDeskContext();
     }
     let documentGenerationInProgress = false;
@@ -1785,6 +1825,93 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
 }
 
 
+
+    let studioSourcePage=0;
+    let studioSourceFingerprint='';
+    let studioFitFrame=null;
+    function getStudioSourceCards(){
+      const pending=[
+        ...selectedStudyFiles.map((file,index)=>({name:file.name,kind:'Document',meta:Math.max(1,Math.round(file.size/1024))+' KB · Ready',removeType:'file',index})),
+        ...selectedStudyWebsites.map((url,index)=>({name:url,kind:'Website',meta:'Ready to read',removeType:'website',index}))
+      ];
+      if(pending.length)return pending;
+      return [...new Set(activeQuestions.map(q=>q.sourceDoc).filter(Boolean))].map(name=>({
+        name,kind:/^https?:\/\//i.test(name)?'Website':'Document',
+        meta:activeQuestions.filter(q=>q.sourceDoc===name).length+' questions · Saved',removeType:null
+      }));
+    }
+    function renderStudioSourceCarousel(){
+      const cards=getStudioSourceCards();
+      const items=cards.length?cards:[{name:'Add your material',kind:'Source material',meta:'Upload notes or add a website.'}];
+      const busy=documentGenerationInProgress||studyFileReadInProgress;
+      const pages=Math.ceil(items.length/2);
+      studioSourcePage=Math.min(studioSourcePage,pages-1);
+      const fingerprint=JSON.stringify({items,busy});
+      const track=document.getElementById('source-carousel-track');
+      if(fingerprint!==studioSourceFingerprint){
+        track.replaceChildren();
+        for(let pageIndex=0;pageIndex<pages;pageIndex++){
+          const page=document.createElement('div');page.className='source-carousel-page';page.setAttribute('role','group');page.setAttribute('aria-label','Sources page '+(pageIndex+1)+' of '+pages);
+          items.slice(pageIndex*2,pageIndex*2+2).forEach(source=>{
+            const card=document.createElement('article');card.className='source-card';card.title=source.name;
+            const type=document.createElement('span');type.className='source-card-kind';type.textContent=source.kind;
+            const title=document.createElement('p');title.className='source-card-title';title.textContent=source.name;
+            const meta=document.createElement('p');meta.className='source-card-meta';meta.textContent=source.meta;
+            card.append(type,title,meta);
+            if(source.removeType){
+              const remove=document.createElement('button');remove.type='button';remove.className='source-card-remove';remove.textContent='×';remove.setAttribute('aria-label','Remove '+source.name);remove.disabled=busy;
+              remove.onclick=()=>source.removeType==='file'?removeStudyFile(source.index):removeStudyWebsite(source.index);
+              card.appendChild(remove);
+            }
+            page.appendChild(card);
+          });
+          track.appendChild(page);
+        }
+        studioSourceFingerprint=fingerprint;
+      }
+      updateStudioSourcePage(cards.length,pages);
+    }
+    function updateStudioSourcePage(count,pages){
+      const track=document.getElementById('source-carousel-track');
+      track.style.transform='translateX(-'+studioSourcePage*100+'%)';
+      [...track.children].forEach((page,index)=>{page.inert=index!==studioSourcePage;page.setAttribute('aria-hidden',String(index!==studioSourcePage));});
+      document.getElementById('source-previous').disabled=studioSourcePage===0;
+      document.getElementById('source-next').disabled=studioSourcePage>=pages-1;
+      document.getElementById('source-page-indicator').textContent=count?(studioSourcePage*2+1)+'–'+Math.min(count,studioSourcePage*2+2)+' of '+count+' source'+(count===1?'':'s'):'No sources added';
+    }
+    function pageStudioSources(direction){
+      const count=getStudioSourceCards().length,pages=Math.max(1,Math.ceil(count/2));
+      studioSourcePage=Math.max(0,Math.min(pages-1,studioSourcePage+direction));
+      updateStudioSourcePage(count,pages);
+    }
+    function handleSourceCarouselKey(event){
+      if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;
+      event.preventDefault();event.stopPropagation();pageStudioSources(event.key==='ArrowRight'?1:-1);
+    }
+    function scheduleStudioFit(){
+      if(studioFitFrame!==null)cancelAnimationFrame(studioFitFrame);
+      studioFitFrame=requestAnimationFrame(()=>{studioFitFrame=null;fitStudioPanels();});
+    }
+    function fitStudioPanels(){
+      const layout=document.getElementById('study-layout'),workspace=document.getElementById('study-session'),rail=document.getElementById('telemetry-dashboard');
+      layout.style.removeProperty('--studio-panel-height');
+      layout.style.setProperty('--reading-density','1');
+      if(!window.matchMedia('(min-width:1191px)').matches)return;
+      const content=document.querySelector('.question-scroll');
+      if(content){
+        for(const density of [1,.97,.94,.92]){
+          layout.style.setProperty('--reading-density',String(density));
+          if(content.scrollHeight<=content.clientHeight+1)break;
+        }
+      }
+      const questionOverflow=content?Math.max(0,content.scrollHeight-content.clientHeight):0;
+      const railOverflow=Math.max(0,rail.scrollHeight-rail.clientHeight);
+      if(questionOverflow>1||railOverflow>1){
+        const height=workspace.getBoundingClientRect().height+Math.max(questionOverflow,railOverflow)+2;
+        layout.style.setProperty('--studio-panel-height',Math.ceil(height)+'px');
+      }
+    }
+
     let studioCourseTitle='Your practice';
     let deskReturnFocus=null;
     function syncStudioHeader(){
@@ -1842,11 +1969,8 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       else{desk.removeAttribute('role');desk.removeAttribute('aria-modal');if(deskReturnFocus?.isConnected){deskReturnFocus.focus({preventScroll:true});deskReturnFocus=null;}}
     }
     function renderStudioDeskContext(){
-      const pending=[...selectedStudyFiles.map(file=>file.name),...selectedStudyWebsites];
       const saved=[...new Set(activeQuestions.map(q=>q.sourceDoc).filter(Boolean))];
-      const sources=pending.length?pending:saved;
-      document.getElementById('desk-current-source').textContent=sources[0]||'Add your material';
-      document.getElementById('desk-source-context').textContent=sources.length?(pending.length?sources.length+' source'+(sources.length===1?'':'s')+' selected':activeQuestions.length+' questions · Saved on this device'):'Drop notes here, or choose a file below.';
+      renderStudioSourceCarousel();
       const select=document.getElementById('study-source-select');
       const unique=[...new Set(QUESTION_BANK.map(q=>q.sourceDoc).filter(Boolean))];
       select.replaceChildren();
@@ -1875,6 +1999,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       try{studioCourseTitle=localStorage.getItem('studioza_course_title_v1')||'Your practice';}catch(error){}
       document.getElementById('course-title-input').value=studioCourseTitle;
       renderStudioDeskContext();syncStudioMode();toggleStudyDesk(false);
+      window.addEventListener('resize',scheduleStudioFit);
+      document.addEventListener('toggle',scheduleStudioFit,true);
+      if(document.fonts?.ready)document.fonts.ready.then(scheduleStudioFit);
+      scheduleStudioFit();
       document.addEventListener('keydown',event=>{
         if(!document.body.classList.contains('desk-is-open'))return;
         if(event.key==='Escape'){event.preventDefault();toggleStudyDesk(false);return;}
