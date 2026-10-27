@@ -1631,18 +1631,18 @@
           ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the Python concept explicit and the explanation accurate.'
           : 'Use clear, familiar everyday examples for theory questions.';
         const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test writing, tracing, predicting output, or debugging Python code. Theory questions should test concepts from the documents. Use only the course material and introductory Python facts needed to interpret it. ${interestInstruction}
-For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Return only the JSON array matching the response schema.
+For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Keep prompts and explanations concise (at most 45 words each), options short, and code snippets at most 12 lines. Return only the compact JSON array matching the response schema, without Markdown fences or surrounding commentary.
 ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`;
-        const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+        const schema = { type: 'ARRAY', minItems: 100, maxItems: 100, items: { type: 'OBJECT', properties: {
           questionType: { type: 'STRING', enum: ['practical', 'theory'] }, sourceDoc: { type: 'STRING', enum: names },
           lecture: { type: 'INTEGER' }, topic: { type: 'STRING' }, prompt: { type: 'STRING' },
-          code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', items: { type: 'STRING' } },
+          code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', minItems: 4, maxItems: 4, items: { type: 'STRING' } },
           correct: { type: 'INTEGER' }, explanation: { type: 'STRING' }, analogyTheme: { type: 'STRING', nullable: true }
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
         const requestBody = {
           systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
           contents: [{ role: 'user', parts: [...parts, { text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 16384 }
+          generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Sending your documents and interests for one 100-question generation…';
         const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, progressButtonId: 'btn-generate-document-sprint' });
@@ -1780,6 +1780,41 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         updateFilterPills();
       } catch(e) { setAiStatus('Saved AI customisation could not be loaded. The built-in question bank is ready.'); }
     }
+    function parseGeminiQuestionResponse(data) {
+      const candidate = data?.candidates?.[0];
+      const reason = candidate?.finishReason || '';
+      const blockReason = data?.promptFeedback?.blockReason;
+      if (blockReason) {
+        throw new Error('Google could not process this request (' + blockReason + '). Try different source material. Your question bank is unchanged.');
+      }
+      if (reason === 'MAX_TOKENS' || reason === 'CONTINUATION') {
+        throw new Error('Google stopped before the question set was complete (response limit). Your files are still selected. Please retry; your question bank is unchanged.');
+      }
+      if (reason && reason !== 'STOP' && reason !== 'FINISH_REASON_UNSPECIFIED') {
+        throw new Error('Google stopped this request (' + reason + '). Your question bank is unchanged. Try again or use different source material.');
+      }
+      const raw = candidate?.content?.parts
+        ?.filter(part => typeof part.text === 'string' && !part.thought)
+        .map(part => part.text).join('');
+      if (!raw?.trim()) {
+        throw new Error(data?.error?.message || 'Google returned no questions. Your files are still selected and your question bank is unchanged.');
+      }
+      let text = raw.replace(/^\uFEFF/, '').trim();
+      // Remove only a complete outer Markdown fence; never repair or accept partial JSON.
+      const fenced = text.match(/^\x60\x60\x60(?:json)?\s*([\s\S]*?)\s*\x60\x60\x60$/i);
+      if (fenced) text = fenced[1].trim();
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        console.warn('AI response format issue', {
+          finishReason: reason || 'not supplied',
+          responseCharacters: raw.length,
+          outputTokens: data?.usageMetadata?.candidatesTokenCount
+        });
+        throw new Error('Google returned an unreadable question set. Your files are still selected. Please retry; your question bank is unchanged.');
+      }
+    }
+
     async function callGemini(prompt, schema, modelId, callOptions = {}) {
       const requestBody = callOptions.requestBody || { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
@@ -1804,12 +1839,12 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         let responseText = '';
         try { responseText = await response.text(); } finally { resetTurnstileWidget(); }
         let data = {};
-        try { data = JSON.parse(responseText); } catch (parseError) {}
+        try { data = JSON.parse(responseText); } catch (parseError) {
+          if (response.ok) throw new Error('The study service returned an unreadable response. Your files are still selected. Please retry; your question bank is unchanged.');
+        }
         if (response.ok) {
           if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 90);
-          const raw = data.candidates?.[0]?.content?.parts?.filter(part => typeof part.text === 'string' && !part.thought).map(part => part.text).join('');
-          if (!raw) throw new Error(data.error?.message || 'The Gemini Worker returned no question data. Your existing questions are unchanged.');
-          try { return JSON.parse(raw); } catch (parseError) { throw new Error('Gemini responded, but its JSON could not be read. Your existing questions are unchanged.'); }
+          return parseGeminiQuestionResponse(data);
         }
         const message = data.error?.message || data.error || responseText || response.statusText || 'No error details were returned.';
         const transient = [408, 429, 500, 502, 503, 504].includes(response.status);
