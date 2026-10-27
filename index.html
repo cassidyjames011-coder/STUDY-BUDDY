@@ -163,6 +163,17 @@
     .telemetry-panel > summary:hover { background:#1e293b; }
     .telemetry-panel > summary:focus-visible { outline:2px solid #38bdf8; outline-offset:3px; }
     .telemetry-panel[open] > summary .telemetry-chevron { transform:rotate(180deg); }
+    .ai-request-button { position:relative; overflow:hidden; isolation:isolate; }
+    .ai-request-button.is-ai-loading { background:#1e293b !important; color:#cbd5e1 !important; opacity:1 !important; cursor:wait !important; }
+    .ai-request-button.is-ai-loading::before { content:""; position:absolute; inset:0 auto 0 0; width:var(--ai-progress,0%); background:linear-gradient(90deg,#0ea5e9,#6366f1); transition:width .5s ease; z-index:0; }
+    .ai-request-label { position:relative; z-index:1; }
+    .ai-request-progress { --ai-progress:0%; margin-top:.5rem; }
+    .ai-request-progress[hidden] { display:none; }
+    .ai-request-track { height:.25rem; overflow:hidden; border-radius:999px; background:#334155; }
+    .ai-request-fill { height:100%; width:var(--ai-progress,0%); background:linear-gradient(90deg,#38bdf8,#818cf8); border-radius:inherit; transition:width .5s ease; }
+    .ai-panel-loading > summary::after { content:""; flex:none; width:.8rem; height:.8rem; border:2px solid #475569; border-top-color:#7dd3fc; border-radius:50%; animation:ai-request-spin .9s linear infinite; }
+    @keyframes ai-request-spin { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion:reduce) { .ai-panel-loading > summary::after { animation:none; border-color:#7dd3fc; } .ai-request-fill, .ai-request-button.is-ai-loading::before { transition:none; } }
     #ai-gen-status:empty { display:none; }
     .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
     @media (max-width:1100px) {
@@ -235,7 +246,8 @@
           <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Choose documents</button>
         </div>
         <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
-        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40">Create my 100-question sprint</button>
+        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="ai-request-button mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40"><span class="ai-request-label">Create my 100-question sprint</span></button>
+        <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating document questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
         <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Choose documents to get started.</p>
         </div>
       </details>
@@ -275,8 +287,10 @@
       </div>
       <p id="brain-hook-requirement" class="text-xs text-slate-400" aria-live="polite">Choose up to 3 interests.</p>
       <div class="grid gap-2">
-        <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="min-h-11 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Personalise theory</button>
-        <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="min-h-11 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-bold text-xs">Practise weak spots</button>
+        <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="ai-request-button min-h-11 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"><span class="ai-request-label">Personalise theory</span></button>
+        <div id="btn-reskin-theory-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Personalising theory questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
+        <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="ai-request-button min-h-11 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-bold text-xs"><span class="ai-request-label">Practise weak spots</span></button>
+        <div id="btn-generate-ai-batch-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating practice questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
       </div>
       <span id="ai-gen-status" role="status" aria-live="polite" class="block text-xs text-slate-400"></span>
       <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-execution="execute" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
@@ -540,6 +554,64 @@
     // ========================================================================
     // INITIALIZATION
     // ========================================================================
+    const aiLoadingJobs = new Map();
+    function updateAiLoading(buttonId, minimum = 0) {
+      const job = aiLoadingJobs.get(buttonId);
+      if (!job) return;
+      // Google does not report completion percentages. Keep the waiting fill below full.
+      const waitingFill = 5 + 80 * (1 - Math.exp(-(Date.now() - job.started) / 30000));
+      job.fill = Math.min(92, Math.max(job.fill, minimum, waitingFill));
+      job.button.style.setProperty('--ai-progress', job.fill + '%');
+      job.progress.style.setProperty('--ai-progress', job.fill + '%');
+    }
+    function startAiLoading(buttonId) {
+      if (aiLoadingJobs.has(buttonId)) return;
+      const button = document.getElementById(buttonId);
+      const progress = document.getElementById(buttonId + '-progress');
+      if (!button || !progress) return;
+      const panel = button.closest('details');
+      const job = { button, progress, panel, started:Date.now(), fill:0, interval:null };
+      aiLoadingJobs.set(buttonId, job);
+      button.disabled = true;
+      button.classList.add('is-ai-loading');
+      button.setAttribute('aria-busy', 'true');
+      progress.hidden = false;
+      progress.removeAttribute('aria-valuenow');
+      progress.setAttribute('aria-valuetext', 'Working; completion time varies');
+      const caption = progress.querySelector('p');
+      if (caption) caption.textContent = 'Generating…';
+      panel?.classList.add('ai-panel-loading');
+      panel?.setAttribute('aria-busy', 'true');
+      updateAiLoading(buttonId);
+      job.interval = setInterval(() => updateAiLoading(buttonId), 500);
+    }
+    function finishAiLoading(buttonId, success) {
+      const job = aiLoadingJobs.get(buttonId);
+      if (!job) return;
+      clearInterval(job.interval);
+      aiLoadingJobs.delete(buttonId);
+      job.button.setAttribute('aria-busy', 'false');
+      if (![...aiLoadingJobs.values()].some(other => other.panel === job.panel)) {
+        job.panel?.classList.remove('ai-panel-loading');
+        job.panel?.setAttribute('aria-busy', 'false');
+      }
+      if (success) {
+        job.button.style.setProperty('--ai-progress', '100%');
+        job.progress.style.setProperty('--ai-progress', '100%');
+        job.progress.setAttribute('aria-valuenow', '100');
+        job.progress.setAttribute('aria-valuetext', 'Complete');
+        const caption = job.progress.querySelector('p');
+        if (caption) caption.textContent = 'Ready';
+      }
+      const reset = () => {
+        if (aiLoadingJobs.has(buttonId)) return;
+        job.button.classList.remove('is-ai-loading');
+        job.button.style.removeProperty('--ai-progress');
+        job.progress.hidden = true;
+      };
+      if (success) setTimeout(reset, 900); else reset();
+    }
+
     let activeQuestionOperations = 0;
     function trackQuestionOperation(change) {
       activeQuestionOperations = Math.max(0, activeQuestionOperations + change);
@@ -1537,12 +1609,14 @@
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
       documentGenerationInProgress = true; trackQuestionOperation(1); renderStudyFiles();
-      if (button) button.textContent = 'Reading documents…';
+      let generationSucceeded = false;
+      startAiLoading('btn-generate-document-sprint');
       try {
         const names = selectedStudyFiles.map(file => file.name);
         const parts = [];
         const sourceNotes = [];
         for (const file of selectedStudyFiles) {
+          updateAiLoading('btn-generate-document-sprint', 10);
           const mimeType = studyFileType(file);
           if (mimeType === 'application/pdf') {
             parts.push({ inlineData: { mimeType, data: bytesToBase64(await file.arrayBuffer()) } });
@@ -1571,7 +1645,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 16384 }
         };
         if (status) status.textContent = 'Sending your documents and interests for one 100-question generation…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0 });
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, progressButtonId: 'btn-generate-document-sprint' });
         if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The response did not contain all 100 questions. Nothing in your current question bank was changed. Try smaller or more focused documents.');
         const practical = generated.filter(q => q?.questionType === 'practical').length;
         const theory = generated.filter(q => q?.questionType === 'theory').length;
@@ -1591,6 +1665,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         activeLectureFilter = 'ai'; currentQIndex = 0; userAnswers = {}; flaggedQuestions = {}; timeSpentPerQuestion = {};
         isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = 3600; remainingSprintSeconds = 3600; elapsedSprintSeconds = 0;
         const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
+        generationSucceeded = true;
         if (status) status.textContent = 'Ready: 60 practical and 40 theory questions, grouped by your uploaded documents. Start when you’re ready.';
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
@@ -1599,7 +1674,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       } finally {
         documentGenerationInProgress = false;
         trackQuestionOperation(-1);
-        if (button) button.textContent = 'Create my 100-question sprint';
+        finishAiLoading('btn-generate-document-sprint', generationSucceeded);
         renderStudyFiles();
       }
     }
@@ -1685,7 +1760,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const ready = selectedBrainHooks.length > 0 && QUESTION_BANK.length > 0;
       ['btn-reskin-theory','btn-generate-ai-batch'].forEach(id => {
         const button = document.getElementById(id);
-        if (button) { button.disabled = !ready; button.classList.toggle('opacity-50', !ready); button.title = !QUESTION_BANK.length ? 'Upload documents or load starter questions first' : ready ? '' : 'Select an interest first'; }
+        if (button) { button.disabled = !ready || aiLoadingJobs.has(id); button.classList.toggle('opacity-50', !ready); button.title = !QUESTION_BANK.length ? 'Upload documents or load starter questions first' : ready ? '' : 'Select an interest first'; }
       });
       const requirement = document.getElementById('brain-hook-requirement');
       if (requirement) requirement.textContent = selectedBrainHooks.length ? selectedBrainHooks.length + ' / 3 interests selected' : 'Choose up to 3 interests.';
@@ -1710,7 +1785,9 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
       const maxRetries = Number.isInteger(callOptions.maxRetries) ? callOptions.maxRetries : 3;
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 15);
         const token = await getTurnstileToken();
+        if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
           response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token }) });
@@ -1729,6 +1806,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         let data = {};
         try { data = JSON.parse(responseText); } catch (parseError) {}
         if (response.ok) {
+          if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 90);
           const raw = data.candidates?.[0]?.content?.parts?.filter(part => typeof part.text === 'string' && !part.thought).map(part => part.text).join('');
           if (!raw) throw new Error(data.error?.message || 'The Gemini Worker returned no question data. Your existing questions are unchanged.');
           try { return JSON.parse(raw); } catch (parseError) { throw new Error('Gemini responded, but its JSON could not be read. Your existing questions are unchanged.'); }
@@ -1745,13 +1823,15 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       }
     }
     async function reskinTheoryQuestions() {
+      if (aiLoadingJobs.has('btn-reskin-theory')) return;
       const button=document.getElementById('btn-reskin-theory');
       const originals=QUESTION_BANK.filter(q=>q.isAnalogyTheory&&!q.isAI);
       const hooks=getBrainHooks();
       if(!hooks.length){setAiStatus('Select at least one interest before customising theory questions. Existing questions remain ready.');return;}
       if(!originals.length){setAiStatus('No built-in theory questions were found; the original bank remains available.');return;}
       trackQuestionOperation(1);
-      button.disabled=true;button.classList.add('opacity-50');
+      let generationSucceeded = false;
+      startAiLoading('btn-reskin-theory');
       let completed=0;
       const batchSize=8;
       try {
@@ -1761,7 +1841,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           const input=batch.map(q=>({id:q.id,lecture:q.lecture,topic:q.topic,prompt:q.prompt,options:q.options,correct:q.correct,explanation:q.explanation}));
           const schema={type:'ARRAY',items:{type:'OBJECT',properties:{id:{type:'STRING'},prompt:{type:'STRING'},options:{type:'ARRAY',items:{type:'STRING'}},explanation:{type:'STRING'},analogyTheme:{type:'STRING'}},required:['id','prompt','options','explanation','analogyTheme']}};
           const system='Rewrite these Python theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact Python concept, lecture, topic, difficulty, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the Python concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
-          const result=await callGemini(system,schema,GEMINI_MODEL_ID);
+          const result=await callGemini(system,schema,GEMINI_MODEL_ID,{progressButtonId:'btn-reskin-theory'});
           if(!Array.isArray(result)||result.length!==batch.length)throw new Error('Gemini returned an incomplete reskin for questions '+(offset+1)+'–'+(offset+batch.length)+'.');
           const byId=new Map(result.map(item=>[item.id,item]));
           const replacements={};
@@ -1774,8 +1854,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           const saved=JSON.parse(localStorage.getItem('exam_sprint_reskins_v2')||'{}');
           localStorage.setItem('exam_sprint_reskins_v2',JSON.stringify(Object.assign(saved,replacements)));
           completed+=batch.length;
+          updateAiLoading('btn-reskin-theory', 10 + 80 * completed / originals.length);
           renderAll();
         }
+        generationSucceeded = true;
         setAiStatus('Reskinned all '+completed+' theory questions around '+hooks.join(', ')+'. Concepts and correct answer positions were retained.');
         updateFilterPills();renderAll();
       } catch(err) {
@@ -1783,9 +1865,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         const detail=err.message||'AI customisation failed.';
         const recovery = /your existing questions remain available/i.test(detail) ? '' : ' Your existing questions remain available.';
         setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+recovery);
-      } finally {trackQuestionOperation(-1);button.disabled=false;button.classList.remove('opacity-50');}
+      } finally {trackQuestionOperation(-1);finishAiLoading('btn-reskin-theory', generationSucceeded);updateBrainHookUI();}
     }
     async function generateNextBatchWithGemini(batchSize=10) {
+      if (aiLoadingJobs.has('btn-generate-ai-batch')) return;
       if (!QUESTION_BANK.length) { setAiStatus('Upload documents or load starter questions before creating a practice sprint.'); return; }
       const button=document.getElementById('btn-generate-ai-batch');
       const modelId=GEMINI_MODEL_ID;
@@ -1797,10 +1880,11 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const system=`You are an accurate introductory Python exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
       const schema={type:'ARRAY',items:{type:'OBJECT',properties:{lecture:{type:'INTEGER'},isAnalogyTheory:{type:'BOOLEAN'},analogyTheme:{type:'STRING',nullable:true},topic:{type:'STRING'},prompt:{type:'STRING'},code:{type:'STRING',nullable:true},options:{type:'ARRAY',items:{type:'STRING'}},correct:{type:'INTEGER'},explanation:{type:'STRING'}},required:['lecture','isAnalogyTheory','topic','prompt','options','correct','explanation']}};
       trackQuestionOperation(1);
-      button.disabled=true; button.classList.add('opacity-50');
+      let generationSucceeded = false;
+      startAiLoading('btn-generate-ai-batch');
       try {
         setAiStatus(`Creating a personalised ${batchSize}-question Exam Sprint…`);
-        const generated=await callGemini(system,schema,modelId);
+        const generated=await callGemini(system,schema,modelId,{progressButtonId:'btn-generate-ai-batch'});
         if(!Array.isArray(generated)||!generated.length) throw new Error('Gemini returned no questions. Your current sprint is unchanged.');
         const stamp=Date.now().toString().slice(-5);
         const cleaned=generated.slice(0,batchSize).filter(q=>q && Array.isArray(q.options)&&q.options.length===4 && Number(q.correct)>=0 && Number(q.correct)<4).map((q,i)=>({...q,id:`AI-${stamp}-${i+1}`,lecture:Math.min(5,Math.max(1,Number(q.lecture)||1)),isAI:true}));
@@ -1809,9 +1893,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         try { localStorage.setItem('exam_sprint_questions_v2',JSON.stringify(QUESTION_BANK.filter(q=>q.isAI))); } catch(e) {}
         const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
         activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; hasSprintStarted=false; isTimerPaused=true; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
+        generationSucceeded = true;
         setAiStatus(`Loaded ${cleaned.length} personalised questions with the Gemini Worker. Start your Exam Sprint when ready.`); playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch(err) { console.error('Gemini API Error:',err); setAiStatus(err.message || 'AI generation failed. Your current question bank remains ready.'); }
-      finally { trackQuestionOperation(-1); button.disabled=false; button.classList.remove('opacity-50'); }
+      finally { trackQuestionOperation(-1); finishAiLoading('btn-generate-ai-batch', generationSucceeded); updateBrainHookUI(); }
     }
 
     // Make room for a newly opened setup section while keeping that section open.
