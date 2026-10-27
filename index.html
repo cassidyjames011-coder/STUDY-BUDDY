@@ -199,7 +199,11 @@
         </div>
       </div>
 
+      <div class="flex flex-wrap items-center gap-2">
       <button onclick="togglePauseTimer()" id="btn-pause-timer" class="min-h-11 px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-sky-500/15" aria-label="Start sprint"><i id="icon-pause-timer" data-lucide="play" class="w-4 h-4"></i><span id="label-pause-timer">Start sprint</span></button>
+        <button id="btn-clear-upload-history" type="button" onclick="clearUploadHistory()" title="Clear uploaded files and AI-generated questions" class="min-h-11 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50">Clear upload history</button>
+        <p id="upload-clear-status" role="status" aria-live="polite" class="w-full text-xs text-slate-400 empty:hidden"></p>
+      </div>
 
       <!-- Study and accessibility options -->
       <details id="options-menu" class="relative ml-auto">
@@ -536,6 +540,58 @@
     // ========================================================================
     // INITIALIZATION
     // ========================================================================
+    let activeQuestionOperations = 0;
+    function trackQuestionOperation(change) {
+      activeQuestionOperations = Math.max(0, activeQuestionOperations + change);
+      const button = document.getElementById('btn-clear-upload-history');
+      if (button) {
+        button.disabled = activeQuestionOperations > 0;
+        button.title = activeQuestionOperations > 0 ? 'Wait for question generation to finish' : 'Clear uploaded files and AI-generated questions';
+      }
+    }
+    function clearUploadHistory() {
+      const status = document.getElementById('upload-clear-status');
+      if (activeQuestionOperations > 0) { if (status) status.textContent = 'Wait for question generation to finish, then clear your uploads.'; return; }
+      const generatedIds = new Set(QUESTION_BANK.filter(q => q.isAI || q.isDocumentGenerated).map(q => q.id));
+      if (!selectedStudyFiles.length && !generatedIds.size) {
+        if (status) status.textContent = 'No upload history to clear.';
+        return;
+      }
+      if (!window.confirm('Clear uploaded files and all AI-generated questions, including their saved answers and progress? Your starter question bank, interests, and preferences will stay.')) return;
+      const activeUploads = activeQuestions.some(q => generatedIds.has(q.id));
+      selectedStudyFiles.length = 0;
+      const input = document.getElementById('document-upload-input');
+      if (input) input.value = '';
+      for (let index = QUESTION_BANK.length - 1; index >= 0; index--) {
+        if (generatedIds.has(QUESTION_BANK[index].id)) QUESTION_BANK.splice(index, 1);
+      }
+      const keep = values => Object.fromEntries(Object.entries(values).filter(([id]) => !generatedIds.has(id)));
+      userAnswers = keep(userAnswers);
+      flaggedQuestions = keep(flaggedQuestions);
+      timeSpentPerQuestion = keep(timeSpentPerQuestion);
+      savedWeakIds = keep(savedWeakIds);
+      let storageCleared = true;
+      try {
+        localStorage.removeItem('exam_sprint_questions_v2');
+        localStorage.setItem('exam_sprint_weak_ids_v2', JSON.stringify(savedWeakIds));
+        const reskins = JSON.parse(localStorage.getItem('exam_sprint_reskins_v2') || '{}');
+        localStorage.setItem('exam_sprint_reskins_v2', JSON.stringify(keep(reskins)));
+        if (activeUploads) localStorage.removeItem('exam_sprint_progress_v2');
+      } catch (error) { storageCleared = false; }
+      if (activeUploads) {
+        activeLectureFilter = 'all';
+        const scope = document.getElementById('scope-filter-select');
+        if (scope) scope.value = 'all';
+        buildSprintPool();
+      }
+      renderStudyFiles();
+      const documentStatus = document.getElementById('document-gen-status');
+      if (documentStatus) documentStatus.textContent = 'Choose documents to get started.';
+      setAiStatus('');
+      renderAll();
+      if (status) status.textContent = storageCleared ? 'Upload history cleared.' : 'Uploads cleared for this session. Browser storage could not be updated.';
+    }
+
     function clearLegacyQuestionMemory() {
       // Retire the old bank without deleting future document questions or preferences.
       ['baa1118_ai_questions_v1', 'exam_sprint_reskins_v1', 'exam_sprint_progress_v1', 'baa1118_weak_ids_v1'].forEach(key => {
@@ -1480,7 +1536,7 @@
       if (!selectedStudyFiles.length || documentGenerationInProgress) return;
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
-      documentGenerationInProgress = true; renderStudyFiles();
+      documentGenerationInProgress = true; trackQuestionOperation(1); renderStudyFiles();
       if (button) button.textContent = 'Reading documents…';
       try {
         const names = selectedStudyFiles.map(file => file.name);
@@ -1542,6 +1598,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (status) status.textContent = error.message || 'Could not create the sprint. Your existing questions remain available.';
       } finally {
         documentGenerationInProgress = false;
+        trackQuestionOperation(-1);
         if (button) button.textContent = 'Create my 100-question sprint';
         renderStudyFiles();
       }
@@ -1693,6 +1750,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const hooks=getBrainHooks();
       if(!hooks.length){setAiStatus('Select at least one interest before customising theory questions. Existing questions remain ready.');return;}
       if(!originals.length){setAiStatus('No built-in theory questions were found; the original bank remains available.');return;}
+      trackQuestionOperation(1);
       button.disabled=true;button.classList.add('opacity-50');
       let completed=0;
       const batchSize=8;
@@ -1725,7 +1783,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         const detail=err.message||'AI customisation failed.';
         const recovery = /your existing questions remain available/i.test(detail) ? '' : ' Your existing questions remain available.';
         setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+recovery);
-      } finally {button.disabled=false;button.classList.remove('opacity-50');}
+      } finally {trackQuestionOperation(-1);button.disabled=false;button.classList.remove('opacity-50');}
     }
     async function generateNextBatchWithGemini(batchSize=10) {
       if (!QUESTION_BANK.length) { setAiStatus('Upload documents or load starter questions before creating a practice sprint.'); return; }
@@ -1738,6 +1796,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const hookText=hooks.length ? hooks.join(', ') : 'no interests selected; use clear everyday examples';
       const system=`You are an accurate introductory Python exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
       const schema={type:'ARRAY',items:{type:'OBJECT',properties:{lecture:{type:'INTEGER'},isAnalogyTheory:{type:'BOOLEAN'},analogyTheme:{type:'STRING',nullable:true},topic:{type:'STRING'},prompt:{type:'STRING'},code:{type:'STRING',nullable:true},options:{type:'ARRAY',items:{type:'STRING'}},correct:{type:'INTEGER'},explanation:{type:'STRING'}},required:['lecture','isAnalogyTheory','topic','prompt','options','correct','explanation']}};
+      trackQuestionOperation(1);
       button.disabled=true; button.classList.add('opacity-50');
       try {
         setAiStatus(`Creating a personalised ${batchSize}-question Exam Sprint…`);
@@ -1752,7 +1811,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; hasSprintStarted=false; isTimerPaused=true; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
         setAiStatus(`Loaded ${cleaned.length} personalised questions with the Gemini Worker. Start your Exam Sprint when ready.`); playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch(err) { console.error('Gemini API Error:',err); setAiStatus(err.message || 'AI generation failed. Your current question bank remains ready.'); }
-      finally { button.disabled=false; button.classList.remove('opacity-50'); }
+      finally { trackQuestionOperation(-1); button.disabled=false; button.classList.remove('opacity-50'); }
     }
 
     // Make room for a newly opened setup section while keeping that section open.
