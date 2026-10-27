@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 
 const MODEL = "gemini-3.5-flash-lite";
 const DAILY_LIMIT = 100;
-const MAX_BODY_BYTES = 100_000;
+const MAX_BODY_BYTES = 12_000_000;
 const ALLOWED_HOSTNAME = "cassidyjames011-coder.github.io";
 
 function json(data, status, origin) {
@@ -174,6 +174,26 @@ export default {
       body.contents.length > 100
     ) {
       return json({ error: "Invalid Gemini request." }, 400, allowedOrigin);
+    }
+
+    // Bound document uploads before the request reaches Google; accept PDFs only as inline binary parts.
+    let inlinePdfCount = 0;
+    let inlinePdfBytes = 0;
+    for (const content of body.contents) {
+      if (!content || !Array.isArray(content.parts)) continue;
+      for (const part of content.parts) {
+        if (part?.inlineData === undefined) continue;
+        const inline = part.inlineData;
+        if (!inline || inline.mimeType !== "application/pdf" || typeof inline.data !== "string" ||
+            !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(inline.data)) {
+          return json({ error: "Only valid PDF document attachments are supported." }, 400, allowedOrigin);
+        }
+        inlinePdfCount += 1;
+        inlinePdfBytes += Math.floor(inline.data.length * 3 / 4);
+        if (inlinePdfCount > 6 || inlinePdfBytes > 8 * 1024 * 1024) {
+          return json({ error: "Document upload limit is 6 PDFs and 8 MB total." }, 413, allowedOrigin);
+        }
+      }
     }
 
     const approvedModels = env.APPROVED_MODELS
