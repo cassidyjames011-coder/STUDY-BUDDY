@@ -2034,10 +2034,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
     async function reskinTheoryQuestions() {
       if (aiLoadingJobs.has('btn-reskin-theory')) return;
       const button=document.getElementById('btn-reskin-theory');
-      const originals=QUESTION_BANK.filter(q=>q.isAnalogyTheory&&!q.isAI);
+      const originals=QUESTION_BANK.filter(q=>q.isAnalogyTheory&&(!q.isAI||q.isDocumentGenerated));
       const hooks=getBrainHooks();
       if(!hooks.length){setAiStatus('Select at least one interest before customising theory questions. Existing questions remain ready.');return;}
-      if(!originals.length){setAiStatus('No built-in theory questions were found; the original bank remains available.');return;}
+      if(!originals.length){setAiStatus('No theory questions are available in this bank yet.');return;}
       trackQuestionOperation(1);
       let generationSucceeded = false;
       startAiLoading('btn-reskin-theory');
