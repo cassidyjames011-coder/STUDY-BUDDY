@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exam Sprint — BAA1118 Python</title>
+  <title>Exam Sprint — Python Practice</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -145,15 +145,21 @@
       .options-popout button { width: 100%; justify-content: flex-start; }
   </style>
   <style>
-    #study-layout { display:grid; grid-template-columns:minmax(17rem,22rem) minmax(0,1fr); align-items:start; gap:1rem; }
+    #study-layout { display:grid; grid-template-columns:minmax(18rem,22rem) minmax(0,1fr); align-items:start; gap:1rem; }
     #study-setup, #study-session { min-width:0; }
-    .study-workspace { display:flex; flex-direction:column; gap:1rem; }
-    #question-deck-container { order:1; }
-    #telemetry-dashboard { order:2; }
-    #question-navigator { order:3; }
+    #study-session { display:grid; grid-template-columns:minmax(0,1fr) minmax(17rem,22rem); grid-template-areas:"summary summary" "focus insights" "navigator insights"; align-items:start; gap:1rem; }
+    .study-workspace { display:contents; }
+    #sprint-completion-summary { grid-area:summary; min-width:0; }
+    #question-deck-container { grid-area:focus; min-width:0; }
+    #telemetry-dashboard { grid-area:insights; grid-template-columns:minmax(0,1fr); align-content:start; min-width:0; }
+    #question-navigator { grid-area:navigator; min-width:0; }
     .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
-    @media (max-width:900px) { #study-layout { grid-template-columns:minmax(0,1fr); } }
-    @media (max-width:640px) { .study-workspace { gap:.75rem; } }
+    @media (max-width:1100px) {
+      #study-layout { grid-template-columns:minmax(17rem,21rem) minmax(0,1fr); }
+      #study-session { grid-template-columns:minmax(0,1fr); grid-template-areas:"summary" "focus" "navigator" "insights"; }
+    }
+    @media (max-width:760px) { #study-layout { grid-template-columns:minmax(0,1fr); } }
+    @media (max-width:640px) { #study-session { gap:.75rem; } }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
@@ -162,7 +168,7 @@
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Brand & Exam Spec Badge -->
+      <!-- Study brand -->
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20">
           <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
@@ -171,10 +177,10 @@
           <div class="flex items-center flex-wrap gap-2">
             <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">⚡ Exam Sprint</h1>
             <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              BAA1118 Python • 10Q / 6m • 36s/Q
+              Personalised study sprints
             </span>
           </div>
-          <p class="text-xs text-slate-400">Personalised micro-sprints for university exams • BAA1118 Test 1</p>
+          <p class="text-xs text-slate-400">Upload course notes and practise with focused, timed questions.</p>
         </div>
       </div>
 
@@ -196,7 +202,9 @@
 
   <div id="study-layout" class="max-w-7xl w-full mx-auto px-4 py-5 flex-1">
     <aside id="study-setup" class="space-y-3" aria-label="Study setup">
-      <section class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 sm:p-5 shadow-lg">
+      <details id="documents-panel" open class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 shadow-lg">
+        <summary class="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 rounded-lg text-sm font-semibold text-slate-100 [&::-webkit-details-marker]:hidden"><span>Course documents</span><span class="text-xs font-normal text-slate-400">Create a 100-question sprint</span><span aria-hidden="true" class="text-slate-400">▾</span></summary>
+        <div class="pt-3">
         <div class="mb-4">
           <p class="text-xs font-bold uppercase tracking-wider text-sky-300">Build a study sprint</p>
           <h2 class="mt-1 text-lg font-bold text-white">Start with your course documents</h2>
@@ -209,16 +217,17 @@
           ondrop="event.preventDefault();this.classList.remove('border-sky-400');handleStudyFiles(event.dataTransfer.files)">
           <i data-lucide="file-up" class="mx-auto mb-2 h-7 w-7 text-sky-300"></i>
           <p class="text-sm font-semibold text-slate-100">Drop your files here</p>
-          <p class="mt-1 text-xs text-slate-400">PDF, TXT, or Markdown · up to 6 files · 8 MB total</p>
+          <p class="mt-1 text-xs text-slate-400">PDF, TXT, or Markdown · up to 10 files · 8 MB total</p>
           <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Choose documents</button>
         </div>
         <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
         <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40">Create my 100-question sprint</button>
         <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Your files stay in this browser session and are sent securely through the study Worker for question creation.</p>
-      </section>
+        </div>
+      </details>
   <!-- FULL-WIDTH SCOPE CONTROLS -->
-  <details id="study-options" class="w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Study options <span class="ml-2 text-xs font-normal text-slate-400">Question scope, order, and view</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
+  <details id="study-options" class="w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden"><span><span class="block">Study options</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Question scope, order, and view</span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
+    <div class="grid grid-cols-1 gap-3 pt-2">
       <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question scope</span>
         <select id="scope-filter-select" onchange="applyScopeFilter(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
           <option value="all">All questions (100)</option><option value="1">L1 · Intro &amp; Errors</option><option value="2">L2 · Types &amp; Strings</option><option value="3">L3 · Collections</option><option value="4">L4 · Control Flow</option><option value="5">L5 · Functions &amp; Files</option><option value="analogy">Theory questions</option><option value="scenario">Code scenarios</option><option value="sample">Sample questions</option><option value="weak">Missed / flagged</option><option value="ai">AI questions</option>
@@ -232,17 +241,17 @@
       </label>
     </div>
   </details>
-  <details id="custom-sprint-settings" class="w-full rounded-2xl border border-slate-800 bg-slate-900/40 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Set sprint length <span class="ml-2 text-xs font-normal text-slate-400">Optional · adjust time and question count</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
-    <div class="max-w-7xl mx-auto flex flex-wrap items-end gap-3">
-      <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
-      <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
-      <button type="button" onclick="applyCustomSprintSettings()" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold">Apply custom sprint</button>
-      <span id="custom-sprint-status" class="text-xs text-slate-400" role="status">Set the time and question count, then apply.</span>
+  <details id="custom-sprint-settings" class="w-full rounded-2xl border border-slate-800 bg-slate-900/40 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden"><span><span class="block">Set sprint length</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Adjust time and question count</span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
+    <div class="grid grid-cols-2 gap-2 pt-2">
+      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-full min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
+      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-full min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
+      <button type="button" onclick="applyCustomSprintSettings()" class="col-span-2 min-h-11 w-full rounded-lg bg-indigo-500 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-400">Apply custom sprint</button>
+      <span id="custom-sprint-status" class="col-span-2 text-xs text-slate-400" role="status">Set the time and question count, then apply.</span>
     </div>
   </details>
 
   <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
-  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><svg aria-hidden="true" class="study-search-icon mr-1 align-text-bottom text-indigo-200" viewBox="0 0 24 24" fill="none" stroke="#c7d2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>Personalise questions <span class="ml-2 text-xs font-normal text-slate-400">Optional · search interests and request AI help</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
+  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><span class="flex min-w-0 items-start gap-2"><svg aria-hidden="true" class="study-search-icon mt-0.5" viewBox="0 0 24 24" fill="none" stroke="#c7d2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><span><span class="block">Personalise questions</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Choose interests for memorable examples</span></span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto space-y-3">
       <div class="space-y-2">
         <div><h2 class="text-sm font-bold text-indigo-200">🧠 Make the questions yours</h2><p class="text-xs text-slate-400">Choose at least one interest. Select up to 3, or add your own.</p></div>
@@ -277,7 +286,7 @@
   </section>
 
   <!-- MAIN WORKSPACE -->
-  <main class="w-full min-w-0 flex flex-col gap-4 study-workspace">
+  <main class="w-full min-w-0 study-workspace">
 
     <!-- 1. HERO TELEMETRY DASHBOARD: 4 CORE CARDS -->
     <section id="telemetry-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2989,7 +2998,7 @@
       'Other interests': ['Planes', 'Ships', 'Trains']
     };
     const selectedStudyFiles = [];
-    const MAX_STUDY_FILES = 6;
+    const MAX_STUDY_FILES = 10;
     const MAX_STUDY_BYTES = 8 * 1024 * 1024;
     function studyFileType(file) {
       const name = file.name.toLowerCase();
@@ -3006,7 +3015,7 @@
         const mime = studyFileType(file);
         if (!mime) { if (status) status.textContent = 'Use PDF, TXT, or Markdown files. Unsupported files were skipped.'; continue; }
         if (selectedStudyFiles.some(existing => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified)) continue;
-        if (selectedStudyFiles.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 6 documents.'; break; }
+        if (selectedStudyFiles.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 10 documents.'; break; }
         const currentSize = selectedStudyFiles.reduce((sum, item) => sum + item.size, 0);
         if (currentSize + file.size > MAX_STUDY_BYTES) { if (status) status.textContent = 'The total upload limit is 8 MB. Remove a file or choose smaller files.'; continue; }
         selectedStudyFiles.push(file); added++;
@@ -3240,7 +3249,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           setAiStatus('Rewriting theory questions '+(offset+1)+'–'+(offset+batch.length)+' of '+originals.length+'…');
           const input=batch.map(q=>({id:q.id,lecture:q.lecture,topic:q.topic,prompt:q.prompt,options:q.options,correct:q.correct,explanation:q.explanation}));
           const schema={type:'ARRAY',items:{type:'OBJECT',properties:{id:{type:'STRING'},prompt:{type:'STRING'},options:{type:'ARRAY',items:{type:'STRING'}},explanation:{type:'STRING'},analogyTheme:{type:'STRING'}},required:['id','prompt','options','explanation','analogyTheme']}};
-          const system='Rewrite these BAA1118 Python theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact Python concept, lecture, topic, difficulty, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the Python concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
+          const system='Rewrite these Python theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact Python concept, lecture, topic, difficulty, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the Python concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
           const result=await callGemini(system,schema,GEMINI_MODEL_ID);
           if(!Array.isArray(result)||result.length!==batch.length)throw new Error('Gemini returned an incomplete reskin for questions '+(offset+1)+'–'+(offset+batch.length)+'.');
           const byId=new Map(result.map(item=>[item.id,item]));
@@ -3271,9 +3280,9 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       const hooks=getBrainHooks();
       if(!hooks.length) { setAiStatus('Select at least one interest before generating questions. Your built-in question bank remains ready.'); return; }
       const weak=QUESTION_BANK.filter(q=>(userAnswers[q.id]!==undefined && userAnswers[q.id]!==q.correct)||flaggedQuestions[q.id]||savedWeakIds[q.id]);
-      const focus=weak.length ? `Focus especially on these weak spots: ${weak.slice(-12).map(q=>`L${q.lecture} ${q.topic}: ${q.prompt}`).join('\n')}` : `Create a balanced personalised weak-spot sprint across BAA1118 Lectures 1–5.`;
+      const focus=weak.length ? `Focus especially on these weak spots: ${weak.slice(-12).map(q=>`L${q.lecture} ${q.topic}: ${q.prompt}`).join('\n')}` : `Create a balanced personalised weak-spot sprint across introductory Python topics.`;
       const hookText=hooks.length ? hooks.join(', ') : 'no interests selected; use clear everyday examples';
-      const system=`You are an accurate DCU BAA1118 exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
+      const system=`You are an accurate introductory Python exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
       const schema={type:'ARRAY',items:{type:'OBJECT',properties:{lecture:{type:'INTEGER'},isAnalogyTheory:{type:'BOOLEAN'},analogyTheme:{type:'STRING',nullable:true},topic:{type:'STRING'},prompt:{type:'STRING'},code:{type:'STRING',nullable:true},options:{type:'ARRAY',items:{type:'STRING'}},correct:{type:'INTEGER'},explanation:{type:'STRING'}},required:['lecture','isAnalogyTheory','topic','prompt','options','correct','explanation']}};
       button.disabled=true; button.classList.add('opacity-50');
       try {
