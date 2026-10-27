@@ -151,21 +151,23 @@
     #documents-panel > summary { min-height:2.75rem; }
     .upload-info-button { display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border:1px solid #64748b; border-radius:50%; color:#7dd3fc; font-weight:700; font-family:serif; font-size:1rem; cursor:pointer; }
     .upload-info-button:hover, .upload-info-button:focus-visible { background:#1e293b; outline:2px solid #38bdf8; outline-offset:2px; }
-    #document-upload-info { margin:auto; width:min(26rem,calc(100vw - 2rem)); padding:1.5rem; border:1px solid #475569; border-radius:1rem; background:#0f172a; color:#f1f5f9; box-shadow:0 20px 60px #0008; }
-    #document-upload-info::backdrop { background:#02061780; }
-    #document-upload-info p { margin-top:.75rem; font-size:.875rem; color:#cbd5e1; }
+    #document-upload-info, #personalisation-info { margin:auto; max-height:calc(100dvh - 2rem); overflow-y:auto; width:min(26rem,calc(100vw - 2rem)); padding:1.5rem; border:1px solid #475569; border-radius:1rem; background:#0f172a; color:#f1f5f9; box-shadow:0 20px 60px #0008; }
+    #document-upload-info::backdrop, #personalisation-info::backdrop { background:#02061780; }
+    #document-upload-info p, #personalisation-info p { margin-top:.75rem; font-size:.875rem; color:#cbd5e1; }
     #study-session { display:grid; grid-template-columns:minmax(0,1fr) minmax(17rem,22rem); grid-template-areas:"summary summary" "focus insights" "navigator insights"; align-items:start; gap:1rem; }
     .study-workspace { display:contents; }
     #sprint-completion-summary { grid-area:summary; min-width:0; }
     #question-deck-container { grid-area:focus; min-width:0; }
-    #telemetry-dashboard { grid-area:insights; grid-template-columns:minmax(0,1fr); align-content:start; min-width:0; }
+    #telemetry-dashboard { contain:size; align-self:stretch; min-height:0; overflow-y:auto; scrollbar-gutter:stable; grid-area:insights; grid-template-columns:minmax(0,1fr); align-content:start; min-width:0; }
     #question-navigator { grid-area:navigator; min-width:0; }
     .telemetry-panel > summary:hover { background:#1e293b; }
     .telemetry-panel > summary:focus-visible { outline:2px solid #38bdf8; outline-offset:3px; }
     .telemetry-panel[open] > summary .telemetry-chevron { transform:rotate(180deg); }
+    #ai-gen-status:empty { display:none; }
     .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
     @media (max-width:1100px) {
       #study-layout { grid-template-columns:minmax(17rem,21rem) minmax(0,1fr); }
+      #telemetry-dashboard { contain:none; overflow:visible; scrollbar-gutter:auto; }
       #study-session { grid-template-columns:minmax(0,1fr); grid-template-areas:"summary" "focus" "navigator" "insights"; }
     }
     @media (max-width:760px) {
@@ -259,26 +261,21 @@
   </details>
 
   <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
-  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><span class="flex min-w-0 items-start gap-2"><svg aria-hidden="true" class="study-search-icon mt-0.5" viewBox="0 0 24 24" fill="none" stroke="#c7d2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><span><span class="block">Personalise questions</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Choose interests for memorable examples</span></span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
-    <div class="max-w-7xl mx-auto space-y-3">
-      <div class="space-y-2">
-        <div><h2 class="text-sm font-bold text-indigo-200">🧠 Make the questions yours</h2><p class="text-xs text-slate-400">Choose at least one interest. Select up to 3, or add your own.</p></div>
-        <div id="brain-hook-picker" class="relative w-full">
-          <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
-          <div class="flex gap-2"><div class="relative min-w-0 flex-1"><svg aria-hidden="true" class="study-search-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search sports, hobbies, planes, ships, trains…" aria-label="Search interests" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div><button id="brain-hook-add-selected" type="button" onclick="addSelectedBrainHooks()" disabled class="shrink-0 px-3 py-2 rounded-lg bg-sky-600 border border-sky-500 text-xs font-bold text-white disabled:opacity-40">Add selected</button><button type="button" onclick="addCustomBrainHook()" class="shrink-0 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 hover:bg-slate-700">Add other</button></div>
-          <div id="brain-hook-options" role="listbox" class="hidden absolute z-30 top-full mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 shadow-2xl p-2"></div>
-        </div>
-        <p id="brain-hook-requirement" class="text-xs text-amber-300">Select at least one interest to enable AI customisation. The question bank and sprints work without it.</p>
+  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3">
+    <summary class="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-lg px-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><span class="flex-1">Personalise questions</span><button type="button" class="upload-info-button" popovertarget="personalisation-info" aria-label="About personalisation" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
+    <div class="space-y-3 pt-3">
+      <div id="brain-hook-picker" class="relative w-full">
+        <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2" aria-label="Selected interests"></div>
+        <div class="relative min-w-0"><svg aria-hidden="true" class="study-search-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search interests…" aria-label="Search interests" aria-controls="brain-hook-options" aria-expanded="false" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full min-h-11 bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div>
+        <div id="brain-hook-options" role="listbox" aria-label="Interests" class="hidden mt-2 w-full max-h-48 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 p-2"></div>
       </div>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <span id="ai-gen-status" role="status" class="text-xs text-slate-400">Ready. Security verification runs automatically when AI is requested.</span>
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-execution="execute" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
-          <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🔥 Reskin My Theory Questions</button>
-          <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold text-xs">✨ Generate My Next Weak-Spot Sprint</button>
-        </div>
+      <p id="brain-hook-requirement" class="text-xs text-slate-400" aria-live="polite">Choose up to 3 interests.</p>
+      <div class="grid gap-2">
+        <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="min-h-11 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Personalise theory</button>
+        <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="min-h-11 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-bold text-xs">Practise weak spots</button>
       </div>
-      <p class="text-xs text-slate-500">AI personalisation uses the configured beta Worker. If it is unavailable, your built-in question bank and sprints remain ready.</p>
+      <span id="ai-gen-status" role="status" aria-live="polite" class="block text-xs text-slate-400"></span>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-execution="execute" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
     </div>
   </details>
 
@@ -289,6 +286,14 @@
       <p>Choose up to 10 PDF, TXT, or Markdown files, with a combined size of 8 MB.</p>
       <p>Files stay in this browser session until you request questions. They are then sent securely to Google AI through the study service to create your sprint.</p>
       <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
+    </div>
+    <div id="personalisation-info" popover role="dialog" aria-labelledby="personalisation-info-title">
+      <h2 id="personalisation-info-title" class="text-lg font-bold">Personalise questions</h2>
+      <p>Search for an interest and select it to add it instantly. Choose up to 3. To use your own topic, type it and select the matching suggestion, or press Enter. Remove a topic with its × button.</p>
+      <p>Your selected topics are saved on this device and included with your documents when you create questions. They help shape memorable examples while keeping the course concepts accurate.</p>
+      <p>Personalise theory updates your existing theory questions. Practise weak spots creates 10 questions based on missed or flagged topics. Both require a selected interest.</p>
+      <p>Security verification runs when you request AI questions. Your existing questions stay available if generation fails.</p>
+      <button type="button" popovertarget="personalisation-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
     </div>
     <section id="study-session" class="min-w-0">
   <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="w-full pb-4">
@@ -3011,7 +3016,6 @@
     // PERSONALISATION + OPTIONAL GEMINI LOCAL BETA
     // ========================================================================
     let selectedBrainHooks = [];
-    let pendingBrainHooks = [];
     const BRAIN_HOOK_GROUPS = {
       'Sports': ['Soccer', 'Rugby', 'Golf', 'Formula 1'],
       'Hobbies': ['Painting', 'Gaming', 'MMA'],
@@ -3152,53 +3156,88 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
     function saveBrainHooks() {
       try { localStorage.setItem('exam_sprint_brain_hooks_v1', JSON.stringify(selectedBrainHooks)); } catch (e) {}
       updateBrainHookUI();
-      setAiStatus(selectedBrainHooks.length ? 'Saved interests: ' + selectedBrainHooks.join(', ') : 'Select at least one interest to use AI customisation. Your question bank still works.');
+      setAiStatus('');
     }
-    function removeBrainHook(name) { selectedBrainHooks=selectedBrainHooks.filter(x=>x!==name); pendingBrainHooks=selectedBrainHooks.slice(); saveBrainHooks(); }
-    function openBrainHookOptions() {
-      const panel=document.getElementById('brain-hook-options');
-      if(panel?.classList.contains('hidden')) pendingBrainHooks=selectedBrainHooks.slice();
-      renderBrainHookOptions();
-    }
-    function renderBrainHookOptions() {
-      const panel=document.getElementById('brain-hook-options'), input=document.getElementById('brain-hook-search');
-      if(!panel||!input) return;
-      const query=input.value.trim().toLowerCase(); panel.innerHTML='';
-      Object.entries(BRAIN_HOOK_GROUPS).forEach(([group,items])=>{
-        const matches=items.filter(item=>item.toLowerCase().includes(query)); if(!matches.length) return;
-        const heading=document.createElement('div'); heading.className='px-2 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500'; heading.textContent=group; panel.appendChild(heading);
-        matches.forEach(item=>{
-          const button=document.createElement('button'); button.type='button'; button.setAttribute('role','option'); button.setAttribute('aria-selected',String(pendingBrainHooks.includes(item)));
-          button.className='w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 '+(pendingBrainHooks.includes(item)?'text-sky-300':'text-slate-200');
-          button.textContent=(pendingBrainHooks.includes(item)?'✓  ':'+  ')+item;
-          button.onclick=()=>{if(pendingBrainHooks.includes(item)) pendingBrainHooks=pendingBrainHooks.filter(x=>x!==item); else if(pendingBrainHooks.length<3) pendingBrainHooks.push(item); else setAiStatus('Choose up to 3 interests. Remove one before adding another.'); renderBrainHookOptions();}; panel.appendChild(button);
-        });
-      });
-      if(query&&!Object.values(BRAIN_HOOK_GROUPS).flat().some(x=>x.toLowerCase()===query)&&!selectedBrainHooks.some(x=>x.toLowerCase()===query)){
-        const custom=document.createElement('button'); custom.type='button'; custom.className='w-full text-left px-2.5 py-2 mt-1 rounded-lg bg-indigo-500/10 text-indigo-200 text-xs hover:bg-indigo-500/20'; custom.textContent='＋ Add “'+input.value.trim().slice(0,40)+'” as a custom interest'; custom.onclick=addCustomBrainHook; panel.appendChild(custom);
-      }
-      const addButton=document.getElementById('brain-hook-add-selected'); if(addButton){addButton.disabled=pendingBrainHooks.length===0; addButton.textContent=pendingBrainHooks.length?'Add selected ('+pendingBrainHooks.length+')':'Add selected';}
-      panel.classList.remove('hidden');
-    }
-    function addSelectedBrainHooks() {
-      selectedBrainHooks=pendingBrainHooks.slice(0,3);
-      saveBrainHooks();
+    function closeBrainHookOptions() {
       document.getElementById('brain-hook-options')?.classList.add('hidden');
+      document.getElementById('brain-hook-search')?.setAttribute('aria-expanded', 'false');
     }
-    function addCustomBrainHook() {
-      const input=document.getElementById('brain-hook-search'), name=(input?.value||'').trim().slice(0,40);
-      if(!name){setAiStatus('Type an interest in the search box, then choose Add other.');return;}
-      if(selectedBrainHooks.some(x=>x.toLowerCase()===name.toLowerCase())){setAiStatus('That interest is already selected.');return;}
-      if(selectedBrainHooks.length>=3){setAiStatus('Choose up to 3 interests. Remove one before adding another.');return;}
-      selectedBrainHooks.push(name); pendingBrainHooks=selectedBrainHooks.slice(); saveBrainHooks(); if(input) input.value=''; document.getElementById('brain-hook-options')?.classList.add('hidden');
+    function removeBrainHook(name) {
+      selectedBrainHooks = selectedBrainHooks.filter(item => item !== name);
+      saveBrainHooks();
     }
-    function handleBrainHookKey(event) { if(event.key==='Enter'){event.preventDefault();addCustomBrainHook();} else if(event.key==='Escape') document.getElementById('brain-hook-options')?.classList.add('hidden'); }
+    function selectBrainHook(name) {
+      name = String(name).trim().slice(0,40);
+      if (!name) return;
+      if (selectedBrainHooks.some(item => item.toLowerCase() === name.toLowerCase())) {
+        closeBrainHookOptions(); return;
+      }
+      if (selectedBrainHooks.length >= 3) {
+        setAiStatus('Choose up to 3 interests. Remove one to change your selection.'); return;
+      }
+      selectedBrainHooks.push(name);
+      saveBrainHooks();
+      document.getElementById('brain-hook-search').value = '';
+      closeBrainHookOptions();
+    }
+    function openBrainHookOptions() { renderBrainHookOptions(); }
+    function renderBrainHookOptions() {
+      const panel = document.getElementById('brain-hook-options');
+      const input = document.getElementById('brain-hook-search');
+      if (!panel || !input) return;
+      const query = input.value.trim().toLowerCase();
+      panel.replaceChildren();
+      function appendOption(name, custom = false) {
+        const selected = selectedBrainHooks.some(item => item.toLowerCase() === name.toLowerCase());
+        const option = document.createElement('button');
+        option.type = 'button'; option.setAttribute('role', 'option');
+        option.setAttribute('aria-selected', String(selected));
+        option.className = 'block w-full min-h-11 text-left px-2.5 py-2 rounded-lg text-sm hover:bg-slate-800 ' + (selected ? 'text-sky-300' : 'text-slate-200');
+        option.textContent = (selected ? '✓ ' : '') + name + (custom ? ' (custom)' : '');
+        option.onclick = () => selectBrainHook(name);
+        panel.appendChild(option);
+      }
+      Object.values(BRAIN_HOOK_GROUPS).flat().filter(name => name.toLowerCase().includes(query)).forEach(name => appendOption(name));
+      if (query && !Object.values(BRAIN_HOOK_GROUPS).flat().some(name => name.toLowerCase() === query) &&
+          !selectedBrainHooks.some(name => name.toLowerCase() === query)) appendOption(input.value.trim().slice(0,40), true);
+      panel.classList.remove('hidden');
+      input.setAttribute('aria-expanded', 'true');
+    }
+    function handleBrainHookKey(event) {
+      if (event.key === 'Escape') { closeBrainHookOptions(); return; }
+      const options = document.getElementById('brain-hook-options');
+      if (event.key === 'ArrowDown') {
+        event.preventDefault(); renderBrainHookOptions(); options.querySelector('button')?.focus();
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const query = event.target.value.trim();
+        if (!query) return;
+        const match = Object.values(BRAIN_HOOK_GROUPS).flat().find(name => name.toLowerCase().includes(query.toLowerCase()));
+        selectBrainHook(match || query);
+      }
+    }
     function updateBrainHookUI() {
-      const chips=document.getElementById('brain-hook-chips'), panel=document.getElementById('brain-hook-options'), requirement=document.getElementById('brain-hook-requirement');
-      if(chips){chips.innerHTML='';selectedBrainHooks.forEach(name=>{const chip=document.createElement('span');chip.className='inline-flex items-center gap-1 rounded-full bg-sky-500/15 border border-sky-500/30 px-2.5 py-1 text-xs text-sky-200';const label=document.createElement('span');label.textContent=name;const remove=document.createElement('button');remove.type='button';remove.setAttribute('aria-label','Remove '+name);remove.className='text-sky-300 hover:text-white';remove.textContent='×';remove.onclick=()=>removeBrainHook(name);chip.append(label,remove);chips.appendChild(chip);});}
-      if(panel&&!panel.classList.contains('hidden')) renderBrainHookOptions();
-      const ready=selectedBrainHooks.length>0; ['btn-reskin-theory','btn-generate-ai-batch'].forEach(id=>{const button=document.getElementById(id);if(button){button.disabled=!ready;button.classList.toggle('opacity-50',!ready);button.title=ready?'':'Choose at least one interest first';}});
-      if(requirement) requirement.textContent=ready?'Selected interests are saved on this device. Choose up to 3.':'Select at least one interest to enable AI customisation. The question bank and sprints work without it.';
+      const chips = document.getElementById('brain-hook-chips');
+      if (chips) {
+        chips.replaceChildren();
+        selectedBrainHooks.forEach(name => {
+          const chip = document.createElement('span');
+          chip.className = 'inline-flex items-center gap-1 rounded-full bg-sky-500/15 border border-sky-500/30 pl-3 text-xs text-sky-200';
+          const label = document.createElement('span'); label.textContent = name;
+          const remove = document.createElement('button'); remove.type = 'button';
+          remove.setAttribute('aria-label', 'Remove ' + name);
+          remove.className = 'min-h-9 min-w-9 rounded-full text-sky-300 hover:bg-slate-700 hover:text-white';
+          remove.textContent = '×'; remove.onclick = () => removeBrainHook(name);
+          chip.append(label, remove); chips.appendChild(chip);
+        });
+      }
+      const ready = selectedBrainHooks.length > 0;
+      ['btn-reskin-theory','btn-generate-ai-batch'].forEach(id => {
+        const button = document.getElementById(id);
+        if (button) { button.disabled = !ready; button.classList.toggle('opacity-50', !ready); button.title = ready ? '' : 'Select an interest first'; }
+      });
+      const requirement = document.getElementById('brain-hook-requirement');
+      if (requirement) requirement.textContent = selectedBrainHooks.length ? selectedBrainHooks.length + ' / 3 interests selected' : 'Choose up to 3 interests.';
     }
     function setAiStatus(message) { const el=document.getElementById('ai-gen-status'); if(el) el.textContent=message; }
     function loadSavedAiQuestionsAndKey() {
@@ -3323,29 +3362,27 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
 
     // Make room for a newly opened setup section while keeping that section open.
     function initSetupPanelSizing() {
-      const setup = document.getElementById('study-setup');
-      const panels = Array.from(setup.querySelectorAll(':scope > details'));
-      let lastOpened = null;
-      panels.forEach(panel => panel.addEventListener('toggle', () => {
-        if (!panel.open) return;
-        lastOpened = panel;
-        requestAnimationFrame(() => {
-          if (lastOpened !== panel || !panel.open || window.matchMedia('(max-width:760px)').matches) return;
-          const expandedHeight = item => item.offsetHeight - item.querySelector('summary').offsetHeight;
-          const others = panels.filter(other => other !== panel && other.open)
-            .sort((left, right) => expandedHeight(right) - expandedHeight(left));
-          while (setup.scrollHeight > setup.clientHeight + 2 && others.length) {
-            others.shift().open = false;
-          }
-          // A section that overflows on its own remains scrollable.
-          setup.scrollTop = 0;
-          const setupBounds = setup.getBoundingClientRect();
-          const headingBounds = panel.querySelector('summary').getBoundingClientRect();
-          if (headingBounds.bottom > setupBounds.bottom) {
-            setup.scrollTop += headingBounds.bottom - setupBounds.bottom;
-          }
-        });
-      }));
+      function sizePanels(container, breakpoint) {
+        const panels = Array.from(container.querySelectorAll(':scope > details'));
+        let lastOpened = null;
+        panels.forEach(panel => panel.addEventListener('toggle', () => {
+          if (!panel.open) return;
+          lastOpened = panel;
+          requestAnimationFrame(() => {
+            if (lastOpened !== panel || !panel.open || window.matchMedia('(max-width:' + breakpoint + 'px)').matches) return;
+            const expandedHeight = item => item.offsetHeight - item.querySelector('summary').offsetHeight;
+            const others = panels.filter(other => other !== panel && other.open)
+              .sort((left, right) => expandedHeight(right) - expandedHeight(left));
+            while (container.scrollHeight > container.clientHeight + 2 && others.length) others.shift().open = false;
+            container.scrollTop = 0;
+            const bounds = container.getBoundingClientRect();
+            const heading = panel.querySelector('summary').getBoundingClientRect();
+            if (heading.bottom > bounds.bottom) container.scrollTop += heading.bottom - bounds.bottom;
+          });
+        }));
+      }
+      sizePanels(document.getElementById('study-setup'), 760);
+      sizePanels(document.getElementById('telemetry-dashboard'), 1100);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -3358,7 +3395,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       document.addEventListener('click', (event) => {
         const picker = document.getElementById('brain-hook-picker');
         const panel = document.getElementById('brain-hook-options');
-        if (picker && panel && !picker.contains(event.target)) panel.classList.add('hidden');
+        if (picker && panel && !picker.contains(event.target)) closeBrainHookOptions();
         const options = document.getElementById('options-menu');
         if (options && !options.contains(event.target)) options.open = false;
       });
