@@ -682,6 +682,7 @@
       if (!window.confirm('Clear uploaded files and all AI-generated questions, including their saved answers and progress? Your starter question bank, interests, and preferences will stay.')) return;
       const activeUploads = activeQuestions.some(q => generatedIds.has(q.id));
       selectedStudyFiles.length = 0;
+      pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
       const input = document.getElementById('document-upload-input');
       if (input) input.value = '';
       for (let index = QUESTION_BANK.length - 1; index >= 0; index--) {
@@ -1594,6 +1595,23 @@
       'Other interests': ['Planes', 'Ships', 'Trains']
     };
     const selectedStudyFiles = [];
+    let pendingDocumentQuestions = [];
+    let pendingDocumentFingerprint = '';
+    function validDocumentQuestion(q, sources) {
+  return q && sources.includes(q.sourceDoc) && ["practical","theory"].includes(q.questionType) &&
+    typeof q.topic === "string" && q.topic.trim() && typeof q.prompt === "string" && q.prompt.trim() &&
+    (q.code === undefined || q.code === null || typeof q.code === "string") &&
+    Array.isArray(q.options) && q.options.length === 4 && q.options.every(option => typeof option === "string" && option.trim()) &&
+    new Set(q.options.map(option => option.trim().toLowerCase())).size === 4 &&
+    Number.isInteger(q.correct) && q.correct >= 0 && q.correct < 4 &&
+    typeof q.explanation === "string" && q.explanation.trim();
+}
+
+
+    function documentQuestionKey(q) {
+      return (q.prompt + '\n' + (q.code || '')).normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
     const MAX_STUDY_FILES = 10;
     const MAX_STUDY_BYTES = 8 * 1024 * 1024;
     function studyFileType(file) {
@@ -1605,6 +1623,7 @@
     }
     function handleStudyFiles(fileList) {
       const status = document.getElementById('document-gen-status');
+      if (documentGenerationInProgress) { if (status) status.textContent = 'Please wait for generation to finish before changing documents.'; return; }
       const incoming = Array.from(fileList || []);
       let added = 0;
       for (const file of incoming) {
@@ -1621,6 +1640,8 @@
       if (status && added) status.textContent = `${selectedStudyFiles.length} document${selectedStudyFiles.length === 1 ? '' : 's'} ready. They’ll be sent with one secure question-generation request.`;
     }
     function removeStudyFile(index) {
+      if (documentGenerationInProgress) return;
+      pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
       selectedStudyFiles.splice(index, 1);
       renderStudyFiles();
       const status = document.getElementById('document-gen-status');
@@ -1643,6 +1664,9 @@
         row.append(label, remove); list.appendChild(row);
       });
       button.disabled = !selectedStudyFiles.length || documentGenerationInProgress;
+      const input = document.getElementById('document-upload-input');
+      if (input) input.disabled = documentGenerationInProgress;
+      list.querySelectorAll('button').forEach(remove => { remove.disabled = documentGenerationInProgress; });
     }
     let documentGenerationInProgress = false;
     function bytesToBase64(buffer) {
@@ -1658,6 +1682,12 @@
       if (!selectedStudyFiles.length || documentGenerationInProgress) return;
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
+      const generationInterests = getBrainHooks();
+      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), interests:generationInterests });
+      if (pendingDocumentFingerprint !== fingerprint) {
+        pendingDocumentQuestions = [];
+        pendingDocumentFingerprint = fingerprint;
+      }
       documentGenerationInProgress = true; trackQuestionOperation(1); renderStudyFiles();
       let generationSucceeded = false;
       startAiLoading('btn-generate-document-sprint');
@@ -1676,7 +1706,7 @@
             sourceNotes.push({ name: file.name, text });
           }
         }
-        const hooks = getBrainHooks();
+        const hooks = generationInterests;
         const interestInstruction = hooks.length
           ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate.'
           : 'Use clear, familiar everyday examples for theory questions.';
@@ -1691,18 +1721,27 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
         const requestBody = {
           systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
-          contents: [{ role: 'user', parts: [...parts, { text: prompt }] }],
+          contents: [{ role: 'user', parts: [...parts, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text }))] }],
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, progressButtonId: 'btn-generate-document-sprint' });
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests,
+          onDocumentBatch:batch => {
+            const seen = new Set(pendingDocumentQuestions.map(documentQuestionKey));
+            for (const question of batch) {
+              if (!validDocumentQuestion(question, names)) continue;
+              const key = documentQuestionKey(question);
+              if (!seen.has(key) && pendingDocumentQuestions.length < 100) {
+                seen.add(key); pendingDocumentQuestions.push(question);
+              }
+            }
+          },
+          progressButtonId: 'btn-generate-document-sprint' });
         if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The study service returned ' + (Array.isArray(generated) ? generated.length : 0) + ' of 100 questions. No partial set was loaded. Your files are still selected; please retry.');
         const practical = generated.filter(q => q?.questionType === 'practical').length;
         const theory = generated.filter(q => q?.questionType === 'theory').length;
-        const valid = generated.every(q => q && names.includes(q.sourceDoc) && ['practical','theory'].includes(q.questionType) &&
-          typeof q.prompt === 'string' && q.prompt.trim() && typeof q.topic === 'string' &&
-          Array.isArray(q.options) && q.options.length === 4 && q.options.every(option => typeof option === 'string' && option.trim()) &&
-          Number.isInteger(q.correct) && q.correct >= 0 && q.correct < 4 && typeof q.explanation === 'string' && q.explanation.trim());
+        const valid = generated.every(q => validDocumentQuestion(q, names)) &&
+          new Set(generated.map(documentQuestionKey)).size === 100;
         if (!valid || practical !== 60 || theory !== 40) throw new Error('The response missed a required question, source, answer, or the 60 practical / 40 theory split. Your current sprint is unchanged. Please retry once.');
         const stamp = Date.now().toString(36);
         const questions = generated.map((q, index) => ({
@@ -1716,11 +1755,12 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = 3600; remainingSprintSeconds = 3600; elapsedSprintSeconds = 0;
         const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
         generationSucceeded = true;
+        pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
         if (status) status.textContent = 'Ready: 60 practical and 40 theory questions, grouped by your uploaded documents. Start when you’re ready.';
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
         console.error('Document question generation:', error);
-        if (status) status.textContent = error.message || 'Could not create the sprint. Your existing questions remain available.';
+        if (status) status.textContent = (pendingDocumentQuestions.length ? pendingDocumentQuestions.length + ' / 100 checked questions kept for retry. Press Create again to continue. ' : '') + (error.message || 'Could not create the sprint. Your existing questions remain available.');
       } finally {
         documentGenerationInProgress = false;
         trackQuestionOperation(-1);
@@ -1888,7 +1928,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         .map(value => String(value).slice(0, 500)).join(' ').slice(0, 1500);
     }
 
-    async function readDocumentSprintStream(response, buttonId) {
+    async function readDocumentSprintStream(response, buttonId, onBatch) {
       if (!response.body) throw new Error('The study service did not open a generation stream. Your files are still selected.');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -1910,6 +1950,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           }
           const status = document.getElementById('document-gen-status');
           if (status) status.textContent = typeof event.message === 'string' ? event.message : event.completed + ' of 100 questions checked';
+        }
+        if (event.type === 'batch') {
+          if (!Array.isArray(event.questions) || event.questions.length > 100) throw new Error('The study service returned an invalid batch.');
+          if (onBatch) onBatch(event.questions);
         }
         if (event.type === 'result') {
           if (!Array.isArray(event.questions)) throw new Error('The study service returned an invalid question set.');
@@ -1950,7 +1994,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
@@ -1962,7 +2006,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           throw new Error('Could not reach the Gemini Worker after ' + (attempt + 1) + (attempt ? ' attempts' : ' attempt') + '. Check your connection and try again.');
         }
         if (response.ok && (response.headers.get('Content-Type') || '').includes('application/x-ndjson')) {
-          try { return await readDocumentSprintStream(response, callOptions.progressButtonId); }
+          try { return await readDocumentSprintStream(response, callOptions.progressButtonId, callOptions.onDocumentBatch); }
           finally { resetTurnstileWidget(); }
         }
         let responseText = '';
