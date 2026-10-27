@@ -145,10 +145,14 @@
       .options-popout button { width: 100%; justify-content: flex-start; }
   </style>
   <style>
+    #study-layout { display:grid; grid-template-columns:minmax(17rem,22rem) minmax(0,1fr); align-items:start; gap:1rem; }
+    #study-setup, #study-session { min-width:0; }
     .study-workspace { display:flex; flex-direction:column; gap:1rem; }
     #question-deck-container { order:1; }
     #telemetry-dashboard { order:2; }
     #question-navigator { order:3; }
+    .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
+    @media (max-width:900px) { #study-layout { grid-template-columns:minmax(0,1fr); } }
     @media (max-width:640px) { .study-workspace { gap:.75rem; } }
   </style>
 </head>
@@ -190,8 +194,30 @@
     </div>
   </header>
 
+  <div id="study-layout" class="max-w-7xl w-full mx-auto px-4 py-5 flex-1">
+    <aside id="study-setup" class="space-y-3" aria-label="Study setup">
+      <section class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 sm:p-5 shadow-lg">
+        <div class="mb-4">
+          <p class="text-xs font-bold uppercase tracking-wider text-sky-300">Build a study sprint</p>
+          <h2 class="mt-1 text-lg font-bold text-white">Start with your course documents</h2>
+          <p class="mt-1 text-sm text-slate-400">Add notes or slides, then create 100 questions: 60 practical and 40 theory.</p>
+        </div>
+        <input id="document-upload-input" type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" multiple class="sr-only" aria-label="Choose PDF, text, or Markdown study documents" onchange="handleStudyFiles(this.files)" />
+        <div id="document-drop-zone" class="rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/70 p-5 text-center transition hover:border-sky-400"
+          ondragover="event.preventDefault();this.classList.add('border-sky-400')"
+          ondragleave="this.classList.remove('border-sky-400')"
+          ondrop="event.preventDefault();this.classList.remove('border-sky-400');handleStudyFiles(event.dataTransfer.files)">
+          <i data-lucide="file-up" class="mx-auto mb-2 h-7 w-7 text-sky-300"></i>
+          <p class="text-sm font-semibold text-slate-100">Drop your files here</p>
+          <p class="mt-1 text-xs text-slate-400">PDF, TXT, or Markdown · up to 6 files · 8 MB total</p>
+          <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Choose documents</button>
+        </div>
+        <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
+        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40">Create my 100-question sprint</button>
+        <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Your files stay in this browser session and are sent securely through the study Worker for question creation.</p>
+      </section>
   <!-- FULL-WIDTH SCOPE CONTROLS -->
-  <details id="study-options" class="w-full bg-slate-900/60 border-b border-slate-800/80 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Study options <span class="ml-2 text-xs font-normal text-slate-400">Question scope, order, and view</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
+  <details id="study-options" class="w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Study options <span class="ml-2 text-xs font-normal text-slate-400">Question scope, order, and view</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
       <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question scope</span>
         <select id="scope-filter-select" onchange="applyScopeFilter(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
@@ -206,7 +232,7 @@
       </label>
     </div>
   </details>
-  <details id="custom-sprint-settings" class="w-full bg-slate-900/40 border-b border-slate-800/80 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Set sprint length <span class="ml-2 text-xs font-normal text-slate-400">Optional · adjust time and question count</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
+  <details id="custom-sprint-settings" class="w-full rounded-2xl border border-slate-800 bg-slate-900/40 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">Set sprint length <span class="ml-2 text-xs font-normal text-slate-400">Optional · adjust time and question count</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto flex flex-wrap items-end gap-3">
       <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
       <label class="block"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-36 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
@@ -216,13 +242,13 @@
   </details>
 
   <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
-  <details id="ai-personalisation" class="bg-indigo-950/30 border-b border-indigo-500/30 px-4 py-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><svg aria-hidden="true" class="mr-1 inline-block h-4 w-4 align-text-bottom text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>Personalise questions <span class="ml-2 text-xs font-normal text-slate-400">Optional · search interests and request AI help</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
+  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3"><summary class="max-w-7xl mx-auto cursor-pointer select-none list-none rounded-lg px-2 py-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><svg aria-hidden="true" class="study-search-icon mr-1 align-text-bottom text-indigo-200" viewBox="0 0 24 24" fill="none" stroke="#c7d2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>Personalise questions <span class="ml-2 text-xs font-normal text-slate-400">Optional · search interests and request AI help</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
     <div class="max-w-7xl mx-auto space-y-3">
       <div class="space-y-2">
         <div><h2 class="text-sm font-bold text-indigo-200">🧠 Make the questions yours</h2><p class="text-xs text-slate-400">Choose at least one interest. Select up to 3, or add your own.</p></div>
         <div id="brain-hook-picker" class="relative w-full">
           <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
-          <div class="flex gap-2"><div class="relative min-w-0 flex-1"><svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search sports, hobbies, planes, ships, trains…" aria-label="Search interests" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div><button id="brain-hook-add-selected" type="button" onclick="addSelectedBrainHooks()" disabled class="shrink-0 px-3 py-2 rounded-lg bg-sky-600 border border-sky-500 text-xs font-bold text-white disabled:opacity-40">Add selected</button><button type="button" onclick="addCustomBrainHook()" class="shrink-0 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 hover:bg-slate-700">Add other</button></div>
+          <div class="flex gap-2"><div class="relative min-w-0 flex-1"><svg aria-hidden="true" class="study-search-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search sports, hobbies, planes, ships, trains…" aria-label="Search interests" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div><button id="brain-hook-add-selected" type="button" onclick="addSelectedBrainHooks()" disabled class="shrink-0 px-3 py-2 rounded-lg bg-sky-600 border border-sky-500 text-xs font-bold text-white disabled:opacity-40">Add selected</button><button type="button" onclick="addCustomBrainHook()" class="shrink-0 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 hover:bg-slate-700">Add other</button></div>
           <div id="brain-hook-options" role="listbox" class="hidden absolute z-30 top-full mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 shadow-2xl p-2"></div>
         </div>
         <p id="brain-hook-requirement" class="text-xs text-amber-300">Select at least one interest to enable AI customisation. The question bank and sprints work without it.</p>
@@ -239,7 +265,9 @@
     </div>
   </details>
 
-  <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="max-w-7xl w-full mx-auto px-4 pt-4">
+    </aside>
+    <section id="study-session" class="min-w-0">
+  <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="w-full pb-4">
     <div class="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-5 sm:p-6">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div><h2 class="text-lg font-bold text-emerald-200">Sprint complete</h2><p id="sprint-completion-copy" class="mt-1 text-sm text-slate-200"></p></div>
@@ -249,7 +277,7 @@
   </section>
 
   <!-- MAIN WORKSPACE -->
-  <main class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 flex flex-col gap-4 study-workspace">
+  <main class="w-full min-w-0 flex flex-col gap-4 study-workspace">
 
     <!-- 1. HERO TELEMETRY DASHBOARD: 4 CORE CARDS -->
     <section id="telemetry-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -371,16 +399,16 @@
         </div>
       </div>
 
-      <!-- CARD 4: LECTURE 1–5 MASTERY BREAKDOWN -->
+      <!-- CARD 4: DOCUMENT SOURCE BREAKDOWN -->
       <div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Lecture Breakdown
+            <i data-lucide="files" class="w-4 h-4"></i> Source Breakdown
           </span>
-          <span class="text-[11px] font-mono text-slate-400">L1 – L5 Accuracy</span>
+          <span class="text-[11px] font-mono text-slate-400">By document</span>
         </div>
 
-        <div id="lecture-mini-bars" class="space-y-1.5 my-1 text-[11px]">
+        <div id="source-mini-bars" class="space-y-1.5 my-1 text-[11px]">
           <!-- Populated dynamically by JS -->
         </div>
 
@@ -418,6 +446,8 @@
     </section>
 
   </main>
+    </section>
+  </div>
 
   <!-- FOOTER -->
   <footer class="bg-slate-950 border-t border-slate-900 px-4 py-4 mt-8">
@@ -2648,48 +2678,29 @@
     }
 
     function renderLectureBreakdown() {
-      const container = document.getElementById('lecture-mini-bars');
+      const container = document.getElementById('source-mini-bars');
       if (!container) return;
-
       const showGrading = isInstantStudyMode || isSprintFinished;
-      const rows = [1, 2, 3, 4, 5].map(lec => {
-        const lecQs = activeQuestions.filter(q => q.lecture === lec);
-        const answered = lecQs.filter(q => userAnswers[q.id] !== undefined);
+      const groups = new Map();
+      activeQuestions.forEach(q => {
+        const source = q.sourceDoc || (q.isAI ? 'Personalised question bank' : 'Built-in question bank');
+        if (!groups.has(source)) groups.set(source, []);
+        groups.get(source).push(q);
+      });
+      container.innerHTML = [...groups.entries()].map(([source, questions]) => {
+        const answered = questions.filter(q => userAnswers[q.id] !== undefined);
         const correct = answered.filter(q => userAnswers[q.id] === q.correct);
-        const pct = answered.length > 0 ? Math.round((correct.length / answered.length) * 100) : 0;
-
-        const rightText = !showGrading
-          ? `${answered.length}/${lecQs.length} ans`
-          : answered.length > 0
-          ? `${correct.length}/${answered.length} (${pct}%)`
-          : `0/${lecQs.length}`;
-
-        const barWidth = !showGrading
-          ? (lecQs.length > 0 ? (answered.length / lecQs.length) * 100 : 0)
-          : pct;
-
-        const barColor = !showGrading
-          ? 'bg-sky-400'
-          : pct >= 75
-          ? 'bg-emerald-400'
-          : pct >= 50
-          ? 'bg-amber-400'
-          : 'bg-rose-500';
-
-        return `
-          <div>
-            <div class="flex justify-between text-[11px] font-mono">
-              <span class="text-slate-300">Lecture ${lec}</span>
-              <span class="text-slate-400">${rightText}</span>
-            </div>
-            <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-              <div class="h-full ${barColor} transition-all duration-300" style="width: ${barWidth}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      container.innerHTML = rows;
+        const pct = answered.length ? Math.round(correct.length / answered.length * 100) : 0;
+        const rightText = showGrading
+          ? (answered.length ? `${correct.length}/${answered.length} · ${pct}%` : `0/${questions.length}`)
+          : `${answered.length}/${questions.length} answered`;
+        const barWidth = showGrading ? pct : (questions.length ? answered.length / questions.length * 100 : 0);
+        const barColor = !showGrading ? 'bg-sky-400' : pct >= 75 ? 'bg-emerald-400' : pct >= 50 ? 'bg-amber-400' : 'bg-rose-500';
+        return `<div>
+          <div class="flex justify-between gap-2 text-[11px] font-mono"><span class="min-w-0 truncate text-slate-300" title="${escapeHtml(source)}">${escapeHtml(source)}</span><span class="shrink-0 text-slate-400">${rightText}</span></div>
+          <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800"><div class="h-full ${barColor} transition-all duration-300" style="width:${barWidth}%"></div></div>
+        </div>`;
+      }).join('') || '<p class="text-xs text-slate-500">Your question sources will appear here.</p>';
     }
 
     function escapeHtml(str) {
@@ -2814,7 +2825,7 @@
                 Q${idx + 1} / ${activeQuestions.length}
               </span>
               <span class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Lecture ${q.lecture} • ${q.id}
+                ${q.sourceDoc ? 'Source · ' + escapeHtml(q.sourceDoc) : 'Lecture ' + q.lecture + ' • ' + q.id}
               </span>
               <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
                 ${escapeHtml(q.topic)}
@@ -2977,6 +2988,137 @@
       'Hobbies': ['Painting', 'Gaming', 'MMA'],
       'Other interests': ['Planes', 'Ships', 'Trains']
     };
+    const selectedStudyFiles = [];
+    const MAX_STUDY_FILES = 6;
+    const MAX_STUDY_BYTES = 8 * 1024 * 1024;
+    function studyFileType(file) {
+      const name = file.name.toLowerCase();
+      if (file.type === 'application/pdf' || name.endsWith('.pdf')) return 'application/pdf';
+      if (file.type === 'text/plain' || name.endsWith('.txt')) return 'text/plain';
+      if (file.type === 'text/markdown' || name.endsWith('.md') || name.endsWith('.markdown')) return 'text/markdown';
+      return '';
+    }
+    function handleStudyFiles(fileList) {
+      const status = document.getElementById('document-gen-status');
+      const incoming = Array.from(fileList || []);
+      let added = 0;
+      for (const file of incoming) {
+        const mime = studyFileType(file);
+        if (!mime) { if (status) status.textContent = 'Use PDF, TXT, or Markdown files. Unsupported files were skipped.'; continue; }
+        if (selectedStudyFiles.some(existing => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified)) continue;
+        if (selectedStudyFiles.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 6 documents.'; break; }
+        const currentSize = selectedStudyFiles.reduce((sum, item) => sum + item.size, 0);
+        if (currentSize + file.size > MAX_STUDY_BYTES) { if (status) status.textContent = 'The total upload limit is 8 MB. Remove a file or choose smaller files.'; continue; }
+        selectedStudyFiles.push(file); added++;
+      }
+      const picker = document.getElementById('document-upload-input'); if (picker) picker.value = '';
+      renderStudyFiles();
+      if (status && added) status.textContent = `${selectedStudyFiles.length} document${selectedStudyFiles.length === 1 ? '' : 's'} ready. They’ll be sent with one secure question-generation request.`;
+    }
+    function removeStudyFile(index) {
+      selectedStudyFiles.splice(index, 1);
+      renderStudyFiles();
+      const status = document.getElementById('document-gen-status');
+      if (status) status.textContent = selectedStudyFiles.length ? 'Document removed. Your remaining files are ready.' : 'Add course notes to build a 100-question sprint.';
+    }
+    function renderStudyFiles() {
+      const list = document.getElementById('study-file-list');
+      const button = document.getElementById('btn-generate-document-sprint');
+      if (!list || !button) return;
+      list.replaceChildren();
+      selectedStudyFiles.forEach((file, index) => {
+        const row = document.createElement('li');
+        row.className = 'flex items-center justify-between gap-3 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs';
+        const label = document.createElement('span');
+        label.className = 'min-w-0 truncate text-slate-200';
+        label.textContent = file.name + ' · ' + (file.size / 1024).toFixed(0) + ' KB';
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'min-h-9 min-w-9 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white';
+        remove.setAttribute('aria-label', 'Remove ' + file.name); remove.textContent = '×'; remove.onclick = () => removeStudyFile(index);
+        row.append(label, remove); list.appendChild(row);
+      });
+      button.disabled = !selectedStudyFiles.length || documentGenerationInProgress;
+    }
+    let documentGenerationInProgress = false;
+    function bytesToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(offset, Math.min(offset + chunkSize, bytes.length)));
+      }
+      return btoa(binary);
+    }
+    async function generateDocumentQuestionBatch() {
+      if (!selectedStudyFiles.length || documentGenerationInProgress) return;
+      const button = document.getElementById('btn-generate-document-sprint');
+      const status = document.getElementById('document-gen-status');
+      documentGenerationInProgress = true; renderStudyFiles();
+      if (button) button.textContent = 'Reading documents…';
+      try {
+        const names = selectedStudyFiles.map(file => file.name);
+        const parts = [];
+        const sourceNotes = [];
+        for (const file of selectedStudyFiles) {
+          const mimeType = studyFileType(file);
+          if (mimeType === 'application/pdf') {
+            parts.push({ inlineData: { mimeType, data: bytesToBase64(await file.arrayBuffer()) } });
+          } else {
+            const text = (await file.text()).trim();
+            if (!text) throw new Error(file.name + ' is empty. Remove it or upload a file with readable text.');
+            sourceNotes.push({ name: file.name, text });
+          }
+        }
+        const hooks = getBrainHooks();
+        const interestInstruction = hooks.length
+          ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the Python concept explicit and the explanation accurate.'
+          : 'Use clear, familiar everyday examples for theory questions.';
+        const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test writing, tracing, predicting output, or debugging Python code. Theory questions should test concepts from the documents. Use only the course material and introductory Python facts needed to interpret it. ${interestInstruction}
+For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Return only the JSON array matching the response schema.
+${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`;
+        const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+          questionType: { type: 'STRING', enum: ['practical', 'theory'] }, sourceDoc: { type: 'STRING', enum: names },
+          lecture: { type: 'INTEGER' }, topic: { type: 'STRING' }, prompt: { type: 'STRING' },
+          code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', items: { type: 'STRING' } },
+          correct: { type: 'INTEGER' }, explanation: { type: 'STRING' }, analogyTheme: { type: 'STRING', nullable: true }
+        }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
+        const requestBody = {
+          systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
+          contents: [{ role: 'user', parts: [...parts, { text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 16384 }
+        };
+        if (status) status.textContent = 'Sending your documents and interests for one 100-question generation…';
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0 });
+        if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The response did not contain all 100 questions. Nothing in your current question bank was changed. Try smaller or more focused documents.');
+        const practical = generated.filter(q => q?.questionType === 'practical').length;
+        const theory = generated.filter(q => q?.questionType === 'theory').length;
+        const valid = generated.every(q => q && names.includes(q.sourceDoc) && ['practical','theory'].includes(q.questionType) &&
+          typeof q.prompt === 'string' && q.prompt.trim() && typeof q.topic === 'string' &&
+          Array.isArray(q.options) && q.options.length === 4 && q.options.every(option => typeof option === 'string' && option.trim()) &&
+          Number.isInteger(q.correct) && q.correct >= 0 && q.correct < 4 && typeof q.explanation === 'string' && q.explanation.trim());
+        if (!valid || practical !== 60 || theory !== 40) throw new Error('The response missed a required question, source, answer, or the 60 practical / 40 theory split. Your current sprint is unchanged. Please retry once.');
+        const stamp = Date.now().toString(36);
+        const questions = generated.map((q, index) => ({
+          ...q, id: `DOC-${stamp}-${index + 1}`, lecture: Math.min(5, Math.max(1, Number(q.lecture) || 1)),
+          isAI: true, isDocumentGenerated: true, isAnalogyTheory: q.questionType === 'theory'
+        }));
+        QUESTION_BANK.push(...questions);
+        try { localStorage.setItem('baa1118_ai_questions_v1', JSON.stringify(QUESTION_BANK.filter(q => q.isAI))); } catch (error) {}
+        activeQuestions = questions; activeSprintSize = 100; activeSprintMinutes = 60; isCustomSprint = false; syncSprintSettingInputs();
+        activeLectureFilter = 'ai'; currentQIndex = 0; userAnswers = {}; flaggedQuestions = {}; timeSpentPerQuestion = {};
+        isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = 3600; remainingSprintSeconds = 3600; elapsedSprintSeconds = 0;
+        const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
+        if (status) status.textContent = 'Ready: 60 practical and 40 theory questions, grouped by your uploaded documents. Start when you’re ready.';
+        playHarmonicChime('complete'); updateFilterPills(); renderAll();
+      } catch (error) {
+        console.error('Document question generation:', error);
+        if (status) status.textContent = error.message || 'Could not create the sprint. Your existing questions remain available.';
+      } finally {
+        documentGenerationInProgress = false;
+        if (button) button.textContent = 'Create my 100-question sprint';
+        renderStudyFiles();
+      }
+    }
     function getBrainHooks() { return selectedBrainHooks.slice(); }
     function saveBrainHooks() {
       try { localStorage.setItem('exam_sprint_brain_hooks_v1', JSON.stringify(selectedBrainHooks)); } catch (e) {}
@@ -3044,10 +3186,10 @@
         updateFilterPills();
       } catch(e) { setAiStatus('Saved AI customisation could not be loaded. The built-in question bank is ready.'); }
     }
-    async function callGemini(prompt, schema, modelId) {
-      const requestBody = { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
+    async function callGemini(prompt, schema, modelId, callOptions = {}) {
+      const requestBody = callOptions.requestBody || { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
-      const maxRetries = 3;
+      const maxRetries = Number.isInteger(callOptions.maxRetries) ? callOptions.maxRetries : 3;
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const token = await getTurnstileToken();
         let response;
