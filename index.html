@@ -306,7 +306,7 @@
     </aside>
     <div id="document-upload-info" popover role="dialog" aria-labelledby="document-upload-info-title">
       <h2 id="document-upload-info-title" class="text-lg font-bold">AI Generator</h2>
-      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Set the count and question type at the top. Mixed uses 60% practical and 40% theory.</p>
+      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Interests personalise Theory questions; Practical questions apply the uploaded material. Set the count and question type at the top. Mixed uses 60% practical and 40% theory.</p>
       <p>Choose up to 10 PDF, TXT, Markdown, or JSON files, with a combined size of 8 MB.</p>
       <p>Files stay in this browser session until you request questions. They are then sent securely to Google AI through the study service to create your sprint.</p>
       <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
@@ -816,9 +816,9 @@
       if (activeLectureFilter === 'sample') {
         pool = pool.filter(q => q.isSample);
       } else if (activeLectureFilter === 'analogy') {
-        pool = pool.filter(q => q.isAnalogyTheory);
+        pool = pool.filter(q => isTheoryQuestion(q));
       } else if (activeLectureFilter === 'scenario') {
-        pool = pool.filter(q => !q.isAnalogyTheory);
+        pool = pool.filter(q => !isTheoryQuestion(q));
       } else if (activeLectureFilter === 'ai') {
         pool = pool.filter(q => q.isAI);
         if (pool.length === 0) pool = [...QUESTION_BANK];
@@ -958,11 +958,11 @@
         if (k === activeLectureFilter) {
           el.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-500 text-slate-950 transition shadow';
         } else if (k === 'analogy') {
-          const analogyCount = QUESTION_BANK.filter(q => q.isAnalogyTheory).length;
+          const analogyCount = QUESTION_BANK.filter(q => isTheoryQuestion(q)).length;
           el.textContent = `⛳🏉✈️ Theory Mediums (${analogyCount})`;
           el.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition';
         } else if (k === 'scenario') {
-          const scenarioCount = QUESTION_BANK.filter(q => !q.isAnalogyTheory).length;
+          const scenarioCount = QUESTION_BANK.filter(q => !isTheoryQuestion(q)).length;
           el.textContent = `💻 Code Scenarios (${scenarioCount})`;
           el.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500/30 transition';
         } else if (k === 'sample') {
@@ -1103,7 +1103,7 @@
       const changed=JSON.stringify(settings)!==appliedSprintSettings;
       if(!hasSprintStarted||changed||isSprintFinished) {
         const scope=['analogy','all','scenario'][settings.mode];
-        const pool=QUESTION_BANK.filter(q=>(!sprintSourceIds||sprintSourceIds.includes(q.id))&&(scope==='all'||(scope==='analogy'?q.isAnalogyTheory:!q.isAnalogyTheory)));
+        const pool=QUESTION_BANK.filter(q=>(!sprintSourceIds||sprintSourceIds.includes(q.id))&&(scope==='all'||(scope==='analogy'?isTheoryQuestion(q):!isTheoryQuestion(q))));
         if(!pool.length){alert('No questions of this type are available. Choose another type or use AI Generator.');return;}
         if(Object.keys(userAnswers).length&&!confirm('Start a new sprint with these settings? This resets the current sprint answers; your question bank stays saved.'))return;
         activeSprintMinutes=settings.minutes;activeSprintSize=settings.questions;activeLectureFilter=scope;
@@ -1249,7 +1249,7 @@
           colorCls += ' ring-2 ring-sky-400';
         }
 
-        const formatHint = q.isAnalogyTheory ? `[${q.analogyTheme} Theory]` : '[Code Scenario]';
+        const formatHint = isTheoryQuestion(q) ? '[Theory]' : '[Practical]';
 
         return `
           <button onclick="jumpToQuestion(${idx})" class="w-8 h-8 rounded-lg border text-xs font-mono transition relative flex items-center justify-center ${colorCls}" title="Q${idx + 1}: ${q.id} ${formatHint} — ${q.topic}">
@@ -1296,20 +1296,17 @@
         .replace(/'/g, '&#039;');
     }
 
+    function isTheoryQuestion(q) {
+      if(q.questionType === 'theory') return true;
+      if(q.questionType === 'practical') return false;
+      return q.isAnalogyTheory === true;
+    }
+
     function getFormatBadgeHTML(q) {
-      if (q.isAnalogyTheory) {
-        if (q.analogyTheme === 'Golf') {
-          return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">⛳ Golf Theory Medium</span>';
-        }
-        if (q.analogyTheme === 'Rugby') {
-          return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">🏉 Rugby Theory Medium</span>';
-        }
-        if (q.analogyTheme === 'Aviation') {
-          return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">✈️ Aviation Theory Medium</span>';
-        }
-        return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">⛳🏉✈️ Theory Medium</span>';
-      }
-      return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-sky-300 border border-slate-700">💻 Specific Code Scenario</span>';
+      const theory=isTheoryQuestion(q);
+      return '<span class="px-2.5 py-1 rounded-lg text-xs font-bold border '+
+        (theory?'bg-emerald-500/20 text-emerald-300 border-emerald-500/40':'bg-sky-500/20 text-sky-300 border-sky-500/40')+'">'+
+        (theory?'Theory':'Practical')+'</span>';
     }
 
     function buildSingleQuestionCardHTML(q, idx) {
@@ -1348,7 +1345,7 @@
             <span class="w-8 h-8 rounded-lg border text-sm font-mono font-bold flex items-center justify-center shrink-0 mt-0.5 ${badgeStyle}">
               ${letters[optIdx]}
             </span>
-            <span class="${q.isAnalogyTheory ? 'font-sans' : 'font-mono'} text-sm sm:text-base leading-relaxed flex-1">${escapeHtml(optText)}</span>
+            <span class="${isTheoryQuestion(q) ? 'font-sans' : 'font-mono'} text-sm sm:text-base leading-relaxed flex-1">${escapeHtml(optText)}</span>
             ${statusTag}
           </button>
         `;
@@ -1413,6 +1410,7 @@
               <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
                 ${escapeHtml(q.topic)}
               </span>
+              ${getFormatBadgeHTML(q)}
               ${q.isSample ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Official Sample PDF</span>' : ''}
             </div>
 
@@ -1689,7 +1687,7 @@
         }
         const hooks = generationInterests;
         const interestInstruction = hooks.length
-          ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate.'
+          ? 'Only for theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate. Do not introduce these interests into practical questions.'
           : 'Use clear, familiar everyday examples for theory questions.';
         const prompt = `Create exactly ${target} four-option multiple-choice questions from the attached course documents, with exactly ${targetPractical} practical questions and ${targetTheory} theory questions. Practical questions should test application through scenarios, procedures, calculations, or worked examples. Include code questions only when the documents teach programming. Theory questions should test concepts from the documents. Use only the supplied course material and facts needed to interpret it. ${interestInstruction}
 For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Keep prompts and explanations concise (at most 45 words each), options short, and code snippets at most 12 lines. Return only the compact JSON array matching the response schema, without Markdown fences or surrounding commentary.
@@ -1848,7 +1846,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         const savedAiQs=JSON.parse(localStorage.getItem('exam_sprint_questions_v2') || '[]');
         if(Array.isArray(savedAiQs)) savedAiQs.forEach(q=>{ if(q && q.id && !QUESTION_BANK.some(existing=>existing.id===q.id)) QUESTION_BANK.push(q); });
         const savedReskins=JSON.parse(localStorage.getItem('exam_sprint_reskins_v2') || '{}');
-        if(savedReskins && typeof savedReskins==='object') QUESTION_BANK.forEach(q=>{ const x=savedReskins[q.id]; if(x && q.isAnalogyTheory && Array.isArray(x.options) && x.options.length===4) { q.prompt=x.prompt; q.options=x.options; q.explanation=x.explanation || q.explanation; q.analogyTheme=x.analogyTheme || q.analogyTheme; q.isReskinned=true; } });
+        if(savedReskins && typeof savedReskins==='object') QUESTION_BANK.forEach(q=>{ const x=savedReskins[q.id]; if(x && isTheoryQuestion(q) && Array.isArray(x.options) && x.options.length===4) { q.prompt=x.prompt; q.options=x.options; q.explanation=x.explanation || q.explanation; q.analogyTheme=x.analogyTheme || q.analogyTheme; q.isReskinned=true; } });
         const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
         updateFilterPills();
       } catch(e) { setAiStatus('Saved AI customisation could not be loaded. The built-in question bank is ready.'); }
