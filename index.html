@@ -1683,10 +1683,10 @@
         const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test writing, tracing, predicting output, or debugging Python code. Theory questions should test concepts from the documents. Use only the course material and introductory Python facts needed to interpret it. ${interestInstruction}
 For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Keep prompts and explanations concise (at most 45 words each), options short, and code snippets at most 12 lines. Return only the compact JSON array matching the response schema, without Markdown fences or surrounding commentary.
 ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`;
-        const schema = { type: 'ARRAY', minItems: 100, maxItems: 100, items: { type: 'OBJECT', properties: {
+        const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
           questionType: { type: 'STRING', enum: ['practical', 'theory'] }, sourceDoc: { type: 'STRING', enum: names },
           lecture: { type: 'INTEGER' }, topic: { type: 'STRING' }, prompt: { type: 'STRING' },
-          code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', minItems: 4, maxItems: 4, items: { type: 'STRING' } },
+          code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', items: { type: 'STRING' } },
           correct: { type: 'INTEGER' }, explanation: { type: 'STRING' }, analogyTheme: { type: 'STRING', nullable: true }
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
         const requestBody = {
@@ -1865,6 +1865,29 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       }
     }
 
+    function describeAiRequestError(data, responseText, statusText) {
+      const error = data?.error;
+      const primary = typeof error === 'string' ? error : error?.message;
+      const details = [];
+      if (Array.isArray(error?.details)) {
+        error.details.forEach(detail => {
+          if (Array.isArray(detail?.fieldViolations)) {
+            detail.fieldViolations.forEach(violation => {
+              const field = typeof violation.field === 'string' ? violation.field : '';
+              const description = typeof violation.description === 'string' ? violation.description : '';
+              if (field || description) details.push((field ? field + ': ' : '') + description);
+            });
+          } else if (typeof detail?.reason === 'string') {
+            details.push(detail.reason);
+          } else if (typeof detail?.description === 'string') {
+            details.push(detail.description);
+          }
+        });
+      }
+      return [primary || responseText || statusText || 'No error details were returned.', ...details]
+        .map(value => String(value).slice(0, 500)).join(' ').slice(0, 1500);
+    }
+
     async function callGemini(prompt, schema, modelId, callOptions = {}) {
       const requestBody = callOptions.requestBody || { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
@@ -1884,7 +1907,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
             await new Promise(resolve => setTimeout(resolve, delay));
             continue;
           }
-          throw new Error('Could not reach the Gemini Worker after ' + maxRetries + ' retries. Check your connection and try again.');
+          throw new Error('Could not reach the Gemini Worker after ' + (attempt + 1) + (attempt ? ' attempts' : ' attempt') + '. Check your connection and try again.');
         }
         let responseText = '';
         try { responseText = await response.text(); } finally { resetTurnstileWidget(); }
@@ -1896,7 +1919,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 90);
           return parseGeminiQuestionResponse(data);
         }
-        const message = data.error?.message || data.error || responseText || response.statusText || 'No error details were returned.';
+        const message = describeAiRequestError(data, responseText, response.statusText);
         const transient = [408, 429, 500, 502, 503, 504].includes(response.status);
         if (transient && attempt < maxRetries) {
           const delay = 1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 350);
@@ -1904,7 +1927,8 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         }
-        throw new Error('Gemini Worker returned HTTP ' + response.status + (data.error?.status ? ' ' + data.error.status : '') + ' after ' + (transient ? maxRetries + ' retries' : '') + '. Details: ' + String(message).slice(0, 500) + ' Your existing questions remain available.');
+        const attempts = attempt > 0 ? ' after ' + (attempt + 1) + ' attempts' : '';
+        throw new Error('Gemini Worker returned HTTP ' + response.status + (data.error?.status ? ' ' + data.error.status : '') + attempts + '. Details: ' + message + ' Your files are still selected and your question bank is unchanged.');
       }
     }
     async function reskinTheoryQuestions() {
