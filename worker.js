@@ -190,8 +190,8 @@ export default {
         }
         inlinePdfCount += 1;
         inlinePdfBytes += Math.floor(inline.data.length * 3 / 4);
-        if (inlinePdfCount > 6 || inlinePdfBytes > 8 * 1024 * 1024) {
-          return json({ error: "Document upload limit is 6 PDFs and 8 MB total." }, 413, allowedOrigin);
+        if (inlinePdfCount > 10 || inlinePdfBytes > 8 * 1024 * 1024) {
+          return json({ error: "Document upload limit is 10 PDFs and 8 MB total." }, 413, allowedOrigin);
         }
       }
     }
