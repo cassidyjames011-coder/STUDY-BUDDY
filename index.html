@@ -279,16 +279,20 @@
       <details id="documents-panel" open class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 shadow-lg">
         <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg text-sm font-semibold text-slate-100 [&::-webkit-details-marker]:hidden"><span class="flex-1">AI Generator</span><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About AI Generator" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
         <div class="pt-3">
-        <input id="document-upload-input" type="file" accept=".pdf,.txt,.md,.json,application/pdf,text/plain,text/markdown,application/json" multiple class="sr-only" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)" />
+        <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)" />
         <div id="document-drop-zone" class="rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/70 p-5 text-center transition hover:border-sky-400"
           ondragover="event.preventDefault();this.classList.add('border-sky-400')"
           ondragleave="this.classList.remove('border-sky-400')"
           ondrop="event.preventDefault();this.classList.remove('border-sky-400');handleStudyFiles(event.dataTransfer.files)">
           <i data-lucide="file-up" class="mx-auto mb-2 h-7 w-7 text-sky-300"></i>
           <p class="text-sm font-semibold text-slate-100">Drop your files here</p>
-          <p class="mt-1 text-xs text-slate-400">PDF, TXT, Markdown, or JSON · up to 10 files · 8 MB total</p>
+          <p class="mt-1 text-xs text-slate-400">PDF, Word (.docx), TXT, Markdown, or JSON · up to 10 files · 8 MB total</p>
           <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Upload files</button>
         </div>
+        <form class="mt-3" onsubmit="event.preventDefault();addStudyWebsite()">
+          <label for="study-website-url" class="block mb-1 text-xs font-semibold text-slate-300">Website URL</label>
+          <div class="flex gap-2"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article" class="min-w-0 flex-1 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100" /><button id="btn-add-website" type="submit" class="min-h-11 rounded-lg bg-slate-800 border border-slate-600 px-3 text-sm font-bold">Add</button></div>
+        </form>
         <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
 <div class="mt-4"><label for="brain-hook-search" class="block mb-2 text-sm font-semibold">Interests <span class="text-xs font-normal text-slate-400">(optional)</span></label>      <div id="brain-hook-picker" class="relative w-full">
         <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2" aria-label="Selected interests"></div>
@@ -307,8 +311,8 @@
     <div id="document-upload-info" popover role="dialog" aria-labelledby="document-upload-info-title">
       <h2 id="document-upload-info-title" class="text-lg font-bold">AI Generator</h2>
       <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Interests personalise Theory questions; Practical questions apply the uploaded material. Set the count and question type at the top. Mixed uses 60% practical and 40% theory.</p>
-      <p>Choose up to 10 PDF, TXT, Markdown, or JSON files, with a combined size of 8 MB.</p>
-      <p>Files stay in this browser session until you request questions. They are then sent securely to Google AI through the study service to create your sprint.</p>
+      <p>Add up to 10 sources in total: files and public website links. Files can be PDF, Word (.docx), TXT, Markdown, or JSON, up to 8 MB combined. Word body text is read; images are not extracted. Save older .doc files as .docx or PDF first.</p>
+      <p>Files and links stay in this browser session until you request questions. They are then read and sent securely to Google AI through the study service. Websites must be publicly readable over HTTPS; sign-in pages and pages that require JavaScript may need to be saved as PDF instead.</p>
       <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
     </div>
     <section id="study-session" class="min-w-0">
@@ -623,15 +627,17 @@
     }
     function clearUploadHistory() {
       const status = document.getElementById('upload-clear-status');
-      if (activeQuestionOperations > 0) { if (status) status.textContent = 'Wait for question generation to finish, then clear your uploads.'; return; }
+      if (activeQuestionOperations > 0 || studyFileReadInProgress) { if (status) status.textContent = 'Wait for question generation to finish, then clear your uploads.'; return; }
       const generatedIds = new Set(QUESTION_BANK.filter(q => q.isAI || q.isDocumentGenerated).map(q => q.id));
-      if (!selectedStudyFiles.length && !generatedIds.size) {
+      if (!selectedStudyFiles.length && !selectedStudyWebsites.length && !generatedIds.size) {
         if (status) status.textContent = 'No upload history to clear.';
         return;
       }
       if (!window.confirm('Clear uploaded files and all AI-generated questions, including their saved answers and progress? Your starter question bank, interests, and preferences will stay.')) return;
       const activeUploads = activeQuestions.some(q => generatedIds.has(q.id));
       selectedStudyFiles.length = 0;
+      selectedStudyWebsites.length = 0;
+      const websiteInput=document.getElementById('study-website-url');if(websiteInput)websiteInput.value='';
       sprintSourceIds = null;
       pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
       const input = document.getElementById('document-upload-input');
@@ -1567,6 +1573,9 @@
       'Other interests': ['Planes', 'Ships', 'Trains']
     };
     const selectedStudyFiles = [];
+    const selectedStudyWebsites = [];
+    const studyFileTextCache = new WeakMap();
+    let studyFileReadInProgress = false;
     let pendingDocumentQuestions = [];
     let pendingDocumentFingerprint = '';
     function validDocumentQuestion(q, sources) {
@@ -1589,28 +1598,123 @@
     function studyFileType(file) {
       const name = file.name.toLowerCase();
       if (file.type === 'application/pdf' || name.endsWith('.pdf')) return 'application/pdf';
+      if (name.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       if (name.endsWith('.json')) return 'application/json';
       if (file.type === 'text/plain' || name.endsWith('.txt')) return 'text/plain';
       if (file.type === 'text/markdown' || name.endsWith('.md') || name.endsWith('.markdown')) return 'text/markdown';
       return '';
     }
-    function handleStudyFiles(fileList) {
+
+    function addStudyWebsite() {
+      const status=document.getElementById('document-gen-status');
+      if(documentGenerationInProgress)return;
+      const input=document.getElementById('study-website-url');
+      try {
+        let value=input.value.trim();
+        if(!value)throw new Error('Paste a website URL first.');
+        if(!/^[a-z][a-z0-9+.-]*:/i.test(value))value='https://'+value;
+        const url=new URL(value);url.hash='';
+        if(url.protocol!=='https:'||url.username||url.password||(url.port&&url.port!=='443')||!url.hostname.includes('.')||url.hostname.includes(':')||/^\d+(?:\.\d+)*$/.test(url.hostname)||/(?:^|\.)(?:localhost|local|internal|lan|home|test|invalid|example|onion)\.?$/.test(url.hostname)||url.href.length>512)throw new Error('Use a public HTTPS website URL, without sign-in details.');
+        if(selectedStudyWebsites.includes(url.href)){status.textContent='That website is already added.';return;}
+        if(selectedStudyFiles.length+selectedStudyWebsites.length>=MAX_STUDY_FILES)throw new Error('You can add up to 10 sources in total.');
+        if(selectedStudyFiles.some(file=>file.name===url.href))throw new Error('That source name is already in use.');
+        selectedStudyWebsites.push(url.href);
+        pendingDocumentQuestions=[];pendingDocumentFingerprint='';
+        input.value='';renderStudyFiles();
+        status.textContent='Website added. It will be read when you select Create.';
+      } catch(error){status.textContent=error.message||'Enter a valid website URL.';}
+    }
+
+    function removeStudyWebsite(index) {
+      if(documentGenerationInProgress)return;
+      selectedStudyWebsites.splice(index,1);
+      pendingDocumentQuestions=[];pendingDocumentFingerprint='';
+      renderStudyFiles();
+      document.getElementById('document-gen-status').textContent='Website removed.';
+    }
+
+    function decodeSourceEntities(text) {
+      const entities={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' '};
+      return text.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi,(match,value)=>{
+        if(value[0]!=='#')return entities[value.toLowerCase()]||match;
+        const code=value[1].toLowerCase()==='x'?parseInt(value.slice(2),16):parseInt(value.slice(1),10);
+        return code>0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)?String.fromCodePoint(code):' ';
+      });
+    }
+
+    async function extractDocxText(buffer) {
+      const view=new DataView(buffer),bytes=new Uint8Array(buffer);
+      const invalid=()=>new Error('This Word file could not be read. Save it as a fresh .docx or PDF and try again.');
+      let end=-1;
+      for(let p=bytes.length-22;p>=Math.max(0,bytes.length-65557);p--){
+        if(view.getUint32(p,true)===0x06054b50 && p+22+view.getUint16(p+20,true)===bytes.length){end=p;break;}
+      }
+      if(end<0)throw invalid();
+      const count=view.getUint16(end+10,true),directory=view.getUint32(end+16,true);
+      if(count===65535||count>10000||view.getUint16(end+4,true)||view.getUint16(end+6,true)||directory>=end)throw invalid();
+      let pos=directory,entry=null,total=0;
+      for(let i=0;i<count;i++){
+        if(pos+46>end||view.getUint32(pos,true)!==0x02014b50)throw invalid();
+        const nameLength=view.getUint16(pos+28,true),extra=view.getUint16(pos+30,true),comment=view.getUint16(pos+32,true);
+        if(pos+46+nameLength+extra+comment>end)throw invalid();
+        const size=view.getUint32(pos+24,true);total+=size;
+        if(total>32*1024*1024)throw new Error('This Word file expands beyond the safe reading limit. Export its text as PDF or TXT.');
+        const name=new TextDecoder().decode(bytes.subarray(pos+46,pos+46+nameLength));
+        if(name==='word/document.xml')entry={flags:view.getUint16(pos+8,true),method:view.getUint16(pos+10,true),compressed:view.getUint32(pos+20,true),size,offset:view.getUint32(pos+42,true)};
+        pos+=46+nameLength+extra+comment;
+      }
+      if(!entry||entry.flags&1||entry.size>2*1024*1024||entry.offset+30>directory)throw invalid();
+      const offset=entry.offset;
+      if(view.getUint32(offset,true)!==0x04034b50)throw invalid();
+      const start=offset+30+view.getUint16(offset+26,true)+view.getUint16(offset+28,true);
+      if(start+entry.compressed>directory)throw invalid();
+      const compressed=bytes.subarray(start,start+entry.compressed);
+      let xmlBytes;
+      if(entry.method===0)xmlBytes=compressed;
+      else if(entry.method===8) {
+        if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot read Word files. Please upload a PDF or TXT version.');
+        let decoder;
+        try{decoder=new DecompressionStream('deflate-raw');}catch(error){throw new Error('This browser cannot read Word files. Please upload a PDF or TXT version.');}
+        const reader=new Blob([compressed]).stream().pipeThrough(decoder).getReader();
+        const chunks=[];let length=0;
+        try{while(true){const part=await reader.read();if(part.done)break;length+=part.value.length;if(length>entry.size||length>2*1024*1024)throw invalid();chunks.push(part.value);}}
+        finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+        xmlBytes=new Uint8Array(length);let at=0;for(const chunk of chunks){xmlBytes.set(chunk,at);at+=chunk.length;}
+      } else throw invalid();
+      if(xmlBytes.length!==entry.size)throw invalid();
+      const xml=new TextDecoder('utf-8',{fatal:true}).decode(xmlBytes);
+      if(!/<(?:\w+:)?document\b/.test(xml)||/<!DOCTYPE|<!ENTITY/i.test(xml))throw invalid();
+      const text=decodeSourceEntities(xml.replace(/<!--[^]*?-->/g,'').replace(/<(?:\w+:)?(?:tab|br|cr)\b[^>]*\/?\s*>/g,'\n').replace(/<\/(?:\w+:)?(?:p|tr)\s*>/g,'\n').replace(/<\/(?:\w+:)?tc\s*>/g,'\t').replace(/<[^>]*>/g,'')).replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+      if(!text)throw new Error('No readable text was found in this Word file. Try a text-based PDF or TXT file.');
+      return text;
+    }
+
+    async function handleStudyFiles(fileList) {
       const status = document.getElementById('document-gen-status');
-      if (documentGenerationInProgress) { if (status) status.textContent = 'Please wait for generation to finish before changing documents.'; return; }
+      if (documentGenerationInProgress || studyFileReadInProgress) { if (status) status.textContent = 'Please wait while your sources are being read.'; return; }
       const incoming = Array.from(fileList || []);
       let added = 0;
+      studyFileReadInProgress = true; renderStudyFiles();
+      try {
       for (const file of incoming) {
         const mime = studyFileType(file);
-        if (!mime) { if (status) status.textContent = 'Use PDF, TXT, Markdown, or JSON files. Unsupported files were skipped.'; continue; }
+        if (!mime) { if (status) status.textContent = 'Use PDF, Word (.docx), TXT, Markdown, or JSON files. Unsupported files were skipped.'; continue; }
         if (selectedStudyFiles.some(existing => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified)) continue;
-        if (selectedStudyFiles.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 10 documents.'; break; }
+        if (selectedStudyFiles.length + selectedStudyWebsites.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 10 sources in total.'; break; }
         const currentSize = selectedStudyFiles.reduce((sum, item) => sum + item.size, 0);
         if (currentSize + file.size > MAX_STUDY_BYTES) { if (status) status.textContent = 'The total upload limit is 8 MB. Remove a file or choose smaller files.'; continue; }
+        if(selectedStudyFiles.some(existing=>existing.name===file.name)||selectedStudyWebsites.includes(file.name)){if(status)status.textContent='Use a different name for files with the same name.';continue;}
+        if(mime==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
+          if(status)status.textContent='Reading '+file.name+'…';
+          try{studyFileTextCache.set(file,await extractDocxText(await file.arrayBuffer()));}
+          catch(error){if(status)status.textContent=file.name+': '+(error.message||'This Word file could not be read. Save as PDF and retry.');continue;}
+        }
         selectedStudyFiles.push(file); added++;
       }
+      } finally {studyFileReadInProgress=false;}
       const picker = document.getElementById('document-upload-input'); if (picker) picker.value = '';
       renderStudyFiles();
-      if (status && added) status.textContent = `${selectedStudyFiles.length} document${selectedStudyFiles.length === 1 ? '' : 's'} ready. They’ll be sent with one secure question-generation request.`;
+      if (status && added) status.textContent = `${selectedStudyFiles.length+selectedStudyWebsites.length} source${selectedStudyFiles.length+selectedStudyWebsites.length === 1 ? '' : 's'} ready. They’ll be sent with your interests when you select Create.`;
     }
     function removeStudyFile(index) {
       if (documentGenerationInProgress) return;
@@ -1636,10 +1740,17 @@
         remove.setAttribute('aria-label', 'Remove ' + file.name); remove.textContent = '×'; remove.onclick = () => removeStudyFile(index);
         row.append(label, remove); list.appendChild(row);
       });
-      button.disabled = !selectedStudyFiles.length || documentGenerationInProgress;
+      selectedStudyWebsites.forEach((url,index)=>{
+        const row=document.createElement('li');row.className='flex items-center justify-between gap-2 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs';
+        const label=document.createElement('span');label.className='min-w-0 truncate text-slate-200';label.textContent=url;label.title=url;
+        const remove=document.createElement('button');remove.type='button';remove.className='min-h-9 min-w-9 rounded-lg text-slate-400 hover:bg-slate-800';remove.textContent='×';remove.setAttribute('aria-label','Remove '+url);remove.onclick=()=>removeStudyWebsite(index);
+        row.append(label,remove);list.appendChild(row);
+      });
+      button.disabled = !(selectedStudyFiles.length+selectedStudyWebsites.length) || documentGenerationInProgress || studyFileReadInProgress;
+      ['study-website-url','btn-add-website'].forEach(id=>{const element=document.getElementById(id);if(element)element.disabled=documentGenerationInProgress||studyFileReadInProgress;});
       const input = document.getElementById('document-upload-input');
-      if (input) input.disabled = documentGenerationInProgress;
-      list.querySelectorAll('button').forEach(remove => { remove.disabled = documentGenerationInProgress; });
+      if (input) input.disabled = documentGenerationInProgress||studyFileReadInProgress;
+      list.querySelectorAll('button').forEach(remove => { remove.disabled = documentGenerationInProgress||studyFileReadInProgress; });
     }
     let documentGenerationInProgress = false;
     function bytesToBase64(buffer) {
@@ -1652,7 +1763,7 @@
       return btoa(binary);
     }
     async function generateDocumentQuestionBatch() {
-      if (!selectedStudyFiles.length || documentGenerationInProgress) return;
+      if (!(selectedStudyFiles.length+selectedStudyWebsites.length) || documentGenerationInProgress || studyFileReadInProgress) return;
       let settings;
       try{settings=readSprintSettings();}catch(error){alert(error.message);return;}
       const target=settings.questions;
@@ -1662,7 +1773,7 @@
       const status = document.getElementById('document-gen-status');
       const generationInterests = getBrainHooks();
       if(!generationInterests.length&&!confirm('No interests selected. Create questions without personalisation?'))return;
-      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), interests:generationInterests, count:target, mode:settings.mode });
+      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), websites:selectedStudyWebsites.slice(), interests:generationInterests, count:target, mode:settings.mode });
       if (pendingDocumentFingerprint !== fingerprint) {
         pendingDocumentQuestions = [];
         pendingDocumentFingerprint = fingerprint;
@@ -1671,7 +1782,8 @@
       let generationSucceeded = false;
       startAiLoading('btn-generate-document-sprint');
       try {
-        const names = selectedStudyFiles.map(file => file.name);
+        const generationWebsites=selectedStudyWebsites.slice();
+        const names = [...selectedStudyFiles.map(file => file.name),...generationWebsites];
         const parts = [];
         const sourceNotes = [];
         for (const file of selectedStudyFiles) {
@@ -1680,11 +1792,13 @@
           if (mimeType === 'application/pdf') {
             parts.push({ inlineData: { mimeType, data: bytesToBase64(await file.arrayBuffer()) } });
           } else {
-            const text = (await file.text()).trim();
+            const text = mimeType==='application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? (studyFileTextCache.get(file) || await extractDocxText(await file.arrayBuffer())) : (await file.text()).trim();
             if (!text) throw new Error(file.name + ' is empty. Remove it or upload a file with readable text.');
             sourceNotes.push({ name: file.name, text });
           }
         }
+        const preparedBytes=sourceNotes.reduce((sum,note)=>sum+new TextEncoder().encode(note.text).byteLength,0)+selectedStudyFiles.filter(file=>studyFileType(file)==='application/pdf').reduce((sum,file)=>sum+file.size,0);
+        if(preparedBytes>MAX_STUDY_BYTES)throw new Error('The extracted text and PDFs exceed 8 MB. Use fewer or more focused sources.');
         const hooks = generationInterests;
         const interestInstruction = hooks.length
           ? 'Only for theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate. Do not introduce these interests into practical questions.'
@@ -1700,11 +1814,11 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
         const requestBody = {
           systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
-          contents: [{ role: 'user', parts: [...parts, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text }))] }],
+          contents: [{ role: 'user', parts: [...parts, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text })), ...(parts.length||sourceNotes.length?[]:[{text:'Create questions from the website sources supplied with this request.'}])] }],
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentWebsites:generationWebsites, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
           onDocumentBatch:batch => {
             const seen = new Set(pendingDocumentQuestions.map(documentQuestionKey));
             for (const question of batch) {
@@ -1975,7 +2089,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
