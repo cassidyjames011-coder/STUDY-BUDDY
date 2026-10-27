@@ -2049,7 +2049,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           setAiStatus('Rewriting theory questions '+(offset+1)+'–'+(offset+batch.length)+' of '+originals.length+'…');
           const input=batch.map(q=>({id:q.id,lecture:q.lecture,topic:q.topic,prompt:q.prompt,options:q.options,correct:q.correct,explanation:q.explanation}));
           const schema={type:'ARRAY',items:{type:'OBJECT',properties:{id:{type:'STRING'},prompt:{type:'STRING'},options:{type:'ARRAY',items:{type:'STRING'}},explanation:{type:'STRING'},analogyTheme:{type:'STRING'}},required:['id','prompt','options','explanation','analogyTheme']}};
-          const system='Rewrite these Python theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact Python concept, lecture, topic, difficulty, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the Python concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
+          const system='Rewrite these theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact original subject, concept, topic, difficulty, source facts, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the original course concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
           const result=await callGemini(system,schema,GEMINI_MODEL_ID,{progressButtonId:'btn-reskin-theory'});
           if(!Array.isArray(result)||result.length!==batch.length)throw new Error('Gemini returned an incomplete reskin for questions '+(offset+1)+'–'+(offset+batch.length)+'.');
           const byId=new Map(result.map(item=>[item.id,item]));
@@ -2067,7 +2067,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           renderAll();
         }
         generationSucceeded = true;
-        setAiStatus('Reskinned all '+completed+' theory questions around '+hooks.join(', ')+'. Concepts and correct answer positions were retained.');
+        setAiStatus('Personalised all '+completed+' theory questions around '+hooks.join(', ')+'. Concepts and correct answer positions were retained.');
         updateFilterPills();renderAll();
       } catch(err) {
         console.error('Theory reskin error:',err);
