@@ -17,7 +17,97 @@ function json(data, status, origin) {
   });
 }
 
-const DOCUMENT_SPRINT_VERSION = "checked-batches-v4-theory-interests";
+const DOCUMENT_SPRINT_VERSION = "checked-batches-v5-websites-docx";
+
+
+function validateWebsiteUrl(value) {
+  if(typeof value!=="string"||value.length>512)throw new Error("Use a public HTTPS website URL of at most 512 characters.");
+  let url;try{url=new URL(value);}catch{throw new Error("Enter a valid website URL.");}
+  const host=url.hostname.toLowerCase().replace(/\.$/,"");
+  if(url.protocol!=="https:"||url.username||url.password||(url.port&&url.port!=="443")||
+      !host.includes(".")||host.includes(":")||/^\d+(?:\.\d+)*$/.test(host)||
+      /(?:^|\.)(?:localhost|local|internal|lan|home|test|invalid|example|onion)$/.test(host))
+    throw new Error("Only public HTTPS websites are supported.");
+  url.hash="";return url;
+}
+
+function isPublicWebsiteAddress(address) {
+  if(address.includes(":")) {
+    if(!/^[0-9a-f:]+$/i.test(address)||address.includes("."))return false;
+    const [first,second="0"]=address.toLowerCase().split(":");
+    const a=parseInt(first,16),b=parseInt(second||"0",16);
+    return a>=0x2000&&a<0x4000&&a!==0x2002&&a!==0x3fff&&!(a===0x2001&&(b<=0x1ff||b===0xdb8));
+  }
+  const octets=address.split(".").map(Number);
+  if(octets.length!==4||octets.some(n=>!Number.isInteger(n)||n<0||n>255))return false;
+  const [a,b,c]=octets;
+  return !(a===0||a===10||a===127||a>=224||a===169&&b===254||
+    a===172&&b>=16&&b<=31||a===192&&(b===168||b===0&&(c===0||c===2)||b===88&&c===99)||
+    a===100&&b>=64&&b<=127||a===198&&(b===18||b===19||b===51&&c===100)||a===203&&b===0&&c===113);
+}
+
+async function verifyPublicWebsiteHost(hostname,signal) {
+  const answers=await Promise.all(["A","AAAA"].map(async type=>{
+    const response=await fetch("https://cloudflare-dns.com/dns-query?name="+encodeURIComponent(hostname)+"&type="+type,{
+      headers:{Accept:"application/dns-json"},redirect:"manual",signal
+    });
+    if(!response.ok)throw new Error("The website address could not be checked. Try again later.");
+    const data=await response.json();
+    if(data.Status!==0&&data.Status!==3)throw new Error("The website address could not be checked.");
+    return (data.Answer||[]).filter(item=>item.type===1||item.type===28).map(item=>item.data);
+  }));
+  const addresses=answers.flat();
+  if(!addresses.length||addresses.some(address=>!isPublicWebsiteAddress(address)))throw new Error("The link must point to a public website.");
+}
+
+function websiteHtmlToText(html) {
+  const entities={amp:"&",lt:"<",gt:">",quot:'"',apos:"'",nbsp:" ",ndash:"–",mdash:"—",lsquo:"‘",rsquo:"’",ldquo:"“",rdquo:"”",hellip:"…",bull:"•"};
+  let text=html.replace(/<!--[\s\S]*?-->/g,"").replace(/<(script|style|noscript|svg|nav|footer|header|form)\b[^>]*>[\s\S]*?<\/\1\s*>/gi," ");
+  text=text.replace(/<\/(?:p|div|h[1-6]|li|tr|section|article|blockquote)\s*>|<br\b[^>]*>/gi,"\n").replace(/<[^>]*>/g," ");
+  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(match,value)=>{
+    if(value[0]!=="#")return entities[value.toLowerCase()]||match;
+    const code=value[1].toLowerCase()==="x"?parseInt(value.slice(2),16):parseInt(value.slice(1),10);
+    return code>0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)?String.fromCodePoint(code):" ";
+  }).replace(/[ \t]+/g," ").replace(/ *\n */g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+
+async function readWebsiteText(value,parentSignal) {
+  const abort=new AbortController(),cancel=()=>abort.abort();
+  if(parentSignal?.aborted)throw new Error("Question generation was cancelled.");
+  parentSignal?.addEventListener("abort",cancel,{once:true});
+  const timer=setTimeout(cancel,15000);
+  let response;
+  try {
+    let url=validateWebsiteUrl(value);
+    for(let hop=0;hop<4;hop++){
+      await verifyPublicWebsiteHost(url.hostname,abort.signal);
+      response=await fetch(url.href,{method:"GET",redirect:"manual",credentials:"omit",headers:{
+        Accept:"text/html,application/xhtml+xml,text/plain;q=0.9"
+      },signal:abort.signal});
+      if([301,302,303,307,308].includes(response.status)){
+        const location=response.headers.get("Location");await response.body?.cancel();
+        if(!location||hop===3)throw new Error("The website redirected too many times.");
+        url=validateWebsiteUrl(new URL(location,url).href);continue;
+      }
+      break;
+    }
+    if(!response.ok)throw new Error("The website returned "+response.status+". Use a publicly accessible page or upload a PDF copy.");
+    const type=(response.headers.get("Content-Type")||"").toLowerCase();
+    if(!type.includes("text/html")&&!type.includes("application/xhtml+xml")&&!type.includes("text/plain"))throw new Error("This link is not a readable web page. Download the document and upload it instead.");
+    if(Number(response.headers.get("Content-Length")||0)>2*1024*1024)throw new Error("This web page is too large. Upload a focused PDF or text excerpt instead.");
+    if(!response.body)throw new Error("The web page was empty.");
+    const reader=response.body.getReader(),decoder=new TextDecoder();let bytes=0,content="";
+    try{while(true){const part=await reader.read();if(part.done)break;bytes+=part.value.byteLength;if(bytes>2*1024*1024)throw new Error("This web page is too large. Upload a focused excerpt instead.");content+=decoder.decode(part.value,{stream:true});}content+=decoder.decode();}
+    finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+    const text=type.includes("text/plain")?content.trim():websiteHtmlToText(content);
+    if(text.length<100)throw new Error("This page has too little readable text. If it needs sign-in or JavaScript, save it as PDF and upload that instead.");
+    if(text.length>160000)throw new Error("This page has too much text for one source. Upload a focused excerpt instead.");
+    return text;
+  } catch(error){
+    if(abort.signal.aborted)throw new Error(parentSignal?.aborted?"Question generation was cancelled.":"Reading the website timed out. Try another page or upload a PDF copy.");
+    throw error;
+  } finally {clearTimeout(timer);parentSignal?.removeEventListener("abort",cancel);if(response?.body&&!response.body.locked)await response.body.cancel().catch(()=>{});}
+}
 
 function documentQuestionSchema(sources, types = ["practical","theory"]) {
   return { type:"ARRAY", items:{ type:"OBJECT", properties:{
@@ -157,7 +247,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
   return questions;
 }
 
-function documentSprintStream(body, sources, env, quota, reservation, origin, ctx, seed, interests, target, mode) {
+function documentSprintStream(body, sources, env, quota, reservation, origin, ctx, seed, interests, target, mode, websites = []) {
   const abort = new AbortController();
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -168,7 +258,15 @@ function documentSprintStream(body, sources, env, quota, reservation, origin, ct
       const work = (async () => {
         try {
           emit({ type:"progress", completed:0, total:target, message:"Preparing checked question batches…" });
-          const questions = await collectDocumentSprint(body, sources, env, quota, reservation, emit, abort.signal, seed, interests, target, mode);
+          const websiteParts=[];
+          for(const url of websites){
+            emit({type:"progress",completed:0,total:target,message:"Reading website: "+new URL(url).hostname+"…"});
+            let text;
+            try{text=await readWebsiteText(url,abort.signal);}catch(error){throw new Error("Could not read "+url+": "+error.message);}
+            websiteParts.push({text:"DOCUMENT: "+url+"\n"+text});
+          }
+          const sourceBody=websiteParts.length?{...body,contents:[...body.contents,{role:"user",parts:websiteParts}]}:body;
+          const questions = await collectDocumentSprint(sourceBody, sources, env, quota, reservation, emit, abort.signal, seed, interests, target, mode);
           emit({ type:"result", questions });
         } catch (error) {
           if (!abort.signal.aborted) emit({ type:"error", error:{ message:error.message || "Question generation was interrupted. Your files and existing bank are unchanged.", status:error.status || 502 } });
@@ -363,6 +461,12 @@ export default {
         return json({ error:"Choose 1–10 named study documents." }, 400, allowedOrigin);
       }
       documentSources = [...new Set(sources)];
+      if(payload.documentWebsites!==undefined && (!Array.isArray(payload.documentWebsites)||payload.documentWebsites.length>10||
+        !payload.documentWebsites.every(url=>typeof url==="string"&&documentSources.includes(url))||
+        new Set(payload.documentWebsites).size!==payload.documentWebsites.length)){
+        return json({error:"Add up to 10 unique website and file sources in total."},400,allowedOrigin);
+      }
+      try{for(const url of payload.documentWebsites||[])validateWebsiteUrl(url);}catch(error){return json({error:error.message},400,allowedOrigin);}
       if (payload.documentQuestions !== undefined &&
           (!Array.isArray(payload.documentQuestions) || payload.documentQuestions.length > payload.documentCount)) {
         return json({ error:"Invalid saved generation progress." }, 400, allowedOrigin);
@@ -520,7 +624,7 @@ export default {
     }
 
     if (isDocumentSprint) {
-      return documentSprintStream(body, documentSources, env, quota, reservation, allowedOrigin, ctx, payload.documentQuestions || [], payload.documentInterests || [], payload.documentCount, payload.documentMode);
+      return documentSprintStream(body, documentSources, env, quota, reservation, allowedOrigin, ctx, payload.documentQuestions || [], payload.documentInterests || [], payload.documentCount, payload.documentMode, payload.documentWebsites || []);
     }
 
     // Construct a restricted Gemini request.
