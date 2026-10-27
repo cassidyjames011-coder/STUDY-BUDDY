@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exam Sprint — Python Practice</title>
+  <title>STUDY BUDDY</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -245,24 +245,17 @@
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Study brand -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20">
-          <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center flex-wrap gap-2">
-            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">⚡ Exam Sprint</h1>
-            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Personalised study sprints
-            </span>
-          </div>
-          <p class="text-xs text-slate-400">Upload course notes and practise with focused, timed questions.</p>
-        </div>
-      </div>
-
+      <h1 class="text-lg font-bold tracking-tight text-white">STUDY BUDDY</h1>
       <div class="flex flex-wrap items-center gap-2">
-      <button onclick="togglePauseTimer()" id="btn-pause-timer" class="min-h-11 px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-sky-500/15" aria-label="Start sprint"><i id="icon-pause-timer" data-lucide="play" class="w-4 h-4"></i><span id="label-pause-timer">Start sprint</span></button>
+<div class="flex items-end gap-2">
+<label class="block text-xs text-slate-400">Time (min)<input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" oninput="draftSettingsChanged()" class="block w-20 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white" /></label>
+<label class="block text-xs text-slate-400">Questions<input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" oninput="draftSettingsChanged()" class="block w-20 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white" /></label>
+</div>
+<div class="w-72">
+<div class="flex justify-between text-xs"><button type="button" class="min-h-9 px-2" onclick="setSprintMode(0)">Theory only</button><button type="button" class="min-h-9 px-2" onclick="setSprintMode(1)">Mixed</button><button type="button" class="min-h-9 px-2" onclick="setSprintMode(2)">Practical only</button></div>
+<input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" aria-valuetext="Mixed" oninput="draftSettingsChanged()" class="block w-full h-6 accent-sky-400 cursor-pointer" />
+</div>
+      <button onclick="togglePauseTimer()" id="btn-pause-timer" class="min-h-11 px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-sky-500/15" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" class="w-4 h-4"></i><span id="label-pause-timer">Start</span></button>
         <button id="btn-clear-upload-history" type="button" onclick="clearUploadHistory()" title="Clear uploaded files and AI-generated questions" class="min-h-11 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50">Clear upload history</button>
         <p id="upload-clear-status" role="status" aria-live="polite" class="w-full text-xs text-slate-400 empty:hidden"></p>
       </div>
@@ -284,84 +277,39 @@
   <div id="study-layout" class="max-w-7xl w-full mx-auto px-4 py-5 flex-1">
     <aside id="study-setup" class="space-y-3" aria-label="Study setup">
       <details id="documents-panel" open class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 shadow-lg">
-        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg text-sm font-semibold text-slate-100 [&::-webkit-details-marker]:hidden"><span class="flex-1">Document Upload</span><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About document uploads" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
+        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg text-sm font-semibold text-slate-100 [&::-webkit-details-marker]:hidden"><span class="flex-1">AI Generator</span><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About AI Generator" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
         <div class="pt-3">
-        <input id="document-upload-input" type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" multiple class="sr-only" aria-label="Choose PDF, text, or Markdown study documents" onchange="handleStudyFiles(this.files)" />
+        <input id="document-upload-input" type="file" accept=".pdf,.txt,.md,.json,application/pdf,text/plain,text/markdown,application/json" multiple class="sr-only" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)" />
         <div id="document-drop-zone" class="rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/70 p-5 text-center transition hover:border-sky-400"
           ondragover="event.preventDefault();this.classList.add('border-sky-400')"
           ondragleave="this.classList.remove('border-sky-400')"
           ondrop="event.preventDefault();this.classList.remove('border-sky-400');handleStudyFiles(event.dataTransfer.files)">
           <i data-lucide="file-up" class="mx-auto mb-2 h-7 w-7 text-sky-300"></i>
           <p class="text-sm font-semibold text-slate-100">Drop your files here</p>
-          <p class="mt-1 text-xs text-slate-400">PDF, TXT, or Markdown · up to 10 files · 8 MB total</p>
-          <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Choose documents</button>
+          <p class="mt-1 text-xs text-slate-400">PDF, TXT, Markdown, or JSON · up to 10 files · 8 MB total</p>
+          <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Upload files</button>
         </div>
         <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
-        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="ai-request-button mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40"><span class="ai-request-label">Create my 100-question sprint</span></button>
-        <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating document questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
-        <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Choose documents to get started.</p>
-        </div>
-      </details>
-  <!-- FULL-WIDTH SCOPE CONTROLS -->
-  <details id="study-options" class="w-full rounded-2xl border border-slate-800 bg-slate-900/60 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden"><span><span class="block">Study options</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Question scope, order, and view</span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
-    <div class="grid grid-cols-1 gap-3 pt-2">
-      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question scope</span>
-        <select id="scope-filter-select" onchange="applyScopeFilter(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-          <option value="all">All questions (0)</option><option value="1">L1 · Intro &amp; Errors</option><option value="2">L2 · Types &amp; Strings</option><option value="3">L3 · Collections</option><option value="4">L4 · Control Flow</option><option value="5">L5 · Functions &amp; Files</option><option value="analogy">Theory questions</option><option value="scenario">Code scenarios</option><option value="sample">Sample questions</option><option value="weak">Missed / flagged</option><option value="ai">AI questions</option>
-        </select>
-      </label>
-      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question order</span>
-        <select id="order-select" onchange="setOrderMode(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400"><option value="sequential">Sequential</option><option value="shuffled">Shuffled</option></select>
-      </label>
-      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Question view</span>
-        <select id="view-select" onchange="setQuestionView(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400"><option value="single">Single card focus</option><option value="all">All questions list</option></select>
-      </label>
-    </div>
-  </details>
-  <details id="custom-sprint-settings" class="w-full rounded-2xl border border-slate-800 bg-slate-900/40 p-3"><summary class="flex cursor-pointer list-none items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden"><span><span class="block">Set sprint length</span><span class="mt-0.5 block text-xs font-normal text-slate-400">Adjust time and question count</span></span><span aria-hidden="true" class="shrink-0 text-slate-400">▾</span></summary>
-    <div class="grid grid-cols-2 gap-2 pt-2">
-      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Test time (minutes, max 90)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="6" inputmode="numeric" class="w-full min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
-      <label class="block min-w-0"><span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Questions (max 100)</span><input id="custom-test-questions" type="number" min="1" max="100" step="1" value="10" inputmode="numeric" class="w-full min-w-0 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-400" /></label>
-      <button type="button" onclick="applyCustomSprintSettings()" class="col-span-2 min-h-11 w-full rounded-lg bg-indigo-500 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-400">Apply custom sprint</button>
-      <span id="custom-sprint-status" class="col-span-2 text-xs text-slate-400" role="status">Set the time and question count, then apply.</span>
-    </div>
-  </details>
-
-  <!-- PERSONALISATION + OPTIONAL LOCAL BETA AI SETUP -->
-  <details id="ai-personalisation" class="rounded-2xl border border-indigo-500/30 bg-indigo-950/30 p-3">
-    <summary class="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-lg px-2 text-sm font-semibold text-indigo-200 hover:bg-indigo-950/70 [&::-webkit-details-marker]:hidden"><span class="flex-1">Personalise questions</span><button type="button" class="upload-info-button" popovertarget="personalisation-info" aria-label="About personalisation" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
-    <div class="space-y-3 pt-3">
-      <div id="brain-hook-picker" class="relative w-full">
+<div class="mt-4"><label for="brain-hook-search" class="block mb-2 text-sm font-semibold">Interests <span class="text-xs font-normal text-slate-400">(optional)</span></label>      <div id="brain-hook-picker" class="relative w-full">
         <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2" aria-label="Selected interests"></div>
         <div class="relative min-w-0"><svg aria-hidden="true" class="study-search-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search interests…" aria-label="Search interests" aria-controls="brain-hook-options" aria-expanded="false" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full min-h-11 bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div>
         <div id="brain-hook-options" role="listbox" aria-label="Interests" class="hidden mt-2 w-full max-h-48 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 p-2"></div>
       </div>
       <p id="brain-hook-requirement" class="text-xs text-slate-400" aria-live="polite">Choose up to 3 interests.</p>
-      <div class="grid gap-2">
-        <button id="btn-reskin-theory" onclick="reskinTheoryQuestions()" class="ai-request-button min-h-11 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"><span class="ai-request-label">Personalise theory</span></button>
-        <div id="btn-reskin-theory-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Personalising theory questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
-        <button id="btn-generate-ai-batch" onclick="generateNextBatchWithGemini(10)" class="ai-request-button min-h-11 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 font-bold text-xs"><span class="ai-request-label">Practise weak spots</span></button>
-        <div id="btn-generate-ai-batch-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating practice questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
-      </div>
-      <span id="ai-gen-status" role="status" aria-live="polite" class="block text-xs text-slate-400"></span>
-    </div>
-  </details>
+<span id="ai-gen-status" role="status" class="text-xs text-slate-400"></span></div>
+        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="ai-request-button mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40"><span class="ai-request-label">Create my 50-question sprint</span></button>
+        <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating document questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
+        <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Upload files to get started.</p>
+        </div>
+      </details>
 
     </aside>
     <div id="document-upload-info" popover role="dialog" aria-labelledby="document-upload-info-title">
-      <h2 id="document-upload-info-title" class="text-lg font-bold">Document Upload</h2>
-      <p>Upload your course notes or slides to create 100 questions: 60 practical and 40 theory. Your selected interests help personalise the examples.</p>
-      <p>Choose up to 10 PDF, TXT, or Markdown files, with a combined size of 8 MB.</p>
+      <h2 id="document-upload-info-title" class="text-lg font-bold">AI Generator</h2>
+      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Set the count and question type at the top. Mixed uses 60% practical and 40% theory.</p>
+      <p>Choose up to 10 PDF, TXT, Markdown, or JSON files, with a combined size of 8 MB.</p>
       <p>Files stay in this browser session until you request questions. They are then sent securely to Google AI through the study service to create your sprint.</p>
       <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
-    </div>
-    <div id="personalisation-info" popover role="dialog" aria-labelledby="personalisation-info-title">
-      <h2 id="personalisation-info-title" class="text-lg font-bold">Personalise questions</h2>
-      <p>Search for an interest and select it to add it instantly. Choose up to 3. To use your own topic, type it and select the matching suggestion, or press Enter. Remove a topic with its × button.</p>
-      <p>Your selected topics are saved on this device and included with your documents when you create questions. They help shape memorable examples while keeping the course concepts accurate.</p>
-      <p>Personalise theory updates your existing theory questions. Practise weak spots creates 10 questions based on missed or flagged topics. Both require a selected interest.</p>
-      <p>Security verification runs when you request AI questions. Your existing questions stay available if generation fails.</p>
-      <button type="button" popovertarget="personalisation-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
     </div>
     <section id="study-session" class="min-w-0">
   <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="w-full pb-4">
@@ -456,8 +404,8 @@
         </div>
 
         <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-2.5 flex items-center justify-between text-xs">
-          <span class="text-slate-400">Projected 100-Q Finish:</span>
-          <span id="metric-projected-100q" class="font-mono font-bold text-sky-300">-- mins (Target &le;60m)</span>
+          <span class="text-slate-400">Projected sprint finish:</span>
+          <span id="metric-projected-100q" class="font-mono font-bold text-sky-300">-- mins</span>
         </div>
       </div>
       </details>
@@ -568,11 +516,13 @@
     // ========================================================================
     // STATE MANAGEMENT & ENGINE VARIABLES
     // ========================================================================
-    let activeSprintSize = 10;            // Default 10Q (6m at 36s/Q)
-    let activeSprintMinutes = 6;
+    let activeSprintSize = 50;            // Default 10Q (6m at 36s/Q)
+    let activeSprintMinutes = 30;
     let isCustomSprint = false;
     let activeLectureFilter = 'all';      // 'all', 1, 2, 3, 4, 5, 'analogy', 'scenario', 'sample', 'weak', 'ai'
-    let isShuffled = false;
+    let isShuffled = true;
+    let appliedSprintSettings = null;
+    let sprintSourceIds = null;
     let isSingleCardView = true;          // Single Card Focus vs Scrollable List
     let isInstantStudyMode = true;        // Instant Study Feedback vs Exam Simulation Mode
     let isSprintFinished = false;
@@ -682,6 +632,7 @@
       if (!window.confirm('Clear uploaded files and all AI-generated questions, including their saved answers and progress? Your starter question bank, interests, and preferences will stay.')) return;
       const activeUploads = activeQuestions.some(q => generatedIds.has(q.id));
       selectedStudyFiles.length = 0;
+      sprintSourceIds = null;
       pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
       const input = document.getElementById('document-upload-input');
       if (input) input.value = '';
@@ -709,7 +660,7 @@
       }
       renderStudyFiles();
       const documentStatus = document.getElementById('document-gen-status');
-      if (documentStatus) documentStatus.textContent = 'Choose documents to get started.';
+      if (documentStatus) documentStatus.textContent = 'Upload files to get started.';
       setAiStatus('');
       renderAll();
       if (status) status.textContent = storageCleared ? 'Upload history cleared.' : 'Uploads cleared for this session. Browser storage could not be updated.';
@@ -729,6 +680,7 @@
         const state = {
           version: 1,
           questionIds: activeQuestions.map(q => q.id),
+          sprintSourceIds,
           currentQIndex,
           activeSprintSize,
           activeSprintMinutes,
@@ -759,14 +711,15 @@
         if (restoredQuestions.some(q => !q)) return false;
         const validIds = new Set(saved.questionIds);
         activeQuestions = restoredQuestions;
-        activeSprintSize = Math.min(100, Math.max(1, Number(saved.activeSprintSize) || restoredQuestions.length));
+        activeSprintSize = Math.min(50, Math.max(1, Number(saved.activeSprintSize) || restoredQuestions.length));
         activeSprintMinutes = Math.min(90, Math.max(1, Number(saved.activeSprintMinutes) || 6));
         isCustomSprint = !!saved.isCustomSprint;
         const allowedScopes = ['all', '1', '2', '3', '4', '5', 'analogy', 'scenario', 'sample', 'weak', 'ai'];
         const scope = String(saved.activeLectureFilter ?? 'all');
         activeLectureFilter = allowedScopes.includes(scope) && ['1', '2', '3', '4', '5'].includes(scope) ? Number(scope) : allowedScopes.includes(scope) ? scope : 'all';
-        isShuffled = !!saved.isShuffled;
-        isSingleCardView = saved.isSingleCardView !== false;
+        isShuffled = true;
+        sprintSourceIds = Array.isArray(saved.sprintSourceIds) ? saved.sprintSourceIds.filter(id => questionById.has(id)) : null;
+        isSingleCardView = true;
         isInstantStudyMode = saved.isInstantStudyMode !== false;
         currentQIndex = Math.min(restoredQuestions.length - 1, Math.max(0, Number(saved.currentQIndex) || 0));
         userAnswers = Object.fromEntries(Object.entries(saved.userAnswers || {}).filter(([id, value]) => validIds.has(id) && Number.isInteger(value) && value >= 0 && value < 4));
@@ -858,7 +811,7 @@
     // SPRINT POOL BUILDER & FILTERS
     // ========================================================================
     function buildSprintPool() {
-      let pool = [...QUESTION_BANK];
+      let pool = QUESTION_BANK.filter(q => !sprintSourceIds || sprintSourceIds.includes(q.id));
 
       if (activeLectureFilter === 'sample') {
         pool = pool.filter(q => q.isSample);
@@ -885,7 +838,7 @@
         }
       }
 
-      const count = Math.min(activeSprintSize, pool.length);
+      const count = Math.min(50, activeSprintSize, pool.length);
       activeQuestions = pool.slice(0, count);
       currentQIndex = 0;
       userAnswers = {};
@@ -905,20 +858,31 @@
     }
 
     function syncSprintSettingInputs() {
-      const minutes=document.getElementById('custom-test-minutes'), questions=document.getElementById('custom-test-questions');
-      if(minutes) minutes.value=String(activeSprintMinutes);
-      if(questions) questions.value=String(activeSprintSize);
-      const status=document.getElementById('custom-sprint-status');
-      if(status) status.textContent=(isCustomSprint?'Custom sprint: ':'Preset sprint: ')+activeSprintMinutes+' min · '+activeSprintSize+' questions';
+      document.getElementById('custom-test-minutes').value=String(Math.min(90,Math.max(1,Math.round(activeSprintMinutes))));
+      document.getElementById('custom-test-questions').value=String(Math.min(50,activeSprintSize));
+      const mode=document.getElementById('sprint-mode');
+      mode.value=activeLectureFilter==='analogy'?'0':activeLectureFilter==='scenario'?'2':'1';
+      mode.setAttribute('aria-valuetext',['Theory only','Mixed','Practical only'][Number(mode.value)]);
+      appliedSprintSettings=JSON.stringify(readSprintSettings());
     }
-    function applyCustomSprintSettings() {
-      const minutes=Number(document.getElementById('custom-test-minutes')?.value), questions=Number(document.getElementById('custom-test-questions')?.value);
-      const status=document.getElementById('custom-sprint-status');
-      if(!Number.isInteger(minutes)||minutes<1||minutes>90||!Number.isInteger(questions)||questions<1||questions>100) { if(status) status.textContent='Enter whole numbers: 1–90 minutes and 1–100 questions.'; return; }
-      activeSprintMinutes=minutes; activeSprintSize=questions; isCustomSprint=true;
-      if(typeof activeLectureFilter==='number') activeLectureFilter='all';
-      const scope=document.getElementById('scope-filter-select'); if(scope) scope.value=String(activeLectureFilter);
-      buildSprintPool(); renderAll(); syncSprintSettingInputs();
+    function readSprintSettings() {
+      const minutes=Number(document.getElementById('custom-test-minutes').value);
+      const questions=Number(document.getElementById('custom-test-questions').value);
+      const mode=Number(document.getElementById('sprint-mode').value);
+      if(!Number.isInteger(minutes)||minutes<1||minutes>90||!Number.isInteger(questions)||questions<1||questions>50) throw new Error('Choose 1–90 minutes and 1–50 questions.');
+      return {minutes,questions,mode};
+    }
+    function setSprintMode(mode) {
+      const input=document.getElementById('sprint-mode');
+      if(input.disabled)return;
+      input.value=String(mode);draftSettingsChanged();
+    }
+    function draftSettingsChanged() {
+      const input=document.getElementById('sprint-mode');
+      input.setAttribute('aria-valuetext',['Theory only','Mixed','Practical only'][Number(input.value)]);
+      const label=document.querySelector('#btn-generate-document-sprint .ai-request-label');
+      if(label&&!documentGenerationInProgress)label.textContent='Create my '+document.getElementById('custom-test-questions').value+'-question sprint';
+      syncTimerControls();
     }
     function startNewSprint(size) {
       activeSprintSize=size; activeSprintMinutes=size*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false;
@@ -947,25 +911,25 @@
       buildSprintPool(); renderAll();
     }
     function setOrderMode(value) {
-      isShuffled = value === 'shuffled';
+      isShuffled = true;
       const label = document.getElementById('label-shuffle'); if (label) label.textContent = isShuffled ? 'Order: Shuffled' : 'Order: Sequential';
       buildSprintPool(); renderAll();
     }
     function setQuestionView(value) {
-      isSingleCardView = value !== 'all';
+      isSingleCardView = true;
       const label = document.getElementById('label-layout'); if (label) label.textContent = isSingleCardView ? 'View: Single Card Focus' : 'View: All Questions List';
       renderQuestionDeck();
       persistSprintState();
     }
     function toggleShuffleOrder() {
-      isShuffled = !isShuffled;
+      isShuffled = true;
       document.getElementById('label-shuffle').textContent = isShuffled ? 'Order: Shuffled' : 'Order: Sequential';
       buildSprintPool();
       renderAll();
     }
 
     function toggleViewLayout() {
-      isSingleCardView = !isSingleCardView;
+      isSingleCardView = true;
       document.getElementById('label-layout').textContent = isSingleCardView ? 'View: Single Card Focus' : 'View: All Questions List';
       renderQuestionDeck();
     }
@@ -1110,6 +1074,7 @@
       return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
+    function readSprintSettingsSafe(){try{return readSprintSettings();}catch(error){return null;}}
     function syncTimerControls() {
       const button = document.getElementById('btn-pause-timer');
       const label = document.getElementById('label-pause-timer');
@@ -1117,27 +1082,36 @@
       const status = document.getElementById('timer-status-sub');
       const finishButton = document.getElementById('btn-finish-sprint');
       if (finishButton) finishButton.classList.toggle('hidden', !hasSprintStarted || isSprintFinished);
-      if (label) label.textContent = !activeQuestions.length ? 'No questions yet' : isSprintFinished ? 'Sprint complete' : (!hasSprintStarted ? 'Start sprint' : isTimerPaused ? 'Resume' : 'Pause');
+      if (label) label.textContent = !hasSprintStarted || isSprintFinished || JSON.stringify(readSprintSettingsSafe())!==appliedSprintSettings ? 'Start' : isTimerPaused ? 'Resume' : 'Pause';
       if (button) {
-        button.disabled = !activeQuestions.length || isSprintFinished;
-        button.setAttribute('aria-label', !activeQuestions.length ? 'No questions yet' : isSprintFinished ? 'Sprint complete' : (!hasSprintStarted ? 'Start sprint' : isTimerPaused ? 'Resume sprint' : 'Pause sprint'));
-        button.classList.toggle('opacity-60', !activeQuestions.length || isSprintFinished);
+        button.disabled = !QUESTION_BANK.length || documentGenerationInProgress;
+        button.setAttribute('aria-label', label?.textContent || 'Start');
+        button.classList.toggle('opacity-60', button.disabled);
       }
       if (icon) icon.setAttribute('data-lucide', isTimerPaused || isSprintFinished ? 'play' : 'pause');
       if (status) status.textContent = !activeQuestions.length ? 'Upload documents to begin' : isSprintFinished ? 'Run complete' : (!hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Saved on this device · resume when ready' : getPaceTargetSeconds().toFixed(1) + 's / question');
       if (window.lucide) lucide.createIcons();
+      ['custom-test-minutes','custom-test-questions','sprint-mode'].forEach(id=>{document.getElementById(id).disabled=!isTimerPaused||documentGenerationInProgress;});
       persistSprintState();
     }
 
     function togglePauseTimer() {
-      if (!activeQuestions.length || isSprintFinished) return;
-      if (isTimerPaused) {
-        hasSprintStarted = true;
-        isTimerPaused = false;
-      } else {
-        isTimerPaused = true;
+      if(documentGenerationInProgress)return;
+      if(!isTimerPaused){isTimerPaused=true;syncTimerControls();return;}
+      let settings;
+      try{settings=readSprintSettings();}catch(error){alert(error.message);return;}
+      const changed=JSON.stringify(settings)!==appliedSprintSettings;
+      if(!hasSprintStarted||changed||isSprintFinished) {
+        const scope=['analogy','all','scenario'][settings.mode];
+        const pool=QUESTION_BANK.filter(q=>(!sprintSourceIds||sprintSourceIds.includes(q.id))&&(scope==='all'||(scope==='analogy'?q.isAnalogyTheory:!q.isAnalogyTheory)));
+        if(!pool.length){alert('No questions of this type are available. Choose another type or use AI Generator.');return;}
+        if(Object.keys(userAnswers).length&&!confirm('Start a new sprint with these settings? This resets the current sprint answers; your question bank stays saved.'))return;
+        activeSprintMinutes=settings.minutes;activeSprintSize=settings.questions;activeLectureFilter=scope;
+        isCustomSprint=true;isShuffled=true;isSingleCardView=true;
+        buildSprintPool();renderAll();
       }
-      syncTimerControls();
+      if(!activeQuestions.length)return;
+      hasSprintStarted=true;isTimerPaused=false;syncTimerControls();
     }
 
     function addExtraMinute() {
@@ -1197,8 +1171,8 @@
         paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30';
       }
 
-      const projectedMins = answeredCount > 0 ? ((avgSecs * 100) / 60).toFixed(1) : ((qSecs * 100) / 60).toFixed(1);
-      document.getElementById('metric-projected-100q').textContent = `${projectedMins} mins (Target ≤60m)`;
+      const projectedMins = answeredCount > 0 ? ((avgSecs * activeQuestions.length) / 60).toFixed(1) : ((qSecs * activeQuestions.length) / 60).toFixed(1);
+      document.getElementById('metric-projected-100q').textContent = `${projectedMins} mins (Target ≤${activeSprintMinutes}m)`;
 
       // 3. Score & Completion Card
       let correctCount = 0;
@@ -1474,7 +1448,7 @@
       if (activeQuestions.length === 0) {
         container.innerHTML = QUESTION_BANK.length
           ? '<div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center"><p class="text-sm text-slate-300">No questions match this filter. Choose All questions to see your bank.</p></div>'
-          : `<div id="empty-question-bank" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col justify-center text-center" style="min-height:38rem"><h2 class="text-xl font-bold text-white">No questions loaded</h2><p class="mt-3 text-sm text-slate-400">Upload your documents to create a study sprint.</p><p class="mt-2 text-xs text-slate-500">The starter question set will be added when it is ready.</p><button type="button" onclick="document.getElementById('documents-panel').open=true;document.getElementById('document-upload-input').click()" class="mt-5 self-center min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Choose documents</button></div>`;
+          : `<div id="empty-question-bank" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col justify-center text-center" style="min-height:38rem"><h2 class="text-xl font-bold text-white">No questions loaded</h2><p class="mt-3 text-sm text-slate-400">Upload your documents to create a study sprint.</p><p class="mt-2 text-xs text-slate-500">The starter question set will be added when it is ready.</p><button type="button" onclick="document.getElementById('documents-panel').open=true;document.getElementById('document-upload-input').click()" class="mt-5 self-center min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Upload files</button></div>`;
         return;
       }
 
@@ -1617,6 +1591,7 @@
     function studyFileType(file) {
       const name = file.name.toLowerCase();
       if (file.type === 'application/pdf' || name.endsWith('.pdf')) return 'application/pdf';
+      if (name.endsWith('.json')) return 'application/json';
       if (file.type === 'text/plain' || name.endsWith('.txt')) return 'text/plain';
       if (file.type === 'text/markdown' || name.endsWith('.md') || name.endsWith('.markdown')) return 'text/markdown';
       return '';
@@ -1628,7 +1603,7 @@
       let added = 0;
       for (const file of incoming) {
         const mime = studyFileType(file);
-        if (!mime) { if (status) status.textContent = 'Use PDF, TXT, or Markdown files. Unsupported files were skipped.'; continue; }
+        if (!mime) { if (status) status.textContent = 'Use PDF, TXT, Markdown, or JSON files. Unsupported files were skipped.'; continue; }
         if (selectedStudyFiles.some(existing => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified)) continue;
         if (selectedStudyFiles.length >= MAX_STUDY_FILES) { if (status) status.textContent = 'You can add up to 10 documents.'; break; }
         const currentSize = selectedStudyFiles.reduce((sum, item) => sum + item.size, 0);
@@ -1645,7 +1620,7 @@
       selectedStudyFiles.splice(index, 1);
       renderStudyFiles();
       const status = document.getElementById('document-gen-status');
-      if (status) status.textContent = selectedStudyFiles.length ? 'Document removed. Your remaining files are ready.' : 'Add course notes to build a 100-question sprint.';
+      if (status) status.textContent = selectedStudyFiles.length ? 'Document removed. Your remaining files are ready.' : 'Upload notes or questions to get started.';
     }
     function renderStudyFiles() {
       const list = document.getElementById('study-file-list');
@@ -1680,15 +1655,21 @@
     }
     async function generateDocumentQuestionBatch() {
       if (!selectedStudyFiles.length || documentGenerationInProgress) return;
+      let settings;
+      try{settings=readSprintSettings();}catch(error){alert(error.message);return;}
+      const target=settings.questions;
+      const targetPractical=settings.mode===0?0:settings.mode===2?target:Math.round(target*0.6);
+      const targetTheory=target-targetPractical;
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
       const generationInterests = getBrainHooks();
-      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), interests:generationInterests });
+      if(!generationInterests.length&&!confirm('No interests selected. Create questions without personalisation?'))return;
+      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), interests:generationInterests, count:target, mode:settings.mode });
       if (pendingDocumentFingerprint !== fingerprint) {
         pendingDocumentQuestions = [];
         pendingDocumentFingerprint = fingerprint;
       }
-      documentGenerationInProgress = true; trackQuestionOperation(1); renderStudyFiles();
+      documentGenerationInProgress = true; trackQuestionOperation(1); syncTimerControls(); renderStudyFiles();
       let generationSucceeded = false;
       startAiLoading('btn-generate-document-sprint');
       try {
@@ -1710,7 +1691,7 @@
         const interestInstruction = hooks.length
           ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate.'
           : 'Use clear, familiar everyday examples for theory questions.';
-        const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test application through scenarios, procedures, calculations, or worked examples. Include code questions only when the documents teach programming. Theory questions should test concepts from the documents. Use only the supplied course material and facts needed to interpret it. ${interestInstruction}
+        const prompt = `Create exactly ${target} four-option multiple-choice questions from the attached course documents, with exactly ${targetPractical} practical questions and ${targetTheory} theory questions. Practical questions should test application through scenarios, procedures, calculations, or worked examples. Include code questions only when the documents teach programming. Theory questions should test concepts from the documents. Use only the supplied course material and facts needed to interpret it. ${interestInstruction}
 For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Keep prompts and explanations concise (at most 45 words each), options short, and code snippets at most 12 lines. Return only the compact JSON array matching the response schema, without Markdown fences or surrounding commentary.
 ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`;
         const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
@@ -1725,24 +1706,24 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests,
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
           onDocumentBatch:batch => {
             const seen = new Set(pendingDocumentQuestions.map(documentQuestionKey));
             for (const question of batch) {
               if (!validDocumentQuestion(question, names)) continue;
               const key = documentQuestionKey(question);
-              if (!seen.has(key) && pendingDocumentQuestions.length < 100) {
+              if (!seen.has(key) && pendingDocumentQuestions.length < target) {
                 seen.add(key); pendingDocumentQuestions.push(question);
               }
             }
           },
           progressButtonId: 'btn-generate-document-sprint' });
-        if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The study service returned ' + (Array.isArray(generated) ? generated.length : 0) + ' of 100 questions. No partial set was loaded. Your files are still selected; please retry.');
+        if (!Array.isArray(generated) || generated.length !== target) throw new Error('The study service returned ' + (Array.isArray(generated) ? generated.length : 0) + ' of ' + target + ' questions. No partial set was loaded. Your files are still selected; please retry.');
         const practical = generated.filter(q => q?.questionType === 'practical').length;
         const theory = generated.filter(q => q?.questionType === 'theory').length;
         const valid = generated.every(q => validDocumentQuestion(q, names)) &&
-          new Set(generated.map(documentQuestionKey)).size === 100;
-        if (!valid || practical !== 60 || theory !== 40) throw new Error('The response missed a required question, source, answer, or the 60 practical / 40 theory split. Your current sprint is unchanged. Please retry once.');
+          new Set(generated.map(documentQuestionKey)).size === target;
+        if (!valid || practical !== targetPractical || theory !== targetTheory) throw new Error('The response missed a required question, source, answer, or the selected question-type split. Your current sprint is unchanged. Please retry once.');
         const stamp = Date.now().toString(36);
         const questions = generated.map((q, index) => ({
           ...q, id: `DOC-${stamp}-${index + 1}`, lecture: Math.min(5, Math.max(1, Number(q.lecture) || 1)),
@@ -1750,22 +1731,24 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         }));
         QUESTION_BANK.push(...questions);
         try { localStorage.setItem('exam_sprint_questions_v2', JSON.stringify(QUESTION_BANK.filter(q => q.isAI))); } catch (error) {}
-        activeQuestions = questions; activeSprintSize = 100; activeSprintMinutes = 60; isCustomSprint = false; syncSprintSettingInputs();
-        activeLectureFilter = 'ai'; currentQIndex = 0; userAnswers = {}; flaggedQuestions = {}; timeSpentPerQuestion = {};
-        isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = 3600; remainingSprintSeconds = 3600; elapsedSprintSeconds = 0;
+        sprintSourceIds=questions.map(q=>q.id);
+        activeSprintSize=target;activeSprintMinutes=settings.minutes;isCustomSprint=true;isShuffled=true;isSingleCardView=true;
+        activeLectureFilter=['analogy','all','scenario'][settings.mode];buildSprintPool();
+        currentQIndex = 0; userAnswers = {}; flaggedQuestions = {}; timeSpentPerQuestion = {};
+        isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = settings.minutes*60; remainingSprintSeconds = totalSprintSeconds; elapsedSprintSeconds = 0;
         const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
         generationSucceeded = true;
         pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
-        if (status) status.textContent = 'Ready: 60 practical and 40 theory questions, grouped by your uploaded documents. Start when you’re ready.';
+        if (status) status.textContent = 'Ready: '+practical+' practical and '+theory+' theory questions. Select Start when you’re ready.';
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
         console.error('Document question generation:', error);
-        if (status) status.textContent = (pendingDocumentQuestions.length ? pendingDocumentQuestions.length + ' / 100 checked questions kept for retry. Press Create again to continue. ' : '') + (error.message || 'Could not create the sprint. Your existing questions remain available.');
+        if (status) status.textContent = (pendingDocumentQuestions.length ? pendingDocumentQuestions.length + ' / '+target+' checked questions kept for retry. Press Create again to continue. ' : '') + (error.message || 'Could not create the sprint. Your existing questions remain available.');
       } finally {
         documentGenerationInProgress = false;
         trackQuestionOperation(-1);
         finishAiLoading('btn-generate-document-sprint', generationSucceeded);
-        renderStudyFiles();
+        syncTimerControls(); renderStudyFiles();
       }
     }
     function getBrainHooks() { return selectedBrainHooks.slice(); }
@@ -1928,7 +1911,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         .map(value => String(value).slice(0, 500)).join(' ').slice(0, 1500);
     }
 
-    async function readDocumentSprintStream(response, buttonId, onBatch) {
+    async function readDocumentSprintStream(response, buttonId, onBatch, target = 50) {
       if (!response.body) throw new Error('The study service did not open a generation stream. Your files are still selected.');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -1940,19 +1923,19 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           throw new Error('The generation connection returned an unreadable update. Your files are still selected; no partial sprint was loaded.');
         }
         if (event.type === 'error') throw new Error(event.error?.message || 'Question generation stopped. Your files are still selected.');
-        if (event.type === 'progress' && Number.isInteger(event.completed) && event.completed >= 0 && event.completed <= 100) {
+        if (event.type === 'progress' && Number.isInteger(event.completed) && event.completed >= 0 && event.completed <= target && event.total === target) {
           const job = aiLoadingJobs.get(buttonId);
           if (job) {
             job.determinate = true;
-            updateAiLoading(buttonId, 5 + event.completed * 0.9);
+            updateAiLoading(buttonId, 5 + event.completed / target * 90);
             const caption = job.progress.querySelector('p');
-            if (caption) caption.textContent = event.completed + ' / 100 questions ready';
+            if (caption) caption.textContent = event.completed + ' / '+target+' questions ready';
           }
           const status = document.getElementById('document-gen-status');
-          if (status) status.textContent = typeof event.message === 'string' ? event.message : event.completed + ' of 100 questions checked';
+          if (status) status.textContent = typeof event.message === 'string' ? event.message : event.completed + ' of '+target+' questions checked';
         }
         if (event.type === 'batch') {
-          if (!Array.isArray(event.questions) || event.questions.length > 100) throw new Error('The study service returned an invalid batch.');
+          if (!Array.isArray(event.questions) || event.questions.length > target) throw new Error('The study service returned an invalid batch.');
           if (onBatch) onBatch(event.questions);
         }
         if (event.type === 'result') {
@@ -1994,7 +1977,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
@@ -2006,7 +1989,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           throw new Error('Could not reach the Gemini Worker after ' + (attempt + 1) + (attempt ? ' attempts' : ' attempt') + '. Check your connection and try again.');
         }
         if (response.ok && (response.headers.get('Content-Type') || '').includes('application/x-ndjson')) {
-          try { return await readDocumentSprintStream(response, callOptions.progressButtonId, callOptions.onDocumentBatch); }
+          try { return await readDocumentSprintStream(response, callOptions.progressButtonId, callOptions.onDocumentBatch, callOptions.documentCount); }
           finally { resetTurnstileWidget(); }
         }
         let responseText = '';
@@ -2031,82 +2014,8 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         throw new Error('Gemini Worker returned HTTP ' + response.status + (data.error?.status ? ' ' + data.error.status : '') + attempts + '. Details: ' + message + ' Your files are still selected and your question bank is unchanged.');
       }
     }
-    async function reskinTheoryQuestions() {
-      if (aiLoadingJobs.has('btn-reskin-theory')) return;
-      const button=document.getElementById('btn-reskin-theory');
-      const originals=QUESTION_BANK.filter(q=>q.isAnalogyTheory&&(!q.isAI||q.isDocumentGenerated));
-      const hooks=getBrainHooks();
-      if(!hooks.length){setAiStatus('Select at least one interest before customising theory questions. Existing questions remain ready.');return;}
-      if(!originals.length){setAiStatus('No theory questions are available in this bank yet.');return;}
-      trackQuestionOperation(1);
-      let generationSucceeded = false;
-      startAiLoading('btn-reskin-theory');
-      let completed=0;
-      const batchSize=8;
-      try {
-        for(let offset=0;offset<originals.length;offset+=batchSize){
-          const batch=originals.slice(offset,offset+batchSize);
-          setAiStatus('Rewriting theory questions '+(offset+1)+'–'+(offset+batch.length)+' of '+originals.length+'…');
-          const input=batch.map(q=>({id:q.id,lecture:q.lecture,topic:q.topic,prompt:q.prompt,options:q.options,correct:q.correct,explanation:q.explanation}));
-          const schema={type:'ARRAY',items:{type:'OBJECT',properties:{id:{type:'STRING'},prompt:{type:'STRING'},options:{type:'ARRAY',items:{type:'STRING'}},explanation:{type:'STRING'},analogyTheme:{type:'STRING'}},required:['id','prompt','options','explanation','analogyTheme']}};
-          const system='Rewrite these theory MCQs using only these student interests: '+hooks.join(', ')+'. Return one item per input with the same id. Preserve the exact original subject, concept, topic, difficulty, source facts, and factual meaning. Rewrite the prompt, all four options, and explanation so the analogy is coherent. Preserve the exact correct option at the same index. Do not introduce new factual claims. Keep the original course concept explicit. Set analogyTheme to one selected interest. Do not omit or add items. Input: '+JSON.stringify(input);
-          const result=await callGemini(system,schema,GEMINI_MODEL_ID,{progressButtonId:'btn-reskin-theory'});
-          if(!Array.isArray(result)||result.length!==batch.length)throw new Error('Gemini returned an incomplete reskin for questions '+(offset+1)+'–'+(offset+batch.length)+'.');
-          const byId=new Map(result.map(item=>[item.id,item]));
-          const replacements={};
-          for(const old of batch){
-            const item=byId.get(old.id);
-            if(!item||typeof item.prompt!=='string'||!Array.isArray(item.options)||item.options.length!==4||!item.options.every(option=>typeof option==='string')||typeof item.explanation!=='string')throw new Error('Gemini returned an invalid reskin for '+old.id+'.');
-            replacements[old.id]={prompt:item.prompt,options:item.options,explanation:item.explanation,analogyTheme:item.analogyTheme};
-          }
-          QUESTION_BANK.forEach(q=>{const replacement=replacements[q.id];if(replacement){q.prompt=replacement.prompt;q.options=replacement.options;q.explanation=replacement.explanation;q.analogyTheme=replacement.analogyTheme;q.isReskinned=true;}});
-          const saved=JSON.parse(localStorage.getItem('exam_sprint_reskins_v2')||'{}');
-          localStorage.setItem('exam_sprint_reskins_v2',JSON.stringify(Object.assign(saved,replacements)));
-          completed+=batch.length;
-          updateAiLoading('btn-reskin-theory', 10 + 80 * completed / originals.length);
-          renderAll();
-        }
-        generationSucceeded = true;
-        setAiStatus('Personalised all '+completed+' theory questions around '+hooks.join(', ')+'. Concepts and correct answer positions were retained.');
-        updateFilterPills();renderAll();
-      } catch(err) {
-        console.error('Theory reskin error:',err);
-        const detail=err.message||'AI customisation failed.';
-        const recovery = /your existing questions remain available/i.test(detail) ? '' : ' Your existing questions remain available.';
-        setAiStatus(completed?'Reskinned '+completed+' of '+originals.length+' questions before stopping. Those changes are saved; retry to continue. '+detail:detail+recovery);
-      } finally {trackQuestionOperation(-1);finishAiLoading('btn-reskin-theory', generationSucceeded);updateBrainHookUI();}
-    }
-    async function generateNextBatchWithGemini(batchSize=10) {
-      if (aiLoadingJobs.has('btn-generate-ai-batch')) return;
-      if (!QUESTION_BANK.length) { setAiStatus('Upload documents or load starter questions before creating a practice sprint.'); return; }
-      const button=document.getElementById('btn-generate-ai-batch');
-      const modelId=GEMINI_MODEL_ID;
-      const hooks=getBrainHooks();
-      if(!hooks.length) { setAiStatus('Select at least one interest before generating questions. Your built-in question bank remains ready.'); return; }
-      const weak=QUESTION_BANK.filter(q=>(userAnswers[q.id]!==undefined && userAnswers[q.id]!==q.correct)||flaggedQuestions[q.id]||savedWeakIds[q.id]);
-      const focus=weak.length ? `Focus especially on these weak spots: ${weak.slice(-12).map(q=>`L${q.lecture} ${q.topic}: ${q.prompt}`).join('\n')}` : `Create a balanced personalised weak-spot sprint across introductory Python topics.`;
-      const hookText=hooks.length ? hooks.join(', ') : 'no interests selected; use clear everyday examples';
-      const system=`You are an accurate introductory Python exam-question writer. Generate exactly ${batchSize} new MCQs, each with four options and one correct answer. Use selected interests for theory analogies: ${hookText}. Roughly 60% code tracing and 40% conceptual theory; set analogyTheme to a selected interest for theory items. Stay strictly within introductory Python topics from Lectures 1–5. Every answer and explanation must be factually correct. ${focus}`;
-      const schema={type:'ARRAY',items:{type:'OBJECT',properties:{lecture:{type:'INTEGER'},isAnalogyTheory:{type:'BOOLEAN'},analogyTheme:{type:'STRING',nullable:true},topic:{type:'STRING'},prompt:{type:'STRING'},code:{type:'STRING',nullable:true},options:{type:'ARRAY',items:{type:'STRING'}},correct:{type:'INTEGER'},explanation:{type:'STRING'}},required:['lecture','isAnalogyTheory','topic','prompt','options','correct','explanation']}};
-      trackQuestionOperation(1);
-      let generationSucceeded = false;
-      startAiLoading('btn-generate-ai-batch');
-      try {
-        setAiStatus(`Creating a personalised ${batchSize}-question Exam Sprint…`);
-        const generated=await callGemini(system,schema,modelId,{progressButtonId:'btn-generate-ai-batch'});
-        if(!Array.isArray(generated)||!generated.length) throw new Error('Gemini returned no questions. Your current sprint is unchanged.');
-        const stamp=Date.now().toString().slice(-5);
-        const cleaned=generated.slice(0,batchSize).filter(q=>q && Array.isArray(q.options)&&q.options.length===4 && Number(q.correct)>=0 && Number(q.correct)<4).map((q,i)=>({...q,id:`AI-${stamp}-${i+1}`,lecture:Math.min(5,Math.max(1,Number(q.lecture)||1)),isAI:true}));
-        if(!cleaned.length) throw new Error('Gemini returned unusable questions. Your current sprint is unchanged.');
-        QUESTION_BANK.push(...cleaned);
-        try { localStorage.setItem('exam_sprint_questions_v2',JSON.stringify(QUESTION_BANK.filter(q=>q.isAI))); } catch(e) {}
-        const allBtn=document.getElementById('flt-all'); if(allBtn) allBtn.textContent=`All (${QUESTION_BANK.length})`;
-        activeQuestions=cleaned; activeSprintSize=cleaned.length; activeSprintMinutes=cleaned.length*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false; syncSprintSettingInputs(); activeLectureFilter='ai'; currentQIndex=0; userAnswers={}; flaggedQuestions={}; timeSpentPerQuestion={}; isSprintFinished=false; hasSprintStarted=false; isTimerPaused=true; totalSprintSeconds=cleaned.length*SECONDS_PER_QUESTION_TARGET; remainingSprintSeconds=totalSprintSeconds; elapsedSprintSeconds=0;
-        generationSucceeded = true;
-        setAiStatus(`Loaded ${cleaned.length} personalised questions with the Gemini Worker. Start your Exam Sprint when ready.`); playHarmonicChime('complete'); updateFilterPills(); renderAll();
-      } catch(err) { console.error('Gemini API Error:',err); setAiStatus(err.message || 'AI generation failed. Your current question bank remains ready.'); }
-      finally { trackQuestionOperation(-1); finishAiLoading('btn-generate-ai-batch', generationSucceeded); updateBrainHookUI(); }
-    }
+
+
 
     // Make room for a newly opened setup section while keeping that section open.
     function initSetupPanelSizing() {
@@ -2137,9 +2046,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       clearLegacyQuestionMemory();
       initEngine();
       loadSavedAiQuestionsAndKey();
-      restoreSprintState();
+      if(!restoreSprintState())buildSprintPool();
       isSprintStateReady = true;
       renderAll();
+      draftSettingsChanged();
       initSetupPanelSizing();
       document.addEventListener('click', (event) => {
         const picker = document.getElementById('brain-hook-picker');
