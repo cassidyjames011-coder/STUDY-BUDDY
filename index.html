@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="theme-color" content="#F5F1EA">
   <meta name="description" content="Studioza turns your source material and interests into focused study sprints.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2210%22%20fill%3D%22%232D193C%22%2F%3E%3Cg%20fill%3D%22none%22%20color%3D%22%23FFFCF7%22%3E%3Cpath%20d%3D%22M29%2011C24%204%2010%206%2010%2014c0%207%2020%204%2020%2012%200%209-15%2012-21%204%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M31%2017C27%2010%2016%2010%2013%2015c-5%208%2015%207%2013%2015-1%205-9%207-15%203%22%20stroke%3D%22%232D193C%22%20stroke-width%3D%227%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M31%2017C27%2010%2016%2010%2013%2015c-5%208%2015%207%2013%2015-1%205-9%207-15%203%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%20fill%3D%22none%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%232D193C%22%2F%3E%3Cpath%20d%3D%22M44%2023C52%2018%2067%2017%2072%2024C77%2031%2074%2039%2066%2044C62%2034%2053%2028%2044%2023Z%20M25%2064C29%2073%2039%2077%2049%2078C38%2086%2020%2081%2025%2064Z%22%20fill%3D%22%23E76F51%22%2F%3E%3Cpath%20d%3D%22M69%2019C59%209%2042%208%2031%2020C20%2032%2021%2045%2038%2055L57%2066C67%2072%2070%2080%2066%2087C82%2073%2081%2059%2064%2049L44%2037C34%2031%2036%2025%2043%2021C52%2015%2061%2015%2069%2019Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3Cpath%20d%3D%22M36%2038C29%2047%2036%2055%2050%2062L59%2067C70%2074%2064%2085%2053%2089C42%2094%2028%2088%2024%2080C34%2085%2046%2083%2052%2077C42%2076%2032%2072%2027%2066C21%2058%2024%2051%2029%2047C29%2056%2040%2062%2048%2065C34%2055%2029%2047%2036%2038Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3C%2Fsvg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Studioza — Your study desk</title>
   <!-- Tailwind CSS CDN -->
@@ -183,6 +183,26 @@
 @media(max-width:760px){#study-setup{height:100svh;max-height:100svh}.desk-note{display:none}.desk-action-area{margin-top:12px}}
 
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}.modal-actions button{font-size:12px}
+
+/* Shared desktop frame: the panels align; long content stays inside each panel. */
+.brand-mark{width:32px;height:32px;border-radius:0;background:transparent}
+.brand-mark svg{width:100%;height:100%}
+.question-scroll{min-width:0}
+@media(min-width:1191px){
+ #study-layout{--studio-panel-height:max(420px,calc(100svh - 192px));align-items:stretch}
+ #study-setup,#study-session,#telemetry-dashboard{height:var(--studio-panel-height);min-height:0;max-height:var(--studio-panel-height);top:104px}
+ #study-session{border:1px solid var(--border);border-radius:14px;background:var(--surface);overflow:hidden;gap:0}
+ #question-deck-container{flex:1;min-height:0;display:flex}
+ .question-card{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;border:0;border-radius:0;padding:24px}
+ .question-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:7px;scrollbar-width:thin;scrollbar-color:var(--border) var(--surface)}
+ .question-scroll:focus-visible{outline:2px solid var(--coral);outline-offset:4px}
+ .question-footer{flex:none;margin-top:16px;padding-top:14px}
+ .question-source{margin-bottom:19px}
+ .question-empty{overflow-y:auto;display:flex;justify-content:center}
+ #sprint-completion-summary{flex:none;margin:12px;border-radius:9px;padding:16px}
+}
+@media(max-width:760px){.brand-mark{width:28px;height:28px}.brand-mark svg{width:100%;height:100%}}
+
 </style>
 </head>
 
@@ -204,7 +224,7 @@
 
 <header class="studio-header">
   <div class="header-inner">
-    <a class="studio-brand" href="#question-deck-container" aria-label="Studioza study workspace"><span class="brand-mark"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M29 11C24 4 10 6 10 14c0 7 20 4 20 12 0 9-15 12-21 4" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><path d="M31 17C27 10 16 10 13 15c-5 8 15 7 13 15-1 5-9 7-15 3" stroke="#2D193C" stroke-width="7" stroke-linecap="round"/><path d="M31 17C27 10 16 10 13 15c-5 8 15 7 13 15-1 5-9 7-15 3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="studio-wordmark">Studioza</span></a>
+    <a class="studio-brand" href="#question-deck-container" aria-label="Studioza study workspace"><span class="brand-mark"><svg aria-hidden="true" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="24" fill="#2D193C"/><path d="M44 23C52 18 67 17 72 24C77 31 74 39 66 44C62 34 53 28 44 23Z M25 64C29 73 39 77 49 78C38 86 20 81 25 64Z" fill="#E76F51"/><path d="M69 19C59 9 42 8 31 20C20 32 21 45 38 55L57 66C67 72 70 80 66 87C82 73 81 59 64 49L44 37C34 31 36 25 43 21C52 15 61 15 69 19Z" fill="#FFFCF7"/><path d="M36 38C29 47 36 55 50 62L59 67C70 74 64 85 53 89C42 94 28 88 24 80C34 85 46 83 52 77C42 76 32 72 27 66C21 58 24 51 29 47C29 56 40 62 48 65C34 55 29 47 36 38Z" fill="#FFFCF7"/></svg></span><span class="studio-wordmark">Studioza</span></a>
     <button id="course-selector" class="course-selector" popovertarget="course-picker" aria-label="Choose study material"><span id="header-course-title">Your practice</span><span aria-hidden="true">⌄</span></button>
     <span id="header-sprint-progress" class="header-progress">Sprint 00 / 00</span>
     <div class="header-timer"><i data-lucide="clock-3" aria-hidden="true"></i><span id="header-time-remaining">00:00</span></div>
@@ -1066,12 +1086,12 @@
   const explanation=feedback?`<section class="question-explanation ${answer===q.correct?'':'is-incorrect'}" aria-label="Answer explanation"><h4>${isSprintFinished?'Answer explained':answer===q.correct?'Correct — here’s why':'The reasoning · Correct answer '+letters[q.correct]}</h4><p>${escapeHtml(q.explanation)}</p></section>`:'';
   const code=q.code?`<div class="question-code"><div>Code reference</div><pre><code>${escapeHtml(q.code)}</code></pre></div>`:'';
   return `<article id="q-card-${escapeHtml(q.id)}" class="question-card">
-    <div class="question-meta">Question ${String(idx+1).padStart(2,'0')} · ${isTheoryQuestion(q)?'Theory':'Practical'}</div>
+    <div class="question-scroll" tabindex="0" aria-label="Question and answers"><div class="question-meta">Question ${String(idx+1).padStart(2,'0')} · ${isTheoryQuestion(q)?'Theory':'Practical'}</div>
     <p class="question-source"><strong>${escapeHtml(q.sourceDoc||'Saved study material')}</strong>${q.topic?' · '+escapeHtml(q.topic):''}</p>
     <h3 id="active-question-heading" tabindex="-1" class="question-prompt">${escapeHtml(q.prompt)}</h3>
     <p class="answer-hint">Choose the answer that fits best.</p>${code}
     <div class="answer-list" role="radiogroup" aria-label="Answer choices">${options}</div>${explanation}
-    <div class="question-footer">
+    </div><div class="question-footer">
       <button type="button" class="flag-action ${flagged?'is-flagged':''}" aria-pressed="${flagged}" data-question-id="${escapeHtml(q.id)}" onclick="toggleFlag(this.dataset.questionId)"><i data-lucide="flag" aria-hidden="true"></i>${flagged?'Flagged for review':'Flag for review'}</button>
       <button type="button" class="question-previous" onclick="navigateQuestion(-1)" ${idx===0?'disabled':''} aria-label="Previous question"><i data-lucide="arrow-left" aria-hidden="true"></i><span>Previous</span></button>
       ${idx<activeQuestions.length-1?'<button type="button" class="question-next" onclick="navigateQuestion(1)">Next question <span aria-hidden="true">→</span></button>':'<button type="button" class="question-next" onclick="finishAndGradeSprint()">Finish sprint <span aria-hidden="true">✓</span></button>'}
@@ -1081,9 +1101,14 @@
 
     function renderQuestionDeck() {
   const container=document.getElementById('question-deck-container');if(!container)return;
+  const oldQuestion=container.dataset.questionId;
+  const oldScroll=container.querySelector('.question-scroll')?.scrollTop||0;
   if(!activeQuestions.length){
     container.innerHTML=`<div class="question-card question-empty"><span class="eyebrow">Your study workspace</span><h2>A fresh start for your next sprint.</h2><p>${QUESTION_BANK.length?'Choose your question mix or a different saved source to continue.':'Bring your notes, add what interests you, and make the material your own.'}</p><div class="empty-step"><span>1</span>Add your source material</div><div class="empty-step"><span>2</span>Choose interests and a question mix</div><div class="empty-step"><span>3</span>Create a focused sprint</div><button type="button" class="button-primary" onclick="openSourcePicker()">Add source materials</button></div>`;
   }else container.innerHTML=buildSingleQuestionCardHTML(activeQuestions[currentQIndex],currentQIndex);
+  const newQuestion=activeQuestions[currentQIndex]?.id||'';
+  container.dataset.questionId=newQuestion;
+  const scroll=container.querySelector('.question-scroll');if(scroll)scroll.scrollTop=oldQuestion===newQuestion?oldScroll:0;
   syncStudioHeader();
   if(window.lucide)lucide.createIcons();
 }
