@@ -17,7 +17,7 @@ function json(data, status, origin) {
   });
 }
 
-const DOCUMENT_SPRINT_VERSION = "checked-batches-v3-50";
+const DOCUMENT_SPRINT_VERSION = "checked-batches-v4-theory-interests";
 
 function documentQuestionSchema(sources, types = ["practical","theory"]) {
   return { type:"ARRAY", items:{ type:"OBJECT", properties:{
@@ -105,7 +105,8 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
     const theoryCount = count - practicalCount;
     const instruction = "This is one batch of a " + target + "-question study sprint. For THIS response produce exactly " + practicalCount +
       " practical and " + theoryCount + " theory questions (" + count + " total). Only generate the requested batch in this response. " +
-      "Stay grounded in the supplied documents. Use these selected interests for examples where relevant: " + JSON.stringify(interests) + ". Practical means applying the material in a scenario, procedure, calculation, or code only where the documents teach programming. " +
+      "Stay grounded in the supplied documents. Theory questions test definitions, principles, explanations, or conceptual relationships. Use these selected interests ONLY in theory questions, as memorable analogies while keeping the original concept explicit: " + JSON.stringify(interests) + ". Set analogyTheme to the selected interest used, or null when none is used. " +
+      "Practical questions require applying the source material through a concrete task, procedure, calculation, worked problem, or code only where the documents teach programming. Keep practical questions in the original source context; do not reframe them around selected interests or analogies, and set analogyTheme to null. " +
       "Keep prompts and explanations concise. Return only a JSON array of complete question objects, with exactly four distinct options and one correct zero-based answer index. " +
       "Use one of these exact sourceDoc names: " + JSON.stringify(sources) + ". Avoid repeating or paraphrasing these already accepted questions: " +
       JSON.stringify(questions.map(q => ({ prompt:q.prompt, code:q.code || "", topic:q.topic })));
