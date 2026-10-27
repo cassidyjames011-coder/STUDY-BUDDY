@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="theme-color" content="#F5F1EA">
+  <meta name="description" content="Studioza turns your source material and interests into focused study sprints.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2210%22%20fill%3D%22%232D193C%22%2F%3E%3Cg%20color%3D%22%23FFFCF7%22%3E%3Cpath%20d%3D%22M29%2011C24%204%2010%206%2010%2014c0%207%2020%204%2020%2012%200%209-15%2012-21%204%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M31%2017C27%2010%2016%2010%2013%2015c-5%208%2015%207%2013%2015-1%205-9%207-15%203%22%20stroke%3D%22%232D193C%22%20stroke-width%3D%227%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M31%2017C27%2010%2016%2010%2013%2015c-5%208%2015%207%2013%2015-1%205-9%207-15%203%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STUDY BUDDY</title>
+  <title>Studioza — Your study desk</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -76,7 +79,7 @@
             state.widgetId = window.turnstile.render('#ai-security-widget', {
               sitekey:'0x4AAAAAAFnDFAKMEwULwt1q',
               action:'generate',
-              theme:'dark',
+              theme:'light',
               size:window.matchMedia('(max-width:380px)').matches ? 'compact' : 'flexible',
               execution:'execute',
               appearance:'execute',
@@ -120,7 +123,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Lexend', 'Inter', 'system-ui', 'sans-serif'],
+            sans: ['Inter', 'Lexend', 'system-ui', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
@@ -134,106 +137,44 @@
     }
   </script>
 
-  <style>
-    body {
-      font-family: 'Lexend', 'Inter', sans-serif;
-      background-color: #0b1120;
-      color: #f1f5f9;
-      line-height: 1.65;
-      letter-spacing: 0.015em;
-    }
 
-    body.dyslexia-mode {
-      letter-spacing: 0.045em !important;
-      word-spacing: 0.12em !important;
-      line-height: 1.85 !important;
-      background-color: #0f172a !important;
-      color: #fef3c7 !important;
-    }
 
-    body.dyslexia-mode .prose-card {
-      background-color: #1e293b !important;
-      border-color: #475569 !important;
-    }
+<style>
 
-    .progress-ring-circle {
-      transition: stroke-dashoffset 0.35s ease-out, stroke 0.3s ease;
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-    }
+:root{--background:#F5F1EA;--surface:#FFFCF7;--aubergine:#2D193C;--coral:#E76F51;--coral-hover:#D95C43;--moss:#54765B;--text:#24211F;--muted-text:#716B65;--border:#D9D2C6;--warning:#C88A2A;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--background);color:var(--text);font:14px/1.6 Inter,system-ui,sans-serif;letter-spacing:0}button,input,select{font:inherit}button,summary,a{-webkit-tap-highlight-color:transparent}button,summary{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}button,summary,input,select,a{outline-offset:4px}button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--coral)!important}input,select{min-height:44px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text)}input[type=number]{font-variant-numeric:tabular-nums}input::placeholder{color:var(--muted-text)}[hidden],.hidden{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}h1,h2,h3,p{margin:0}svg{flex:none}.eyebrow{font:600 10px/1.5 Inter,sans-serif;letter-spacing:.13em;text-transform:uppercase}.muted{color:var(--muted-text)}.button-primary{background:var(--coral);color:var(--aubergine);border:1px solid var(--coral);border-radius:8px;padding:10px 16px;font-weight:600;min-height:44px}.button-primary:hover{background:var(--coral-hover)}.button-outline{border:1px solid var(--aubergine);border-radius:8px;padding:10px 16px;color:var(--aubergine);background:transparent;font-weight:600;min-height:44px}.button-outline:hover{background:#eee6ed}.quiet-action{background:none;border:0;padding:10px 0;color:var(--aubergine);min-height:40px;font-weight:500}.quiet-action:hover{text-decoration:underline}::selection{background:#f8c7b9;color:var(--aubergine)}
+.studio-header{position:sticky;top:0;z-index:40;background:var(--background);border-bottom:1px solid var(--border)}.header-inner{max-width:1440px;margin:auto;display:flex;align-items:center;gap:24px;padding:15px 24px;min-height:76px}.studio-brand{display:flex;align-items:center;gap:10px;flex:none;text-decoration:none;color:var(--aubergine)}.brand-mark{height:38px;width:38px;background:var(--aubergine);color:var(--surface);border-radius:10px;display:grid;place-items:center}.brand-mark svg{width:33px;height:33px}.studio-wordmark{font:600 28px/1 Fraunces,Georgia,serif;letter-spacing:-1px}.course-selector{display:flex;align-items:center;justify-content:space-between;gap:24px;border:0;border-left:1px solid var(--border);background:none;padding:0 0 0 24px;min-height:36px;max-width:270px;text-align:left;font-size:13px;color:var(--aubergine)}#header-course-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.header-progress{margin-left:auto;white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted-text)}.header-timer{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--aubergine)}.header-timer svg{height:16px;width:16px}.header-start{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:7px;background:var(--surface);min-height:36px;padding:6px 10px;font-size:12px;color:var(--aubergine);font-weight:600}.header-start svg{height:13px;width:13px}.preferences{position:relative;flex:none}.preferences>summary{display:grid;place-items:center;border:1px solid var(--border);background:#eee8df;border-radius:50%;width:36px;height:36px;list-style:none;color:var(--aubergine)}summary::-webkit-details-marker{display:none}.preferences>summary svg{height:17px;width:17px}.options-popout,.preferences-history{position:absolute;right:0;width:264px;background:var(--surface)!important;color:var(--text);border:1px solid var(--border)!important;border-radius:12px!important;padding:12px;box-shadow:0 8px 24px #2d193c12!important;z-index:45}.options-popout{top:46px;margin:0!important}.options-popout>p{color:var(--muted-text)!important}.options-popout button{width:100%;min-height:40px;justify-content:flex-start;color:var(--text)!important;border:0!important;background:none!important;font-size:12px}.options-popout button:hover{background:var(--background)!important}.preferences-history{top:296px;border-top:0!important;border-radius:0 0 12px 12px!important;font-size:12px}.preferences-history button{background:none;color:var(--muted-text);border:0;min-height:40px;text-align:left}.preferences-history p:empty{display:none}.desk-toggle,.desk-close{display:none}
+#study-layout{max-width:1440px;margin:0 auto;padding:28px 24px 40px;display:grid;grid-template-columns:minmax(300px,1.02fr) minmax(520px,1.8fr) minmax(220px,.64fr);gap:24px;align-items:start;width:100%}#study-setup,#study-session,#telemetry-dashboard{min-width:0}#study-setup{position:sticky;top:104px;align-self:start;border-radius:16px;background:var(--aubergine);color:var(--surface);padding:26px 24px 22px;min-height:min(800px,calc(100svh - 130px));max-height:calc(100svh - 130px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#786283 var(--aubergine);display:flex;flex-direction:column}#study-setup .eyebrow{color:#c7b7d0}.desk-top{display:flex;align-items:center;justify-content:space-between}#desk-course-title{font:500 29px/1.2 Fraunces,Georgia,serif;letter-spacing:-.4px;margin:13px 0 25px;overflow-wrap:anywhere}.desk-source{padding:15px;border:1px solid #685271;border-radius:10px;background:#3a2547;transition:border-color .15s}.desk-source.is-drag-over{border-color:var(--coral);outline:2px solid var(--coral)}.source-heading{display:flex;align-items:center;gap:7px;font-size:10px;color:#d9cddd}.source-heading svg{width:15px;height:15px}.source-heading button{margin-left:auto;background:none;border:0;color:#f1c9bc;min-height:28px;padding:0 0 0 8px;font-size:11px;text-decoration:underline;text-underline-offset:3px}#desk-current-source{font-size:13px;line-height:1.6;font-weight:500;margin-top:12px;overflow-wrap:anywhere}#desk-source-context{font-size:10px;color:#c8b9d1;margin-top:5px}.desk-upload{margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px;width:100%;min-height:44px;border:1px solid #947e9c;border-radius:8px;background:none;color:var(--surface);font-size:12px;font-weight:500}.desk-upload:hover{background:#422d50}.desk-upload svg{height:14px;width:14px}.desk-file-types{font-size:9px;color:#cabdd0;margin-top:7px;text-align:center}#study-file-list{padding:0;list-style:none;margin:10px 0 0;display:grid;gap:6px}#study-file-list:empty{display:none}#study-file-list li{background:#3a2547!important;border-color:#685271!important;padding:6px 9px!important;color:var(--surface);font-size:10px!important}#study-file-list li span{color:var(--surface)!important}#study-file-list li button{color:#d8c9df!important;min-width:30px;min-height:30px}.desk-website{margin-top:14px;font-size:11px}.desk-website summary{display:flex;align-items:center;justify-content:space-between;list-style:none;min-height:30px;color:#d8c9df}.website-input-row{display:flex;gap:6px;margin-top:7px}.website-input-row input{width:100%;min-width:0;font-size:11px!important}.website-input-row button{border:1px solid #947e9c;background:none;color:var(--surface);border-radius:7px;padding:6px 10px}.desk-section-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;margin:24px 0 10px}.upload-info-button{display:inline-grid;place-items:center;width:24px;height:24px;min-height:24px;border:1px solid #947e9c;border-radius:50%;background:none;color:#d8c9df;font-family:Georgia,serif;font-size:13px}#brain-hook-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}#brain-hook-chips:empty{margin:0}#brain-hook-chips>span{background:#50375f!important;border:1px solid #7c6288!important;border-radius:7px!important;padding-left:10px;font-size:11px;color:var(--surface)!important}#brain-hook-chips button{min-height:30px!important;min-width:28px!important;color:#dbcce3!important;border-radius:6px!important}.interest-search{position:relative}.interest-search svg{position:absolute;left:11px;top:14px;width:14px;height:14px;color:#cbbbd3}.interest-search input{width:100%;padding-left:33px}#study-setup input{background:#3a2547!important;color:var(--surface)!important;border-color:#786283!important;min-height:42px;font-size:12px}#study-setup input::placeholder{color:#c4b3cd}#brain-hook-options{background:#3a2547!important;border:1px solid #786283!important;border-radius:8px;padding:5px;max-height:150px;overflow-y:auto;margin-top:6px}#brain-hook-options button{font-size:12px!important;color:var(--surface)!important;min-height:38px}#brain-hook-options button:hover{background:#50375f!important}#brain-hook-options button[aria-selected=true]{color:#ffc9b7!important}#brain-hook-requirement,#ai-gen-status{font-size:10px;color:#c4b3cd!important;margin-top:7px}#ai-gen-status:empty{display:none}.mode-control{display:flex;gap:3px;border:1px solid #786283;border-radius:8px;padding:3px;background:#3a2547}.mode-control button{flex:1;min-height:34px;border:0;border-radius:5px;background:none;font-size:11px;color:#d7c9df}.mode-control button[aria-checked=true]{background:var(--coral);color:var(--aubergine);font-weight:600}.sprint-settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:17px}.sprint-settings label{font-size:11px;color:#e2d7e7}.sprint-settings label span{color:#c4b3cd;font-size:9px}.sprint-settings input{display:block;width:100%;margin-top:6px}.desk-create{background:var(--coral);color:var(--aubergine);border:0;border-radius:8px;min-height:46px;display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 15px;margin-top:19px;font-size:13px;font-weight:600}.desk-create:hover{background:var(--coral-hover)}.desk-create:disabled{background:#806b86;color:#e6dbe9;opacity:.65}.desk-create>span:last-child{font-size:18px;line-height:1}.desk-create>.ai-request-label{font-size:13px!important;line-height:1.5!important}#document-gen-status{font-size:10px;line-height:1.6;color:#cbbbd3;margin-top:10px}#document-gen-status:empty{display:none}.desk-note{display:flex;align-items:flex-start;gap:10px;border-top:1px solid #5d4569;padding-top:19px;margin-top:auto;min-height:70px;font-size:11px;color:#e4d8e9}.desk-note svg{width:16px;height:16px;margin-top:2px}.desk-note p span{font-size:10px;color:#c4b3cd}.desk-note::before{content:"";height:0}#documents-panel{margin-bottom:24px}
+#study-session{display:flex;flex-direction:column;gap:16px}.question-card{border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:28px;box-shadow:none;min-width:0}.question-meta{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--muted-text);margin-bottom:8px}.question-source{font-size:10px;line-height:1.6;color:var(--muted-text);overflow-wrap:anywhere;margin-bottom:27px;max-width:100%}.question-source strong{font-weight:500;color:var(--aubergine)}.question-prompt{font:500 25px/1.4 Inter,sans-serif;letter-spacing:-.65px;color:var(--aubergine);margin:0 0 14px;overflow-wrap:anywhere}.answer-hint{font-size:11px;color:var(--muted-text);margin:0 0 21px}.answer-list{display:grid;gap:11px}.answer-option{min-height:60px;display:flex;align-items:flex-start;gap:12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);padding:16px;text-align:left;width:100%;color:var(--text);font-size:13px;line-height:1.65;transition:background-color .15s,border-color .15s}.answer-option:hover{background:#f8f2e9;border-color:#dda08f}.answer-letter{width:26px;height:26px;display:grid;place-items:center;flex:none;border:1px solid var(--border);border-radius:6px;background:#f4f0e9;color:var(--muted-text);font-size:11px;font-weight:600}.answer-copy{flex:1;min-width:0}.answer-option.selected{background:#fae9e2;border-color:var(--coral)}.answer-option.selected .answer-letter{background:var(--coral);color:var(--aubergine);border-color:var(--coral)}.answer-option.correct{background:#f1f5ee;border-color:var(--moss)}.answer-option.correct .answer-letter{background:var(--moss);color:var(--surface);border-color:var(--moss)}.answer-option.incorrect{background:#fae9e2;border-color:var(--coral)}.answer-option.incorrect .answer-letter{background:var(--coral);color:var(--aubergine);border-color:var(--coral)}.answer-feedback{display:block;font-size:10px;font-weight:600;margin-top:5px;color:var(--moss)}.answer-option.incorrect .answer-feedback{color:#a9442e}.question-explanation{margin-top:20px;padding:18px;border-left:3px solid var(--moss);border-radius:0 8px 8px 0;background:#f1f5ee;font-size:12px;line-height:1.8}.question-explanation.is-incorrect{border-color:var(--coral);background:#faeee7}.question-explanation h4{font-size:11px;color:var(--aubergine);margin:0 0 8px;font-weight:600}.question-footer{display:flex;align-items:center;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--border)}.flag-action,.question-previous{min-height:42px;border:0;background:none;color:var(--muted-text);font-size:11px;padding:6px 0;display:flex;align-items:center;gap:5px}.flag-action svg,.question-previous svg{height:13px;width:13px}.flag-action.is-flagged{color:#93621c}.question-previous{margin-left:auto}.question-next{display:flex;align-items:center;justify-content:center;gap:10px;border:0;background:var(--coral);color:var(--aubergine);border-radius:7px;min-height:44px;font-size:11px;font-weight:600;padding:11px 15px;white-space:nowrap}.question-next:hover{background:var(--coral-hover)}.question-code{margin:18px 0;border:1px solid var(--border);border-radius:9px;background:#f0ebe3;overflow:hidden}.question-code>div{font-size:10px;color:var(--muted-text);padding:8px 14px;border-bottom:1px solid var(--border)}.question-code pre{padding:16px;overflow-x:auto;font:12px/1.7 'JetBrains Mono',monospace;color:var(--aubergine);margin:0}.question-empty{min-height:540px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}.question-empty .eyebrow{color:var(--moss);margin-bottom:18px}.question-empty h2{font:500 36px/1.2 Fraunces,Georgia,serif;color:var(--aubergine);max-width:360px;letter-spacing:-.8px}.question-empty>p{color:var(--muted-text);font-size:13px;max-width:340px;margin:17px 0 24px}.question-empty .empty-step{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--muted-text);margin:8px 0}.empty-step span{border:1px solid var(--border);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;font-size:10px}.question-empty .button-primary{margin-top:25px}#sprint-completion-summary{padding:25px;border:1px solid #b7c7b4;border-radius:12px;background:#edf2e9}#sprint-completion-summary h2{font:500 28px Fraunces,Georgia,serif;color:var(--aubergine);margin:8px 0}#sprint-completion-summary p{font-size:12px;color:var(--muted-text);margin-bottom:15px}
+#telemetry-dashboard{position:sticky;top:104px;max-height:calc(100svh - 130px);overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:23px 18px;scrollbar-width:thin;scrollbar-color:var(--border) var(--surface)}#telemetry-dashboard>h2{color:var(--aubergine);font-size:11px}.status-section{padding:22px 0;border-bottom:1px solid var(--border)}.status-section>.eyebrow{color:var(--muted-text);font-size:9px}.status-countdown{font-size:39px;font-weight:500;letter-spacing:-1.8px;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--aubergine);margin:10px 0 7px}#timer-status-sub{font-size:10px;line-height:1.5;min-height:16px}.timer-track{height:3px;background:#e9e1d7;border-radius:5px;margin:17px 0 8px;overflow:hidden}#bar-timer-remaining{height:100%;background:var(--coral);width:0}.status-meta{font-size:9px;line-height:1.6;color:var(--muted-text)}.timer-secondary{display:flex;justify-content:space-between;margin-top:10px;gap:10px}.timer-secondary button{min-height:28px;padding:0;font-size:9px;color:var(--muted-text);border:0;background:none}.timer-secondary button:hover{text-decoration:underline}.status-stat{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:10px;color:var(--muted-text);margin-bottom:15px}.status-stat strong{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--aubergine);white-space:nowrap}.status-stat:first-of-type strong{font-size:19px}.status-stat+#metric-score-fraction{margin-top:-12px;margin-bottom:20px}.flag-count{font-size:10px;color:#93621c;margin-top:9px}#question-nav-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.map-question{aspect-ratio:1;min-height:30px;border:1px solid var(--border);border-radius:6px;background:var(--background);color:var(--muted-text);font-size:10px;position:relative;font-variant-numeric:tabular-nums}.map-question.correct,.map-question.completed{background:var(--moss);color:var(--surface);border-color:var(--moss)}.map-question.incorrect{background:#f7dfd5;color:#973c28;border-color:#db927e}.map-question.flagged{background:#f5e7c9;border-color:var(--warning);color:#795019}.map-question.current{background:var(--aubergine);color:var(--surface);border-color:var(--aubergine)}.map-flag{position:absolute;right:2px;top:0;font-size:9px;color:#f6bf5c}.map-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:8px;color:var(--muted-text);margin-bottom:9px}.map-legend span{display:flex;align-items:center;gap:4px}.map-dot{width:5px;height:5px;border-radius:50%;background:var(--moss)}.map-dot.flagged{background:var(--warning)}#btn-finish-sprint{width:100%;font-size:11px;margin-top:20px}.source-breakdown{margin-top:18px;font-size:10px}.source-breakdown summary{display:flex;justify-content:space-between;list-style:none;color:var(--muted-text);min-height:28px}.source-breakdown>div{margin-top:12px}.source-breakdown>div>div{margin-bottom:10px}.studio-footer{max-width:1440px;width:100%;margin:0 auto;padding:0 24px 25px;display:flex;justify-content:space-between;gap:16px;font-size:10px;color:var(--muted-text)}.studio-footer button{background:none;border:0;color:var(--muted-text);font-size:10px}
+.studio-popover,#document-upload-info,#ai-security-dialog{margin:auto;max-height:calc(100svh - 40px);overflow-y:auto;width:min(460px,calc(100vw - 32px));padding:28px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:0 12px 48px #2d193c18}.studio-popover::backdrop,#document-upload-info::backdrop,#ai-security-dialog::backdrop{background:#2d193c44}.studio-popover h2,#document-upload-info h2,#ai-security-dialog h2{font:500 26px Fraunces,Georgia,serif;color:var(--aubergine)!important;margin-bottom:14px}.studio-popover label{display:block;font-size:12px;font-weight:500;margin:18px 0 7px}.studio-popover select{width:100%;font-size:12px}.studio-popover p,#document-upload-info p,#ai-security-dialog p{color:var(--muted-text)!important;font-size:12px;line-height:1.8;margin:12px 0}.course-name-row{display:flex;gap:8px}.course-name-row input{min-width:0;flex:1}.course-name-row button{font-size:12px}.studio-popover>button{margin-top:10px}#document-upload-info>button{background:var(--coral)!important;color:var(--aubergine)!important;box-shadow:none;font:600 12px Inter,sans-serif;border-radius:8px}#ai-security-dialog>button{background:var(--background)!important;color:var(--aubergine)!important;border-color:var(--border)!important}.ai-request-button{position:relative;overflow:hidden;isolation:isolate}.ai-request-button.is-ai-loading{background:#806b86!important;color:var(--aubergine)!important;opacity:1!important;cursor:wait}.ai-request-button.is-ai-loading::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--ai-progress,0%);background:var(--coral);transition:width .5s ease;z-index:0}.ai-request-label{position:relative;z-index:1}.ai-request-progress{--ai-progress:0%;margin-top:9px}.ai-request-track{height:3px;background:#685271;border-radius:5px;overflow:hidden}.ai-request-fill{height:100%;width:var(--ai-progress,0%);background:var(--coral);transition:width .5s ease}.ai-request-progress p{font-size:10px;color:#dbcce3;margin-top:5px}.study-search-icon{width:14px;height:14px}
+.text-white,.text-slate-100,.text-slate-200{color:var(--text)}.text-slate-300,.text-slate-400,.text-slate-500{color:var(--muted-text)}.text-sky-300,.text-sky-400,.text-indigo-300,.text-indigo-400{color:var(--aubergine)}.text-emerald-300,.text-emerald-400{color:var(--moss)}.bg-slate-950,.bg-slate-900,.bg-slate-800{background:var(--background)}.border-slate-700,.border-slate-800{border-color:var(--border)}.bg-sky-400,.bg-sky-500{background:var(--coral)}.bg-emerald-400,.bg-emerald-500{background:var(--moss)}.bg-rose-500{background:var(--coral)}.font-mono{font-family:Inter,sans-serif;font-variant-numeric:tabular-nums}body.dyslexia-mode{font-family:Lexend,Inter,sans-serif;letter-spacing:.035em;word-spacing:.08em;line-height:1.85}body.dyslexia-mode .question-prompt{font-family:Lexend,Inter,sans-serif;letter-spacing:0;line-height:1.65}.desk-backdrop{display:none}
+@media(min-width:1600px){#study-layout{padding-top:36px}.question-card{padding:34px}.question-prompt{font-size:27px}}
+@media(max-width:1190px) and (min-width:761px){#study-layout{grid-template-columns:minmax(280px,.9fr) minmax(0,1.65fr);gap:22px}#study-setup{grid-column:1;grid-row:1 / span 2}#study-session{grid-column:2}#telemetry-dashboard{grid-column:2;position:static;max-height:none;display:grid;grid-template-columns:1fr 1fr;gap:0 24px}#telemetry-dashboard>h2,#question-navigator,#btn-finish-sprint,.source-breakdown{grid-column:1 / -1}#question-nav-grid{grid-template-columns:repeat(10,minmax(0,1fr))}.header-inner{gap:15px}.course-selector{max-width:190px;font-size:12px;padding-left:16px}.question-card{padding:23px}.question-prompt{font-size:24px}}
+@media(max-width:760px){.header-inner{padding:12px 18px;gap:12px;flex-wrap:wrap;min-height:70px}.studio-wordmark{font-size:25px}.brand-mark{width:32px;height:32px;border-radius:8px}.brand-mark svg{width:28px;height:28px}.course-selector{display:none}.header-progress{font-size:10px;margin-left:auto}.header-timer{font-size:12px;gap:5px}.header-timer svg{display:none}.preferences{display:none}.header-start{font-size:11px;min-height:32px;padding:5px 8px}.header-start svg{display:none}.desk-toggle{display:flex;align-items:center;gap:6px;font-size:11px;border:1px solid var(--border);background:var(--surface);color:var(--aubergine);border-radius:6px;padding:6px 9px;min-height:32px}.desk-toggle svg{height:12px;width:12px}.desk-toggle span{display:none}#study-layout{display:block;padding:20px 16px 28px}#study-session{width:100%}#study-setup{position:fixed;z-index:80;top:0;bottom:0;left:0;width:min(370px,calc(100vw - 24px));height:100svh;max-height:100svh;min-height:0;border-radius:0 16px 16px 0;padding:25px 24px;transform:translateX(-110%);visibility:hidden;transition:transform .2s,visibility .2s}.desk-is-open #study-setup{transform:translateX(0);visibility:visible}.desk-is-open{overflow:hidden}.desk-close{display:block;color:var(--surface);background:none;border:1px solid #947e9c;width:32px;height:32px;border-radius:6px;font-size:22px;line-height:1}.desk-backdrop:not([hidden]){display:block;position:fixed;inset:0;background:#2d193c66;z-index:70;border:0;width:100%;height:100%}.question-card{padding:22px 19px;border-radius:12px}.question-meta{font-size:9px}.question-source{font-size:10px;margin-bottom:23px}.question-prompt{font-size:24px;line-height:1.45;letter-spacing:-.5px}.answer-option{font-size:13px;padding:13px;min-height:56px;gap:10px}.answer-letter{width:24px;height:24px}.question-footer{position:sticky;bottom:0;background:var(--surface);padding:13px 0 9px;margin-top:23px;gap:10px;z-index:20}.question-next{min-height:48px;padding:10px 12px;font-size:11px}.question-previous span{display:none}.question-previous{width:24px;justify-content:center}.flag-action{font-size:10px}.flag-action svg{display:none}#telemetry-dashboard{position:static;max-height:none;margin-top:20px;padding:22px}#question-nav-grid{grid-template-columns:repeat(8,minmax(0,1fr))}.status-countdown{font-size:38px}.status-stat{font-size:12px}.status-section>.eyebrow{font-size:10px}.status-meta{font-size:11px}.status-section{padding:20px 0}.map-question{font-size:12px;min-height:34px}.status-stat strong{font-size:15px}.status-stat:first-of-type strong{font-size:21px}.question-empty{min-height:460px}.question-empty h2{font-size:33px}.studio-footer{padding:0 18px 22px;font-size:9px;align-items:center}.studio-footer button{font-size:9px}#document-gen-status,#brain-hook-requirement{font-size:11px}.desk-file-types{font-size:10px}}
+@media(max-width:390px){.header-inner{gap:9px;padding:10px 12px}.studio-wordmark{font-size:23px}.studio-brand{gap:7px}.header-progress{font-size:9px}.header-timer{font-size:11px}.header-start{padding:5px}.header-start span{font-size:10px}.header-progress{letter-spacing:-.3px}.question-card{padding:20px 16px}.question-prompt{font-size:22px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
-    }
 
-    @keyframes softPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.65; transform: scale(1.06); }
-    }
-    .animate-soft-pulse {
-      animation: softPulse 2.2s infinite ease-in-out;
-    }
-      .options-popout button { width: 100%; justify-content: flex-start; }
-  </style>
-  <style>
-    #study-layout { display:grid; align-content:start; grid-template-columns:minmax(18rem,22rem) minmax(0,1fr); align-items:start; gap:1rem; }
-    #study-setup, #study-session { min-width:0; }
-    #study-setup { contain:size; align-self:stretch; min-height:0; overflow-y:auto; scrollbar-gutter:stable; padding-right:.25rem; }
-    #documents-panel > summary { min-height:2.75rem; }
-    .upload-info-button { display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border:1px solid #64748b; border-radius:50%; color:#7dd3fc; font-weight:700; font-family:serif; font-size:1rem; cursor:pointer; }
-    .upload-info-button:hover, .upload-info-button:focus-visible { background:#1e293b; outline:2px solid #38bdf8; outline-offset:2px; }
-    #document-upload-info, #personalisation-info { margin:auto; max-height:calc(100dvh - 2rem); overflow-y:auto; width:min(26rem,calc(100vw - 2rem)); padding:1.5rem; border:1px solid #475569; border-radius:1rem; background:#0f172a; color:#f1f5f9; box-shadow:0 20px 60px #0008; }
-    #document-upload-info::backdrop, #personalisation-info::backdrop { background:#02061780; }
-    #document-upload-info p, #personalisation-info p { margin-top:.75rem; font-size:.875rem; color:#cbd5e1; }
-    #study-session { display:grid; grid-template-columns:minmax(0,1fr) minmax(17rem,22rem); grid-template-areas:"summary summary" "focus insights" "navigator insights"; align-items:start; gap:1rem; }
-    .study-workspace { display:contents; }
-    #sprint-completion-summary { grid-area:summary; min-width:0; }
-    #question-deck-container { grid-area:focus; min-width:0; }
-    #telemetry-dashboard { contain:size; align-self:stretch; min-height:0; overflow-y:auto; scrollbar-gutter:stable; grid-area:insights; grid-template-columns:minmax(0,1fr); align-content:start; min-width:0; }
-    #question-navigator { grid-area:navigator; min-width:0; }
-    .telemetry-panel > summary:hover { background:#1e293b; }
-    .telemetry-panel > summary:focus-visible { outline:2px solid #38bdf8; outline-offset:3px; }
-    .telemetry-panel[open] > summary .telemetry-chevron { transform:rotate(180deg); }
-    .ai-request-button { position:relative; overflow:hidden; isolation:isolate; }
-    .ai-request-button.is-ai-loading { background:#1e293b !important; color:#cbd5e1 !important; opacity:1 !important; cursor:wait !important; }
-    .ai-request-button.is-ai-loading::before { content:""; position:absolute; inset:0 auto 0 0; width:var(--ai-progress,0%); background:linear-gradient(90deg,#0ea5e9,#6366f1); transition:width .5s ease; z-index:0; }
-    .ai-request-label { position:relative; z-index:1; }
-    .ai-request-progress { --ai-progress:0%; margin-top:.5rem; }
-    .ai-request-progress[hidden] { display:none; }
-    .ai-request-track { height:.25rem; overflow:hidden; border-radius:999px; background:#334155; }
-    .ai-request-fill { height:100%; width:var(--ai-progress,0%); background:linear-gradient(90deg,#38bdf8,#818cf8); border-radius:inherit; transition:width .5s ease; }
-    .ai-panel-loading > summary::after { content:""; flex:none; width:.8rem; height:.8rem; border:2px solid #475569; border-top-color:#7dd3fc; border-radius:50%; animation:ai-request-spin .9s linear infinite; }
-    @keyframes ai-request-spin { to { transform:rotate(360deg); } }
-    @media (prefers-reduced-motion:reduce) { .ai-panel-loading > summary::after { animation:none; border-color:#7dd3fc; } .ai-request-fill, .ai-request-button.is-ai-loading::before { transition:none; } }
-    #ai-security-dialog { width:min(26rem,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; margin:auto; padding:1.25rem; border:1px solid #475569; border-radius:1rem; background:#0f172a; color:#f1f5f9; box-shadow:0 20px 60px #0008; }
-    #ai-security-dialog::backdrop { background:#020617b3; }
-    #ai-gen-status:empty { display:none; }
-    .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
-    @media (max-width:1100px) {
-      #study-layout { grid-template-columns:minmax(17rem,21rem) minmax(0,1fr); }
-      #telemetry-dashboard { contain:none; overflow:visible; scrollbar-gutter:auto; }
-      #study-session { grid-template-columns:minmax(0,1fr); grid-template-areas:"summary" "focus" "navigator" "insights"; }
-    }
-    @media (max-width:760px) {
-      #study-layout { grid-template-columns:minmax(0,1fr); }
-      #study-setup { contain:none; overflow:visible; padding-right:0; scrollbar-gutter:auto; }
-    }
-    @media (max-width:640px) { #study-session { gap:.75rem; } }
-  </style>
+/* Shared preferences stay accessible at every screen size. */
+.preferences-panel{position:absolute;right:0;top:46px;width:min(280px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;z-index:45;box-shadow:0 8px 24px #2d193c12}
+.preferences-panel .options-popout,.preferences-panel .preferences-history{position:static!important;top:auto!important;width:100%!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;max-width:none!important}
+.preferences-panel .preferences-history{margin-top:8px;padding-top:8px!important;border-top:1px solid var(--border)!important}
+.question-source{font-size:11px}.answer-option{font-size:14px}.status-meta{font-size:10px}.status-stat{font-size:11px}.timer-secondary button{font-size:10px}.desk-file-types{font-size:10px}.mode-control button{font-size:12px}.desk-create{min-height:48px}
+@media(max-width:760px){
+ .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 13px;padding:12px 16px}
+ .studio-brand{grid-column:1;grid-row:1}.desk-toggle{grid-column:2;grid-row:1}.preferences{display:block;grid-column:3;grid-row:1;justify-self:end}
+ .header-progress{grid-column:1;grid-row:2;margin:0;font-size:11px}.header-timer{grid-column:2;grid-row:2;justify-self:end;font-size:12px}
+ .header-start{grid-column:3;grid-row:2;justify-self:end;min-width:36px;justify-content:center}.header-start span{font-size:11px}
+ .preferences>summary{width:32px;height:32px}.preferences-panel{top:42px}
+ .answer-option{font-size:14px}.status-meta{font-size:11px}.status-stat{font-size:12px}
+ .question-source{font-size:11px}
+}
+
+</style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
 
+<body>
   <dialog id="ai-security-dialog" aria-labelledby="ai-security-title" aria-describedby="ai-security-help" oncancel="event.preventDefault();cancelAiSecurityCheck()">
     <h2 id="ai-security-title" class="text-lg font-bold text-white">Security check</h2>
     <p id="ai-security-help" class="mt-2 text-sm text-slate-300">Complete the check below if asked. This window closes automatically when you are verified.</p>
@@ -241,28 +182,18 @@
     <button type="button" onclick="cancelAiSecurityCheck()" class="min-h-11 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700">Cancel</button>
   </dialog>
 
-  <!-- TOP COMMAND BAR -->
-  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      
-      <h1 class="text-lg font-bold tracking-tight text-white">STUDY BUDDY</h1>
-      <div class="flex flex-wrap items-center gap-2">
-<div class="flex items-end gap-2">
-<label class="block text-xs text-slate-400">Time (min)<input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" oninput="draftSettingsChanged()" class="block w-20 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white" /></label>
-<label class="block text-xs text-slate-400">Questions<input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" oninput="draftSettingsChanged()" class="block w-20 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white" /></label>
-</div>
-<div class="w-72">
-<div class="flex justify-between text-xs"><button type="button" class="min-h-9 px-2" onclick="setSprintMode(0)">Theory only</button><button type="button" class="min-h-9 px-2" onclick="setSprintMode(1)">Mixed</button><button type="button" class="min-h-9 px-2" onclick="setSprintMode(2)">Practical only</button></div>
-<input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" aria-valuetext="Mixed" oninput="draftSettingsChanged()" class="block w-full h-6 accent-sky-400 cursor-pointer" />
-</div>
-      <button onclick="togglePauseTimer()" id="btn-pause-timer" class="min-h-11 px-4 py-2 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-sky-500/15" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" class="w-4 h-4"></i><span id="label-pause-timer">Start</span></button>
-        <button id="btn-clear-upload-history" type="button" onclick="clearUploadHistory()" title="Clear uploaded files and AI-generated questions" class="min-h-11 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50">Clear upload history</button>
-        <p id="upload-clear-status" role="status" aria-live="polite" class="w-full text-xs text-slate-400 empty:hidden"></p>
-      </div>
 
-      <!-- Study and accessibility options -->
-      <details id="options-menu" class="relative ml-auto">
-        <summary class="list-none cursor-pointer select-none px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-100 flex items-center gap-2 [&::-webkit-details-marker]:hidden"><i data-lucide="settings-2" class="w-4 h-4 text-sky-300"></i> Options <span aria-hidden="true" class="text-slate-400">▾</span></summary>
+<header class="studio-header">
+  <div class="header-inner">
+    <a class="studio-brand" href="#question-deck-container" aria-label="Studioza study workspace"><span class="brand-mark"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M29 11C24 4 10 6 10 14c0 7 20 4 20 12 0 9-15 12-21 4" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><path d="M31 17C27 10 16 10 13 15c-5 8 15 7 13 15-1 5-9 7-15 3" stroke="#2D193C" stroke-width="7" stroke-linecap="round"/><path d="M31 17C27 10 16 10 13 15c-5 8 15 7 13 15-1 5-9 7-15 3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="studio-wordmark">Studioza</span></a>
+    <button id="course-selector" class="course-selector" popovertarget="course-picker" aria-label="Choose study material"><span id="header-course-title">Your practice</span><span aria-hidden="true">⌄</span></button>
+    <span id="header-sprint-progress" class="header-progress">Sprint 00 / 00</span>
+    <div class="header-timer"><i data-lucide="clock-3" aria-hidden="true"></i><span id="header-time-remaining">00:00</span></div>
+    <button onclick="togglePauseTimer()" id="btn-pause-timer" class="header-start" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" aria-hidden="true"></i><span id="label-pause-timer">Start</span></button>
+    <button type="button" id="btn-open-study-desk" class="desk-toggle" onclick="toggleStudyDesk(true)" aria-controls="study-setup" aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>Study desk</span></button>
+    <details id="options-menu" class="preferences">
+      <summary aria-label="Study preferences" title="Study preferences"><i data-lucide="user-round" aria-hidden="true"></i></summary>
+            <div class="preferences-panel">
         <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">
           <p class="px-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Study and accessibility</p>
           <button id="btn-feedback-mode" onclick="toggleFeedbackMode()" title="Switch between Instant Study Feedback and Exam Simulation Mode" class="px-2.5 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 text-indigo-300 transition"><i data-lucide="zap" class="w-4 h-4"></i><span id="label-feedback-mode">Mode: Instant Study</span></button>
@@ -270,249 +201,111 @@
           <button id="btn-noise-toggle" onclick="toggleBrownNoise()" title="Toggle Warm Brown Noise (ADD Distraction Shield)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="waves" class="w-4 h-4 text-amber-400"></i><span id="label-noise">Focus Noise: Off</span></button>
           <button id="btn-dyslexia-toggle" onclick="toggleDyslexiaMode()" title="Toggle Dyslexia-Friendly Warm Cream Contrast & Expanded Spacing" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i><span id="label-dyslexia">Dyslexia Mode</span></button>
         </div>
-      </details>
-    </div>
-  </header>
 
-  <div id="study-layout" class="max-w-7xl w-full mx-auto px-4 py-5 flex-1">
-    <aside id="study-setup" class="space-y-3" aria-label="Study setup">
-      <details id="documents-panel" open class="rounded-2xl border border-sky-500/30 bg-slate-900 p-4 shadow-lg">
-        <summary class="flex cursor-pointer list-none items-center gap-3 rounded-lg text-sm font-semibold text-slate-100 [&::-webkit-details-marker]:hidden"><span class="flex-1">AI Generator</span><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About AI Generator" onclick="event.stopPropagation()">i</button><span aria-hidden="true" class="text-slate-400">▾</span></summary>
-        <div class="pt-3">
-        <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)" />
-        <div id="document-drop-zone" class="rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/70 p-5 text-center transition hover:border-sky-400"
-          ondragover="event.preventDefault();this.classList.add('border-sky-400')"
-          ondragleave="this.classList.remove('border-sky-400')"
-          ondrop="event.preventDefault();this.classList.remove('border-sky-400');handleStudyFiles(event.dataTransfer.files)">
-          <i data-lucide="file-up" class="mx-auto mb-2 h-7 w-7 text-sky-300"></i>
-          <p class="text-sm font-semibold text-slate-100">Drop your files here</p>
-          <p class="mt-1 text-xs text-slate-400">PDF, Word (.docx), TXT, Markdown, or JSON · up to 10 files · 8 MB total</p>
-          <button type="button" onclick="document.getElementById('document-upload-input').click()" class="mt-3 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Upload files</button>
-        </div>
-        <form class="mt-3" onsubmit="event.preventDefault();addStudyWebsite()">
-          <label for="study-website-url" class="block mb-1 text-xs font-semibold text-slate-300">Website URL</label>
-          <div class="flex gap-2"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article" class="min-w-0 flex-1 min-h-11 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100" /><button id="btn-add-website" type="submit" class="min-h-11 rounded-lg bg-slate-800 border border-slate-600 px-3 text-sm font-bold">Add</button></div>
-        </form>
-        <ul id="study-file-list" class="mt-3 space-y-2" aria-label="Selected documents"></ul>
-<div class="mt-4"><label for="brain-hook-search" class="block mb-2 text-sm font-semibold">Interests <span class="text-xs font-normal text-slate-400">(optional)</span></label>      <div id="brain-hook-picker" class="relative w-full">
-        <div id="brain-hook-chips" class="flex flex-wrap gap-1.5 mb-2" aria-label="Selected interests"></div>
-        <div class="relative min-w-0"><svg aria-hidden="true" class="study-search-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Search interests…" aria-label="Search interests" aria-controls="brain-hook-options" aria-expanded="false" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)" class="w-full min-h-11 bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-400" /></div>
-        <div id="brain-hook-options" role="listbox" aria-label="Interests" class="hidden mt-2 w-full max-h-48 overflow-y-auto rounded-xl border border-slate-700 bg-slate-950 p-2"></div>
+      <div class="preferences-history">
+        <button id="btn-clear-upload-history" type="button" onclick="clearUploadHistory()" title="Clear uploaded files and generated questions">Clear upload history</button>
+        <p id="upload-clear-status" role="status" aria-live="polite"></p>
       </div>
-      <p id="brain-hook-requirement" class="text-xs text-slate-400" aria-live="polite">Choose up to 3 interests.</p>
-<span id="ai-gen-status" role="status" class="text-xs text-slate-400"></span></div>
-        <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="ai-request-button mt-3 min-h-12 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/10 disabled:cursor-not-allowed disabled:opacity-40"><span class="ai-request-label">Create my 50-question sprint</span></button>
-        <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating document questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
-        <p id="document-gen-status" class="mt-2 text-xs text-slate-400" role="status" aria-live="polite">Upload files to get started.</p>
-        </div>
+      </div>
+    </details>
+  </div>
+</header>
+<div id="course-picker" class="studio-popover" popover>
+  <h2>Your study material</h2>
+  <label for="course-title-input">Course name</label>
+  <form onsubmit="event.preventDefault();saveCourseTitle()"><div class="course-name-row"><input id="course-title-input" type="text" maxlength="60" placeholder="e.g. Python Practice"><button class="button-primary" type="submit">Save</button></div></form>
+  <label for="study-source-select">Practice from</label>
+  <select id="study-source-select" onchange="selectStudySource(this.value)"><option value="">All saved sources</option></select>
+  <p class="muted">Choose a saved source or add new material from your study desk.</p>
+  <button type="button" class="quiet-action" popovertarget="course-picker" popovertargetaction="hide">Done</button>
+</div>
+<button id="desk-backdrop" class="desk-backdrop" aria-label="Close study desk" onclick="toggleStudyDesk(false)" hidden></button>
+<div id="study-layout">
+  <aside id="study-setup" aria-label="Your study desk">
+    <div class="desk-top"><span class="eyebrow">Your study desk</span><button type="button" class="desk-close" onclick="toggleStudyDesk(false)" aria-label="Close study desk">×</button></div>
+    <h2 id="desk-course-title">Your practice</h2>
+    <div id="documents-panel">
+      <div id="document-drop-zone" class="desk-source" ondragover="event.preventDefault();this.classList.add('is-drag-over')" ondragleave="this.classList.remove('is-drag-over')" ondrop="event.preventDefault();this.classList.remove('is-drag-over');handleStudyFiles(event.dataTransfer.files)">
+        <div class="source-heading"><i data-lucide="file-text" aria-hidden="true"></i><span>Source material</span><button type="button" onclick="openSourcePicker()">Change</button></div>
+        <p id="desk-current-source">Add your material</p>
+        <p id="desk-source-context">Drop notes here, or choose a file below.</p>
+      </div>
+      <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)">
+      <button type="button" class="desk-upload" onclick="openSourcePicker()"><i data-lucide="upload" aria-hidden="true"></i>Upload source materials</button>
+      <p class="desk-file-types">PDF, Word, TXT, Markdown or JSON · 8 MB total</p>
+      <ul id="study-file-list" aria-label="Selected sources"></ul>
+      <details class="desk-website"><summary>Add a website <span aria-hidden="true">+</span></summary>
+        <form onsubmit="event.preventDefault();addStudyWebsite()"><label for="study-website-url" class="sr-only">Website URL</label><div class="website-input-row"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article"><button id="btn-add-website" type="submit">Add</button></div></form>
       </details>
-
-    </aside>
+      <div class="desk-section-label"><label for="brain-hook-search">Your interests</label><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About creating a sprint">i</button></div>
+      <div id="brain-hook-picker">
+        <div id="brain-hook-chips" aria-label="Selected interests"></div>
+        <div class="interest-search"><svg aria-hidden="true" class="study-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Add an interest…" aria-label="Search interests" aria-controls="brain-hook-options" aria-expanded="false" onfocus="openBrainHookOptions()" oninput="renderBrainHookOptions()" onkeydown="handleBrainHookKey(event)"></div>
+        <div id="brain-hook-options" role="listbox" aria-label="Interests" class="hidden"></div>
+      </div>
+      <p id="brain-hook-requirement" aria-live="polite">Choose up to 3 interests.</p>
+      <span id="ai-gen-status" role="status" aria-live="polite"></span>
+      <div class="desk-section-label"><span id="mode-label">Question mix</span></div>
+      <div id="question-mode-control" class="mode-control" role="radiogroup" aria-labelledby="mode-label">
+        <button type="button" role="radio" data-mode="0" aria-checked="false" tabindex="-1" onclick="setSprintMode(0)" onkeydown="handleModeKey(event,0)">Theory</button>
+        <button type="button" role="radio" data-mode="1" aria-checked="true" tabindex="0" onclick="setSprintMode(1)" onkeydown="handleModeKey(event,1)">Mixed</button>
+        <button type="button" role="radio" data-mode="2" aria-checked="false" tabindex="-1" onclick="setSprintMode(2)" onkeydown="handleModeKey(event,2)">Practical</button>
+        <input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" hidden>
+      </div>
+      <div class="sprint-settings">
+        <label for="custom-test-minutes">Time <span>(minutes)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" oninput="draftSettingsChanged()" inputmode="numeric"></label>
+        <label for="custom-test-questions">Questions <span>(max 50)</span><input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" oninput="draftSettingsChanged()" inputmode="numeric"></label>
+      </div>
+      <button id="btn-generate-document-sprint" type="button" onclick="generateDocumentQuestionBatch()" disabled class="ai-request-button desk-create"><span class="ai-request-label">Create sprint</span><span aria-hidden="true">↗</span></button>
+      <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating sprint" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p>Creating your questions…</p></div>
+      <p id="document-gen-status" role="status" aria-live="polite">Add source material to create your sprint.</p>
+    </div>
+    <div class="desk-note"><i data-lucide="bookmark-check" aria-hidden="true"></i><p>Pick up where you left off.<br><span>Your progress is saved on this device.</span></p></div>
+  </aside>
+  <main id="study-session" aria-label="Question workspace">
+    <section id="sprint-completion-summary" hidden role="status" aria-live="polite"><span class="eyebrow">Session review</span><h2>Sprint complete</h2><p id="sprint-completion-copy"></p><button type="button" onclick="resetCurrentSprint()" class="button-outline">Restart this sprint</button></section>
+    <section id="question-deck-container" aria-label="Sprint questions"></section>
+  </main>
+  <aside id="telemetry-dashboard" aria-label="Sprint status">
+    <h2 class="eyebrow">Sprint status</h2>
+    <section id="sprint-timer-panel" class="status-section">
+      <h3 class="eyebrow">Sprint timer</h3>
+      <div id="metric-time-remaining" class="status-countdown">00:00</div>
+      <p id="timer-status-sub" class="muted">Ready when you are</p>
+      <div class="timer-track" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="100" id="timer-progress"><div id="bar-timer-remaining"></div></div>
+      <p id="metric-time-elapsed-label" class="status-meta">00:00 elapsed</p>
+      <div class="timer-secondary"><button type="button" onclick="addExtraMinute()" title="Add one minute">+1 min</button><button type="button" onclick="resetCurrentSprint()">Restart</button></div>
+    </section>
+    <section class="status-section">
+      <h3 class="sr-only">Sprint statistics</h3>
+      <div class="status-stat"><span>Accuracy</span><strong id="metric-accuracy-pct">—</strong></div>
+      <p id="metric-score-fraction" class="status-meta"></p>
+      <p id="score-mode-subtitle" class="sr-only"></p>
+      <div class="status-stat"><span>Questions completed</span><strong id="label-answered-count">0 / 0</strong></div>
+      <div class="status-stat"><span>Target pace</span><strong id="label-pace-target">—</strong></div>
+      <p id="badge-pace-status" class="status-meta">On pace</p>
+      <p id="badge-flagged-count" class="flag-count" hidden></p>
+    </section>
+    <section id="question-navigator" class="status-section" aria-label="Question map">
+      <h3 class="eyebrow">Question map</h3>
+      <div id="question-nav-grid"></div>
+      <div class="map-legend"><span><i class="map-dot answered"></i>Completed</span><span><i class="map-dot flagged"></i>Flagged</span></div>
+      <p class="status-meta">A–D to answer · ← → to move</p>
+    </section>
+    <button id="btn-finish-sprint" type="button" onclick="finishAndGradeSprint()" class="button-outline hidden">Finish sprint</button>
+    <details id="source-breakdown-panel" class="source-breakdown"><summary>Source breakdown <span aria-hidden="true">+</span></summary><div id="source-mini-bars"></div></details>
+  </aside>
+</div>
     <div id="document-upload-info" popover role="dialog" aria-labelledby="document-upload-info-title">
-      <h2 id="document-upload-info-title" class="text-lg font-bold">AI Generator</h2>
-      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Interests personalise Theory questions; Practical questions apply the uploaded material. Set the count and question type at the top. Mixed uses 60% practical and 40% theory.</p>
+      <h2 id="document-upload-info-title" class="text-lg font-bold">Create your sprint</h2>
+      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Interests personalise Theory questions; Practical questions apply the uploaded material. Set the count and question type on your study desk. Mixed uses 60% practical and 40% theory.</p>
       <p>Add up to 10 sources in total: files and public website links. Files can be PDF, Word (.docx), TXT, Markdown, or JSON, up to 8 MB combined. Word body text is read; images are not extracted. Save older .doc files as .docx or PDF first.</p>
       <p>Files and links stay in this browser session until you request questions. They are then read and sent securely to Google AI through the study service. Websites must be publicly readable over HTTPS; sign-in pages and pages that require JavaScript may need to be saved as PDF instead.</p>
       <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
     </div>
-    <section id="study-session" class="min-w-0">
-  <section id="sprint-completion-summary" hidden role="status" aria-live="polite" class="w-full pb-4">
-    <div class="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-5 sm:p-6">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div><h2 class="text-lg font-bold text-emerald-200">Sprint complete</h2><p id="sprint-completion-copy" class="mt-1 text-sm text-slate-200"></p></div>
-        <button type="button" onclick="resetCurrentSprint()" class="min-h-11 px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-sm">Restart this sprint</button>
-      </div>
-    </div>
-  </section>
 
-  <!-- MAIN WORKSPACE -->
-  <main class="w-full min-w-0 study-workspace">
+<footer class="studio-footer"><span>Studioza · A space to study.</span><button type="button" onclick="clearSavedWeakHistory()">Clear review history</button></footer>
 
-    <!-- 1. HERO TELEMETRY DASHBOARD: 4 CORE CARDS -->
-    <section id="telemetry-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- CARD 1: SPRINT COUNTDOWN TIMER + RADIAL RING -->
-      <details id="sprint-timer-panel" open class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-sky-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="timer" class="w-4 h-4"></i> Sprint Timer</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
-        <div class="telemetry-body pt-2">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            
-            <p id="timer-status-sub" class="text-xs text-slate-400 mt-0.5">Ready when you are</p>
-          </div>
-          <div class="flex items-center gap-1">
-            <button onclick="addExtraMinute()" title="Add +1 Min Buffer" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700">+1m</button>
-          </div>
-        </div>
-
-        <div class="my-4 flex items-center justify-between gap-4">
-          <div>
-            <div id="metric-time-remaining" class="font-mono text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              06:00
-            </div>
-            <div id="metric-time-elapsed-label" class="text-xs text-slate-300 mt-1 font-medium">
-              00:00 elapsed of 06:00 sprint
-            </div>
-          </div>
-
-          <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
-            <svg class="w-16 h-16" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="26" fill="transparent" stroke="#1e293b" stroke-width="6"></circle>
-              <circle id="ring-timer-remaining" class="progress-ring-circle" cx="32" cy="32" r="26" fill="transparent" stroke="#38bdf8" stroke-width="6" stroke-dasharray="163.36" stroke-dashoffset="0" stroke-linecap="round"></circle>
-            </svg>
-            <span id="ring-timer-pct" class="absolute font-mono text-xs font-bold text-sky-300">100%</span>
-          </div>
-        </div>
-
-        <div>
-          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-            <div id="bar-timer-remaining" class="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-300" style="width: 100%"></div>
-          </div>
-          <div class="flex justify-between items-center text-[11px] font-mono text-slate-400 mt-1.5">
-            <span id="label-sprint-size">10 Questions</span>
-            <span id="label-pace-target" class="text-amber-300 font-semibold">Target: 36.0s / Q</span>
-            <button onclick="resetCurrentSprint()" class="text-rose-400 hover:underline">Restart</button>
-          </div>
-        </div>
-      </div>
-      </details>
-
-      <!-- CARD 2: PER-QUESTION PACE TELEMETRY (VS 36S TARGET) -->
-      <details id="question-pace-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="gauge" class="w-4 h-4"></i> Question Pace</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
-        <div class="telemetry-body pt-2">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            
-            <p class="text-xs text-slate-400 mt-0.5">Time on active question vs 36s cap</p>
-          </div>
-          <span id="badge-pace-status" class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            ON PACE
-          </span>
-        </div>
-
-        <div class="my-4">
-          <div class="flex items-baseline justify-between">
-            <div id="metric-current-q-time" class="font-mono text-3xl sm:text-4xl font-extrabold text-amber-300 tracking-tight">
-              00.0s
-            </div>
-            <div class="text-right">
-              <div class="text-[11px] text-slate-400 uppercase">Avg / Answered Q</div>
-              <div id="metric-avg-q-time" class="font-mono text-sm font-bold text-white">0.0s / 36.0s</div>
-            </div>
-          </div>
-          <!-- 36-second visual pace bar for current question -->
-          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800 mt-3">
-            <div id="bar-current-q-pace" class="h-full bg-emerald-400 transition-all duration-300" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-2.5 flex items-center justify-between text-xs">
-          <span class="text-slate-400">Projected sprint finish:</span>
-          <span id="metric-projected-100q" class="font-mono font-bold text-sky-300">-- mins</span>
-        </div>
-      </div>
-      </details>
-
-      <!-- CARD 3: LIVE ACCURACY & SCORE TELEMETRY -->
-      <details id="accuracy-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-emerald-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Live Accuracy</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
-        <div class="telemetry-body pt-2">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            
-            <p class="text-xs text-slate-400 mt-0.5" id="score-mode-subtitle">Real-time grading telemetry</p>
-          </div>
-          <span id="badge-flagged-count" class="px-2 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-            0 Flagged 🚩
-          </span>
-        </div>
-
-        <div class="my-3 flex items-baseline justify-between">
-          <div id="metric-accuracy-pct" class="font-mono text-3xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight">
-            0.0%
-          </div>
-          <div id="metric-score-fraction" class="font-mono text-sm text-slate-200 font-bold">
-            0 / 0 Correct
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <div>
-            <div class="flex justify-between text-[11px] mb-1">
-              <span class="text-slate-400">Sprint Completion</span>
-              <span id="label-answered-count" class="font-mono text-sky-300 font-semibold">0 / 20 Answered</span>
-            </div>
-            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-              <div id="bar-sprint-completion" class="h-full bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </details>
-
-      <!-- CARD 4: DOCUMENT SOURCE BREAKDOWN -->
-      <details id="source-breakdown-panel" class="prose-card telemetry-panel bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-xs font-bold uppercase tracking-wider text-indigo-400 [&::-webkit-details-marker]:hidden"><span class="flex items-center gap-1.5"><i data-lucide="files" class="w-4 h-4"></i> Source Breakdown</span><span aria-hidden="true" class="telemetry-chevron text-slate-400">▾</span></summary>
-        <div class="telemetry-body pt-2">
-        <div class="flex items-center justify-between mb-1">
-          
-          <span class="text-[11px] font-mono text-slate-400">By document</span>
-        </div>
-
-        <div id="source-mini-bars" class="space-y-1.5 my-1 text-[11px]">
-          <!-- Populated dynamically by JS -->
-        </div>
-      </div>
-      </details>
-
-      
-
-        <button id="btn-finish-sprint" onclick="finishAndGradeSprint()" class="hidden w-full mt-2 min-h-11 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200 font-bold text-sm transition flex items-center justify-center gap-1.5">
-          <i data-lucide="flag" class="w-4 h-4"></i>
-          <span>Finish sprint early</span>
-        </button>
-    </section>
-
-    <!-- 2. QUESTION NAVIGATOR PILL MATRIX -->
-    <details id="question-navigator" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg"><summary class="cursor-pointer select-none list-none text-sm font-semibold text-slate-200 [&::-webkit-details-marker]:hidden">Jump to a question <span class="ml-2 text-xs font-normal text-slate-400">Open the sprint map</span><span aria-hidden="true" class="float-right text-slate-400">▾</span></summary>
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <i data-lucide="grid" class="w-3.5 h-3.5 text-sky-400"></i> Sprint Question Matrix
-          </span>
-          <span class="text-xs text-slate-500 hidden sm:inline">• Click any number to jump • Keyboard: <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-mono text-[10px]">1-4</kbd> or <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-mono text-[10px]">A-D</kbd> to answer, <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-mono text-[10px]">←/→</kbd> navigate, <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-mono text-[10px]">F</kbd> flag</span>
-        </div>
-        <div class="flex items-center gap-3 text-[11px]">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Correct</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Incorrect</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Flagged 🚩</span>
-        </div>
-      </div>
-      <div id="question-nav-grid" class="flex flex-wrap gap-1.5">
-        <!-- Populated dynamically -->
-      </div>
-    </details>
-
-    <!-- 3. INTERACTIVE QUESTION DECK (SINGLE FOCUS OR FULL LIST) -->
-    <section id="question-deck-container" class="space-y-4" aria-label="Sprint questions">
-      <!-- Populated dynamically -->
-    </section>
-
-  </main>
-    </section>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="bg-slate-950 border-t border-slate-900 px-4 py-4 mt-8">
-    <div class="max-w-7xl mx-auto flex justify-center">
-      <button onclick="clearSavedWeakHistory()" class="px-3 py-2 rounded-lg border border-rose-500/40 bg-rose-500/10 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 hover:border-rose-400 transition">Clear Saved Weak-Spot History</button>
-    </div>
-  </footer>
-
-  <!-- ======================================================================== -->
-  <!-- MASTER 100-QUESTION BANK (LECTURES 1 TO 5: 60 SCENARIO + 40 ANALOGY)     -->
-  <!-- ======================================================================== -->
   <script>
     // Starter questions will be supplied by the user.
     const QUESTION_BANK = [];
@@ -798,20 +591,15 @@
     }
 
     function handleKeyShortcuts(e) {
-      if (['TEXTAREA', 'INPUT', 'SELECT'].includes(document.activeElement.tagName)) return;
-      if (activeQuestions.length === 0) return;
-
-      const key = e.key.toUpperCase();
-      const currentQ = activeQuestions[currentQIndex];
-
-      if (['1', 'A'].includes(key)) { e.preventDefault(); selectOption(currentQ.id, 0); }
-      else if (['2', 'B'].includes(key)) { e.preventDefault(); selectOption(currentQ.id, 1); }
-      else if (['3', 'C'].includes(key)) { e.preventDefault(); selectOption(currentQ.id, 2); }
-      else if (['4', 'D'].includes(key)) { e.preventDefault(); selectOption(currentQ.id, 3); }
-      else if (key === 'ARROWLEFT' || key === 'P') { e.preventDefault(); navigateQuestion(-1); }
-      else if (key === 'ARROWRIGHT' || key === 'N') { e.preventDefault(); navigateQuestion(1); }
-      else if (key === 'F') { e.preventDefault(); toggleFlag(currentQ.id); }
-    }
+  if(e.defaultPrevented||document.body.classList.contains('desk-is-open')||document.getElementById('ai-security-dialog')?.open)return;
+  if(['TEXTAREA','INPUT','SELECT'].includes(document.activeElement.tagName)||e.target.closest('#options-menu[open],#course-picker,[role="radiogroup"]'))return;
+  if(!activeQuestions.length)return;
+  const key=e.key.toUpperCase(),q=activeQuestions[currentQIndex],index=['A','B','C','D'].indexOf(key);
+  if(index>=0||['1','2','3','4'].includes(key)){e.preventDefault();chooseStudioAnswer(q.id,index>=0?index:Number(key)-1);}
+  else if(key==='ARROWLEFT'||key==='P'){e.preventDefault();navigateQuestion(-1);}
+  else if(key==='ARROWRIGHT'||key==='N'){e.preventDefault();navigateQuestion(1);}
+  else if(key==='F'){e.preventDefault();toggleFlag(q.id);}
+}
 
     // ========================================================================
     // SPRINT POOL BUILDER & FILTERS
@@ -884,21 +672,23 @@
       input.value=String(mode);draftSettingsChanged();
     }
     function draftSettingsChanged() {
-      const input=document.getElementById('sprint-mode');
-      input.setAttribute('aria-valuetext',['Theory only','Mixed','Practical only'][Number(input.value)]);
-      const label=document.querySelector('#btn-generate-document-sprint .ai-request-label');
-      if(label&&!documentGenerationInProgress)label.textContent='Create my '+document.getElementById('custom-test-questions').value+'-question sprint';
-      syncTimerControls();
-    }
+  const input=document.getElementById('sprint-mode');
+  input.setAttribute('aria-valuetext',['Theory','Mixed','Practical'][Number(input.value)]);
+  syncStudioMode();
+  const label=document.querySelector('#btn-generate-document-sprint .ai-request-label');
+  if(label&&!documentGenerationInProgress)label.textContent='Create sprint';
+  document.getElementById('btn-generate-document-sprint').setAttribute('aria-label','Create a '+document.getElementById('custom-test-questions').value+' question sprint');
+  syncTimerControls();
+}
     function startNewSprint(size) {
       activeSprintSize=size; activeSprintMinutes=size*SECONDS_PER_QUESTION_TARGET/60; isCustomSprint=false;
       syncSprintSettingInputs(); buildSprintPool(); renderAll();
     }
 
     function resetCurrentSprint() {
-      buildSprintPool();
-      renderAll();
-    }
+  if((hasSprintStarted||Object.keys(userAnswers).length)&&!confirm('Restart this sprint? Your current answers and timer will reset.'))return;
+  buildSprintPool();renderAll();
+}
 
     function applyScopeFilter(value) {
       const filter = ['1','2','3','4','5'].includes(value) ? Number(value) : value;
@@ -1010,6 +800,7 @@
       renderQuestionNavGrid();
       renderQuestionDeck();
       renderLectureBreakdown();
+      focusActiveQuestion();
       persistSprintState();
     }
 
@@ -1045,6 +836,7 @@
       renderQuestionNavGrid();
       if (isSingleCardView) {
         renderQuestionDeck();
+        focusActiveQuestion();
       } else {
         const cardEl = document.getElementById(`q-card-${activeQuestions[idx].id}`);
         if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1058,17 +850,20 @@
         persistSprintState();
         renderQuestionNavGrid();
         renderQuestionDeck();
+        focusActiveQuestion();
       }
     }
 
     function finishAndGradeSprint(autoTriggeredByTimer = false) {
-      isSprintFinished = true;
-      isTimerPaused = true;
-      syncTimerControls();
-      playHarmonicChime('complete');
-      renderAll();
-
-    }
+  if(!activeQuestions.length||isSprintFinished)return;
+  if(autoTriggeredByTimer!==true){
+    const remaining=activeQuestions.filter(q=>userAnswers[q.id]===undefined).length;
+    if(!confirm('Finish this sprint? '+(remaining?remaining+' question'+(remaining===1?' is':'s are')+' still unanswered. ':'')+'You can review your answers afterwards.'))return;
+  }
+  isSprintFinished=true;isTimerPaused=true;
+  syncTimerControls();playHarmonicChime('complete');renderAll();
+  document.getElementById('sprint-completion-summary').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
 
     // ========================================================================
     // TIMER & LIVE TELEMETRY UPDATES
@@ -1088,16 +883,17 @@
       const status = document.getElementById('timer-status-sub');
       const finishButton = document.getElementById('btn-finish-sprint');
       if (finishButton) finishButton.classList.toggle('hidden', !hasSprintStarted || isSprintFinished);
-      if (label) label.textContent = !hasSprintStarted || isSprintFinished || JSON.stringify(readSprintSettingsSafe())!==appliedSprintSettings ? 'Start' : isTimerPaused ? 'Resume' : 'Pause';
+      if (label) label.textContent = documentGenerationInProgress ? 'Creating…' : !hasSprintStarted || isSprintFinished || JSON.stringify(readSprintSettingsSafe())!==appliedSprintSettings ? 'Start' : isTimerPaused ? 'Resume' : 'Pause';
       if (button) {
         button.disabled = !QUESTION_BANK.length || documentGenerationInProgress;
         button.setAttribute('aria-label', label?.textContent || 'Start');
         button.classList.toggle('opacity-60', button.disabled);
       }
       if (icon) icon.setAttribute('data-lucide', isTimerPaused || isSprintFinished ? 'play' : 'pause');
-      if (status) status.textContent = !activeQuestions.length ? 'Upload documents to begin' : isSprintFinished ? 'Run complete' : (!hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Saved on this device · resume when ready' : getPaceTargetSeconds().toFixed(1) + 's / question');
+      if (status) status.textContent = !activeQuestions.length ? 'Add material to begin' : isSprintFinished ? 'Sprint complete' : !hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Paused · Progress saved' : 'Your sprint is in progress';
       if (window.lucide) lucide.createIcons();
       ['custom-test-minutes','custom-test-questions','sprint-mode'].forEach(id=>{document.getElementById(id).disabled=!isTimerPaused||documentGenerationInProgress;});
+      syncStudioMode();
       persistSprintState();
     }
 
@@ -1129,91 +925,29 @@
     function getPaceTargetSeconds() { return activeQuestions.length > 0 ? totalSprintSeconds / activeQuestions.length : SECONDS_PER_QUESTION_TARGET; }
 
     function updateLiveTelemetryUI() {
-      // 1. Sprint Timer Card
-      document.getElementById('metric-time-remaining').textContent = formatMinSec(remainingSprintSeconds);
-      document.getElementById('metric-time-elapsed-label').textContent = `${formatMinSec(elapsedSprintSeconds)} elapsed of ${formatMinSec(totalSprintSeconds)} sprint`;
-      document.getElementById('label-sprint-size').textContent = `${activeQuestions.length} Questions`;
-
-      const pctRem = totalSprintSeconds > 0 ? Math.max(0, Math.min(100, (remainingSprintSeconds / totalSprintSeconds) * 100)) : 0;
-      const circumference = 163.36;
-      const dashOffset = circumference - (pctRem / 100) * circumference;
-      const ringEl = document.getElementById('ring-timer-remaining');
-      if (ringEl) {
-        ringEl.style.strokeDashoffset = dashOffset;
-        ringEl.setAttribute('stroke', pctRem < 20 ? '#f43f5e' : '#38bdf8');
-      }
-      document.getElementById('ring-timer-pct').textContent = `${Math.round(pctRem)}%`;
-      document.getElementById('bar-timer-remaining').style.width = `${pctRem}%`;
-
-      // 2. Per-Question Pace Card
-      const currentQ = activeQuestions[currentQIndex];
-      const qSecs = currentQ ? (timeSpentPerQuestion[currentQ.id] || 0) : 0;
-      document.getElementById('metric-current-q-time').textContent = `${qSecs.toFixed(1)}s`;
-
-      const paceTarget = getPaceTargetSeconds();
-      const qPacePct = Math.min(100, (qSecs / paceTarget) * 100);
-      const qBar = document.getElementById('bar-current-q-pace');
-      if (qBar) {
-        qBar.style.width = `${qPacePct}%`;
-        qBar.className = qSecs <= paceTarget
-          ? 'h-full bg-emerald-400 transition-all duration-150'
-          : 'h-full bg-rose-500 transition-all duration-150';
-      }
-
-      const answeredCount = Object.keys(userAnswers).length;
-      const avgSecs = answeredCount > 0 ? (elapsedSprintSeconds / answeredCount) : qSecs;
-      document.getElementById('metric-avg-q-time').textContent = `${avgSecs.toFixed(1)}s / ${paceTarget.toFixed(1)}s`;
-      const targetLabel=document.getElementById('label-pace-target'); if(targetLabel) targetLabel.textContent=`Target: ${paceTarget.toFixed(1)}s / Q`;
-
-      const paceBadge = document.getElementById('badge-pace-status');
-      if (avgSecs <= paceTarget * 0.9) {
-        paceBadge.textContent = 'AHEAD OF PACE ⚡';
-        paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-      } else if (avgSecs <= paceTarget * 1.03) {
-        paceBadge.textContent = 'ON PACE ✓';
-        paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30';
-      } else {
-        paceBadge.textContent = 'OVER TARGET ⚠️';
-        paceBadge.className = 'px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30';
-      }
-
-      const projectedMins = answeredCount > 0 ? ((avgSecs * activeQuestions.length) / 60).toFixed(1) : ((qSecs * activeQuestions.length) / 60).toFixed(1);
-      document.getElementById('metric-projected-100q').textContent = `${projectedMins} mins (Target ≤${activeSprintMinutes}m)`;
-
-      // 3. Score & Completion Card
-      let correctCount = 0;
-      activeQuestions.forEach(q => {
-        if (userAnswers[q.id] === q.correct) correctCount++;
-      });
-
-      const showScoresNow = isInstantStudyMode || isSprintFinished;
-      const accuracyPct = answeredCount > 0 ? ((correctCount / answeredCount) * 100) : 0;
-
-      if (showScoresNow) {
-        document.getElementById('metric-accuracy-pct').textContent = `${accuracyPct.toFixed(1)}%`;
-        document.getElementById('metric-score-fraction').textContent = `${correctCount} / ${answeredCount} Correct`;
-        document.getElementById('score-mode-subtitle').textContent = isSprintFinished ? 'Final Sprint Score' : 'Real-time grading telemetry';
-      } else {
-        document.getElementById('metric-accuracy-pct').textContent = `EXAM`;
-        document.getElementById('metric-score-fraction').textContent = `${answeredCount} / ${activeQuestions.length} Locked`;
-        document.getElementById('score-mode-subtitle').textContent = 'Hidden until Finish Run clicked';
-      }
-
-      const flaggedCount = Object.values(flaggedQuestions).filter(Boolean).length;
-      document.getElementById('badge-flagged-count').textContent = `${flaggedCount} Flagged 🚩`;
-      document.getElementById('label-answered-count').textContent = `${answeredCount} / ${activeQuestions.length} Answered`;
-      const compPct = activeQuestions.length > 0 ? (answeredCount / activeQuestions.length) * 100 : 0;
-      document.getElementById('bar-sprint-completion').style.width = `${compPct}%`;
-      const completion = document.getElementById('sprint-completion-summary');
-      const completionCopy = document.getElementById('sprint-completion-copy');
-      if (completion) completion.hidden = !isSprintFinished;
-      if (completionCopy && isSprintFinished) {
-        const unanswered = Math.max(0, activeQuestions.length - answeredCount);
-        completionCopy.textContent = unanswered
-          ? `You answered ${answeredCount} of ${activeQuestions.length} questions and got ${correctCount} correct. ${unanswered} unanswered ${unanswered === 1 ? 'question was' : 'questions were'} not scored. Review explanations below.`
-          : `You answered all ${activeQuestions.length} questions and got ${correctCount} correct. Review explanations below or restart this sprint.`;
-      }
-    }
+  const answered=activeQuestions.filter(q=>userAnswers[q.id]!==undefined).length;
+  const correct=activeQuestions.filter(q=>userAnswers[q.id]===q.correct).length;
+  const grading=isInstantStudyMode||isSprintFinished;
+  const percent=totalSprintSeconds?Math.max(0,Math.min(100,remainingSprintSeconds/totalSprintSeconds*100)):0;
+  document.getElementById('metric-time-remaining').textContent=formatMinSec(remainingSprintSeconds);
+  document.getElementById('metric-time-elapsed-label').textContent=formatMinSec(elapsedSprintSeconds)+' elapsed';
+  document.getElementById('bar-timer-remaining').style.width=percent+'%';
+  document.getElementById('timer-progress').setAttribute('aria-valuenow',String(Math.round(percent)));
+  document.getElementById('metric-accuracy-pct').textContent=grading?(answered?Math.round(correct/answered*100)+'%':'—'):'Hidden';
+  document.getElementById('metric-score-fraction').textContent=grading?correct+' / '+answered+' correct':'Shown when you finish';
+  document.getElementById('score-mode-subtitle').textContent=grading?'Answer feedback is visible':'Answers are hidden until the sprint ends';
+  document.getElementById('label-answered-count').textContent=answered+' / '+activeQuestions.length;
+  const target=getPaceTargetSeconds();
+  document.getElementById('label-pace-target').textContent=activeQuestions.length?Math.round(target)+'s / Q':'—';
+  const average=answered?elapsedSprintSeconds/answered:0;
+  const pace=document.getElementById('badge-pace-status');
+  pace.textContent=!hasSprintStarted?'Start when you’re ready':!answered?'Finding your pace':average<=target*1.03?'On pace':Math.round(average-target)+'s over target per question';
+  const flagged=Object.values(flaggedQuestions).filter(Boolean).length;
+  const flagLabel=document.getElementById('badge-flagged-count');flagLabel.hidden=!flagged;flagLabel.textContent=flagged+' flagged for review';
+  const summary=document.getElementById('sprint-completion-summary');summary.hidden=!isSprintFinished;
+  if(isSprintFinished)document.getElementById('sprint-completion-copy').textContent='You completed '+answered+' of '+activeQuestions.length+' questions, with '+correct+' correct. '+(activeQuestions.length-answered?'Unanswered questions were not scored. ':'')+'Review the explanations at your own pace.';
+  syncStudioHeader();
+}
 
     // ========================================================================
     // RENDERERS: NAV GRID, LECTURE BREAKDOWN, QUESTION CARDS & EXPORT TABLE
@@ -1225,46 +959,22 @@
       renderQuestionDeck();
       syncTimerControls();
       updateBrainHookUI();
+      renderStudioDeskContext();
 
       lucide.createIcons();
     }
 
     function renderQuestionNavGrid() {
-      const grid = document.getElementById('question-nav-grid');
-      if (!grid) return;
-
-      const showGrading = isInstantStudyMode || isSprintFinished;
-
-      grid.innerHTML = activeQuestions.map((q, idx) => {
-        const ans = userAnswers[q.id];
-        const isAnswered = ans !== undefined;
-        const isCurrent = idx === currentQIndex && isSingleCardView;
-        const isFlagged = !!flaggedQuestions[q.id];
-
-        let colorCls = 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-600';
-        if (isAnswered) {
-          if (showGrading) {
-            colorCls = (ans === q.correct)
-              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold'
-              : 'bg-rose-500/25 text-rose-300 border-rose-500/50 font-bold';
-          } else {
-            colorCls = 'bg-sky-500/25 text-sky-300 border-sky-500/50 font-bold';
-          }
-        }
-        if (isCurrent) {
-          colorCls += ' ring-2 ring-sky-400';
-        }
-
-        const formatHint = isTheoryQuestion(q) ? '[Theory]' : '[Practical]';
-
-        return `
-          <button onclick="jumpToQuestion(${idx})" class="w-8 h-8 rounded-lg border text-xs font-mono transition relative flex items-center justify-center ${colorCls}" title="Q${idx + 1}: ${q.id} ${formatHint} — ${q.topic}">
-            ${idx + 1}
-            ${isFlagged ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400"></span>' : ''}
-          </button>
-        `;
-      }).join('');
-    }
+  const grid=document.getElementById('question-nav-grid');if(!grid)return;
+  const grading=isInstantStudyMode||isSprintFinished;
+  grid.innerHTML=activeQuestions.map((q,index)=>{
+    const answered=userAnswers[q.id]!==undefined,flagged=!!flaggedQuestions[q.id],current=index===currentQIndex;
+    let state=answered?(grading?(userAnswers[q.id]===q.correct?'correct':'incorrect'):'completed'):'';
+    if(flagged)state+=' flagged';
+    const status=(answered?(grading?userAnswers[q.id]===q.correct?'correct':'incorrect':'completed'):'unanswered')+(flagged?', flagged for review':'');
+    return `<button type="button" class="map-question ${state} ${current?'current':''}" onclick="jumpToQuestion(${index})" ${current?'aria-current="step"':''} aria-label="Question ${index+1}, ${status}" title="Question ${index+1} · ${status}">${index+1}${flagged?'<span class="map-flag" aria-hidden="true">•</span>':''}</button>`;
+  }).join('')||'<p class="status-meta" style="grid-column:1 / -1">Your question map will appear here.</p>';
+}
 
     function renderLectureBreakdown() {
       const container = document.getElementById('source-mini-bars');
@@ -1316,154 +1026,40 @@
     }
 
     function buildSingleQuestionCardHTML(q, idx) {
-      const userAns = userAnswers[q.id];
-      const isAnswered = userAns !== undefined;
-      const showFeedback = (isInstantStudyMode && isAnswered) || isSprintFinished;
-      const isFlagged = !!flaggedQuestions[q.id];
-      const letters = ['A', 'B', 'C', 'D'];
-
-      const optionsHtml = q.options.map((optText, optIdx) => {
-        const isSelected = userAns === optIdx;
-        const isCorrectOpt = q.correct === optIdx;
-
-        let cardStyle = 'bg-slate-950/90 border-slate-800 hover:border-slate-600 text-slate-200';
-        let badgeStyle = 'bg-slate-800 text-slate-300 border-slate-700';
-        let statusTag = '';
-
-        if (showFeedback) {
-          if (isCorrectOpt) {
-            cardStyle = 'bg-emerald-950/40 border-emerald-500/60 text-emerald-100 ring-1 ring-emerald-500/40';
-            badgeStyle = 'bg-emerald-500 text-slate-950 font-extrabold';
-            statusTag = '<span class="ml-auto text-xs font-mono font-bold text-emerald-400 shrink-0">✓ Correct</span>';
-          } else if (isSelected && !isCorrectOpt) {
-            cardStyle = 'bg-rose-950/40 border-rose-500/60 text-rose-100 ring-1 ring-rose-500/40';
-            badgeStyle = 'bg-rose-500 text-white font-extrabold';
-            statusTag = '<span class="ml-auto text-xs font-mono font-bold text-rose-400 shrink-0">✗ Your Choice</span>';
-          }
-        } else if (isSelected) {
-          cardStyle = 'bg-sky-500/20 border-sky-400 text-white ring-1 ring-sky-400';
-          badgeStyle = 'bg-sky-400 text-slate-950 font-extrabold';
-          statusTag = '<span class="ml-auto text-xs font-mono font-bold text-sky-300 shrink-0">Selected</span>';
-        }
-
-        return `
-          <button onclick="selectOption('${q.id}', ${optIdx})" class="w-full min-h-14 text-left p-4 rounded-xl border transition flex items-start gap-3 ${cardStyle}">
-            <span class="w-8 h-8 rounded-lg border text-sm font-mono font-bold flex items-center justify-center shrink-0 mt-0.5 ${badgeStyle}">
-              ${letters[optIdx]}
-            </span>
-            <span class="${isTheoryQuestion(q) ? 'font-sans' : 'font-mono'} text-sm sm:text-base leading-relaxed flex-1">${escapeHtml(optText)}</span>
-            ${statusTag}
-          </button>
-        `;
-      }).join('');
-
-      const codeBlockHtml = q.code
-        ? `<div class="my-3.5 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
-            <div class="bg-slate-900/90 px-3.5 py-1.5 border-b border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span>Python 3 (Read-Only Exam Cell)</span>
-              <span>${q.id}</span>
-            </div>
-            <pre class="p-4 font-mono text-xs sm:text-sm text-sky-300 overflow-x-auto leading-relaxed">${escapeHtml(q.code)}</pre>
-          </div>`
-        : '';
-
-      const explanationHtml = showFeedback
-        ? `<div class="mt-4 p-4 rounded-xl border ${
-            userAns === q.correct
-              ? 'bg-emerald-950/25 border-emerald-500/40'
-              : 'bg-amber-950/25 border-amber-500/40'
-          }">
-            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-1 ${
-              userAns === q.correct ? 'text-emerald-400' : 'text-amber-300'
-            }">
-              <span>${userAns === q.correct ? '✓ Correct — Concept Breakdown' : `✗ Correct Answer: Option ${letters[q.correct]}`}</span>
-              <span class="font-mono">Time: ${(timeSpentPerQuestion[q.id] || 0).toFixed(1)}s</span>
-            </div>
-            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${escapeHtml(q.explanation)}</p>
-          </div>`
-        : '';
-
-      const navFooterHtml = isSingleCardView
-        ? `<div class="flex flex-wrap items-center justify-between gap-2 mt-5 pt-4 border-t border-slate-800">
-            <button onclick="navigateQuestion(-1)" ${idx === 0 ? 'disabled' : ''} class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-xs font-bold text-slate-200 transition flex items-center gap-1.5">
-              <i data-lucide="arrow-left" class="w-4 h-4"></i> Previous (←)
-            </button>
-            <div class="text-xs font-mono text-slate-400">
-              Question <strong class="text-white">${idx + 1}</strong> of <strong class="text-white">${activeQuestions.length}</strong>
-            </div>
-            ${
-              idx < activeQuestions.length - 1
-                ? `<button onclick="navigateQuestion(1)" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow">
-                    Next Question (→) <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                  </button>`
-                : `<button onclick="finishAndGradeSprint()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow">
-                    Finish sprint ✓
-                  </button>`
-            }
-          </div>`
-        : '';
-
-      return `
-        <article id="q-card-${q.id}" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-sky-500 text-slate-950">
-                Q${idx + 1} / ${activeQuestions.length}
-              </span>
-              <span class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                ${q.sourceDoc ? 'Source · ' + escapeHtml(q.sourceDoc) : 'Lecture ' + q.lecture + ' • ' + q.id}
-              </span>
-              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-amber-300 border border-slate-700">
-                ${escapeHtml(q.topic)}
-              </span>
-              ${getFormatBadgeHTML(q)}
-              ${q.isSample ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Official Sample PDF</span>' : ''}
-            </div>
-
-            <button onclick="toggleFlag('${q.id}')" class="px-3 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 ${
-              isFlagged
-                ? 'bg-amber-500/25 border-amber-400 text-amber-300'
-                : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-            }">
-              <span>🚩 ${isFlagged ? 'Flagged for Review' : 'Flag (F)'}</span>
-            </button>
-          </div>
-
-          <h3 class="text-lg sm:text-xl font-bold text-white leading-snug">
-            ${escapeHtml(q.prompt)}
-          </h3>
-
-          ${codeBlockHtml}
-
-          <div class="grid grid-cols-1 gap-2.5 mt-3">
-            ${optionsHtml}
-          </div>
-
-          ${explanationHtml}
-          ${navFooterHtml}
-        </article>
-      `;
-    }
+  const answer=userAnswers[q.id],answered=answer!==undefined,feedback=isInstantStudyMode&&answered||isSprintFinished;
+  const flagged=!!flaggedQuestions[q.id],letters=['A','B','C','D'];
+  const options=q.options.map((text,index)=>{
+    const selected=answer===index,correct=index===q.correct;
+    const state=feedback&&correct?'correct':feedback&&selected?'incorrect':selected?'selected':'';
+    const label=feedback&&correct?'✓ Correct':feedback&&selected?(isSprintFinished?'✕ Your answer':'✕ Try again · Your answer'):selected?'Selected':'';
+    return `<button type="button" id="answer-${idx}-${index}" role="radio" aria-checked="${selected}" aria-disabled="${isSprintFinished}" tabindex="${answered?selected?'0':'-1':index===0?'0':'-1'}" data-question-id="${escapeHtml(q.id)}" onclick="chooseStudioAnswer(this.dataset.questionId,${index})" onkeydown="handleAnswerKey(event,${index})" class="answer-option ${state}">
+      <span class="answer-letter" aria-hidden="true">${letters[index]}</span><span class="answer-copy"><span class="sr-only">${letters[index]}. </span>${escapeHtml(text)}${label?`<span class="answer-feedback">${label}</span>`:''}</span>
+    </button>`;
+  }).join('');
+  const explanation=feedback?`<section class="question-explanation ${answer===q.correct?'':'is-incorrect'}" aria-label="Answer explanation"><h4>${isSprintFinished?'Answer explained':answer===q.correct?'Correct — here’s why':'The reasoning · Correct answer '+letters[q.correct]}</h4><p>${escapeHtml(q.explanation)}</p></section>`:'';
+  const code=q.code?`<div class="question-code"><div>Code reference</div><pre><code>${escapeHtml(q.code)}</code></pre></div>`:'';
+  return `<article id="q-card-${escapeHtml(q.id)}" class="question-card">
+    <div class="question-meta">Question ${String(idx+1).padStart(2,'0')} · ${isTheoryQuestion(q)?'Theory':'Practical'}</div>
+    <p class="question-source"><strong>${escapeHtml(q.sourceDoc||'Saved study material')}</strong>${q.topic?' · '+escapeHtml(q.topic):''}</p>
+    <h3 id="active-question-heading" tabindex="-1" class="question-prompt">${escapeHtml(q.prompt)}</h3>
+    <p class="answer-hint">Choose the answer that fits best.</p>${code}
+    <div class="answer-list" role="radiogroup" aria-label="Answer choices">${options}</div>${explanation}
+    <div class="question-footer">
+      <button type="button" class="flag-action ${flagged?'is-flagged':''}" aria-pressed="${flagged}" data-question-id="${escapeHtml(q.id)}" onclick="toggleFlag(this.dataset.questionId)"><i data-lucide="flag" aria-hidden="true"></i>${flagged?'Flagged for review':'Flag for review'}</button>
+      <button type="button" class="question-previous" onclick="navigateQuestion(-1)" ${idx===0?'disabled':''} aria-label="Previous question"><i data-lucide="arrow-left" aria-hidden="true"></i><span>Previous</span></button>
+      ${idx<activeQuestions.length-1?'<button type="button" class="question-next" onclick="navigateQuestion(1)">Next question <span aria-hidden="true">→</span></button>':'<button type="button" class="question-next" onclick="finishAndGradeSprint()">Finish sprint <span aria-hidden="true">✓</span></button>'}
+    </div>
+  </article>`;
+}
 
     function renderQuestionDeck() {
-      const container = document.getElementById('question-deck-container');
-      if (!container) return;
-
-      if (activeQuestions.length === 0) {
-        container.innerHTML = QUESTION_BANK.length
-          ? '<div class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center"><p class="text-sm text-slate-300">No questions match this filter. Choose All questions to see your bank.</p></div>'
-          : `<div id="empty-question-bank" class="prose-card bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col justify-center text-center" style="min-height:38rem"><h2 class="text-xl font-bold text-white">No questions loaded</h2><p class="mt-3 text-sm text-slate-400">Upload your documents to create a study sprint.</p><p class="mt-2 text-xs text-slate-500">The starter question set will be added when it is ready.</p><button type="button" onclick="document.getElementById('documents-panel').open=true;document.getElementById('document-upload-input').click()" class="mt-5 self-center min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Upload files</button></div>`;
-        return;
-      }
-
-      if (isSingleCardView) {
-        const q = activeQuestions[currentQIndex];
-        container.innerHTML = buildSingleQuestionCardHTML(q, currentQIndex);
-      } else {
-        container.innerHTML = activeQuestions.map((q, idx) => buildSingleQuestionCardHTML(q, idx)).join('');
-      }
-      lucide.createIcons();
-    }
+  const container=document.getElementById('question-deck-container');if(!container)return;
+  if(!activeQuestions.length){
+    container.innerHTML=`<div class="question-card question-empty"><span class="eyebrow">Your study workspace</span><h2>A fresh start for your next sprint.</h2><p>${QUESTION_BANK.length?'Choose your question mix or a different saved source to continue.':'Bring your notes, add what interests you, and make the material your own.'}</p><div class="empty-step"><span>1</span>Add your source material</div><div class="empty-step"><span>2</span>Choose interests and a question mix</div><div class="empty-step"><span>3</span>Create a focused sprint</div><button type="button" class="button-primary" onclick="openSourcePicker()">Add source materials</button></div>`;
+  }else container.innerHTML=buildSingleQuestionCardHTML(activeQuestions[currentQIndex],currentQIndex);
+  syncStudioHeader();
+  if(window.lucide)lucide.createIcons();
+}
 
     // ========================================================================
     // WEB AUDIO API (HARMONIC CHIMES & BROWN NOISE) + DYSLEXIA MODE
@@ -1751,6 +1347,7 @@
       const input = document.getElementById('document-upload-input');
       if (input) input.disabled = documentGenerationInProgress||studyFileReadInProgress;
       list.querySelectorAll('button').forEach(remove => { remove.disabled = documentGenerationInProgress||studyFileReadInProgress; });
+      renderStudioDeskContext();
     }
     let documentGenerationInProgress = false;
     function bytesToBase64(buffer) {
@@ -1851,7 +1448,8 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
         generationSucceeded = true;
         pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
-        if (status) status.textContent = 'Ready: '+practical+' practical and '+theory+' theory questions. Select Start when you’re ready.';
+        if (status) status.textContent = 'Your next sprint is ready. '+practical+' practical · '+theory+' theory. Select Start when you’re ready.';
+        toggleStudyDesk(false);
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
         console.error('Document question generation:', error);
@@ -2131,27 +1729,107 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
 
     // Make room for a newly opened setup section while keeping that section open.
     function initSetupPanelSizing() {
-      function sizePanels(container, breakpoint) {
-        const panels = Array.from(container.querySelectorAll(':scope > details'));
-        let lastOpened = null;
-        panels.forEach(panel => panel.addEventListener('toggle', () => {
-          if (!panel.open) return;
-          lastOpened = panel;
-          requestAnimationFrame(() => {
-            if (lastOpened !== panel || !panel.open || window.matchMedia('(max-width:' + breakpoint + 'px)').matches) return;
-            const expandedHeight = item => item.offsetHeight - item.querySelector('summary').offsetHeight;
-            const others = panels.filter(other => other !== panel && other.open)
-              .sort((left, right) => expandedHeight(right) - expandedHeight(left));
-            while (container.scrollHeight > container.clientHeight + 2 && others.length) others.shift().open = false;
-            container.scrollTop = 0;
-            const bounds = container.getBoundingClientRect();
-            const heading = panel.querySelector('summary').getBoundingClientRect();
-            if (heading.bottom > bounds.bottom) container.scrollTop += heading.bottom - bounds.bottom;
-          });
-        }));
-      }
-      sizePanels(document.getElementById('study-setup'), 760);
-      sizePanels(document.getElementById('telemetry-dashboard'), 1100);
+  window.matchMedia('(max-width:760px)').addEventListener('change',()=>toggleStudyDesk(false));
+}
+
+
+    let studioCourseTitle='Your practice';
+    let deskReturnFocus=null;
+    function syncStudioHeader(){
+      const progress=document.getElementById('header-sprint-progress');
+      if(progress)progress.textContent='Sprint '+String(activeQuestions.length?currentQIndex+1:0).padStart(2,'0')+' / '+String(activeQuestions.length).padStart(2,'0');
+      const timer=document.getElementById('header-time-remaining');if(timer)timer.textContent=formatMinSec(remainingSprintSeconds);
+    }
+    function syncStudioMode(){
+      const input=document.getElementById('sprint-mode');
+      document.querySelectorAll('#question-mode-control button').forEach(button=>{
+        const selected=Number(button.dataset.mode)===Number(input.value);
+        button.setAttribute('aria-checked',String(selected));button.tabIndex=selected?0:-1;button.disabled=input.disabled;
+      });
+    }
+    function handleModeKey(event,index){
+      const offset=event.key==='ArrowRight'||event.key==='ArrowDown'?1:event.key==='ArrowLeft'||event.key==='ArrowUp'?-1:0;
+      if(!offset&&event.key!=='Home'&&event.key!=='End')return;
+      event.preventDefault();event.stopPropagation();
+      const next=event.key==='Home'?0:event.key==='End'?2:(index+offset+3)%3;
+      setSprintMode(next);document.querySelector('#question-mode-control button[data-mode="'+next+'"]')?.focus();
+    }
+    function chooseStudioAnswer(id,index){
+      if(isSprintFinished)return;
+      selectOption(id,index);
+      document.getElementById('answer-'+currentQIndex+'-'+index)?.focus({preventScroll:true});
+    }
+    function handleAnswerKey(event,index){
+      const offset=event.key==='ArrowDown'||event.key==='ArrowRight'?1:event.key==='ArrowUp'||event.key==='ArrowLeft'?-1:0;
+      if(!offset&&event.key!=='Home'&&event.key!=='End')return;
+      event.preventDefault();event.stopPropagation();
+      const next=event.key==='Home'?0:event.key==='End'?3:(index+offset+4)%4;
+      const question=activeQuestions[currentQIndex];if(question)chooseStudioAnswer(question.id,next);
+    }
+    function focusActiveQuestion(){
+      syncStudioHeader();
+      document.getElementById('active-question-heading')?.focus({preventScroll:true});
+    }
+    function openSourcePicker(){
+      if(documentGenerationInProgress||studyFileReadInProgress)return;
+      if(window.matchMedia('(max-width:760px)').matches)toggleStudyDesk(true);
+      document.getElementById('document-upload-input').click();
+    }
+    function toggleStudyDesk(show){
+      const mobile=window.matchMedia('(max-width:760px)').matches;
+      const open=!!show&&mobile,desk=document.getElementById('study-setup');
+      if(open&&!document.body.classList.contains('desk-is-open'))deskReturnFocus=document.activeElement;
+      document.body.classList.toggle('desk-is-open',open);
+      document.getElementById('desk-backdrop').hidden=!open;
+      document.getElementById('btn-open-study-desk').setAttribute('aria-expanded',String(open));
+      ['study-session','telemetry-dashboard'].forEach(id=>{document.getElementById(id).inert=open;});
+      document.querySelector('.studio-header').inert=open;
+      document.querySelector('.studio-footer').inert=open;
+      if(open){desk.setAttribute('role','dialog');desk.setAttribute('aria-modal','true');desk.querySelector('.desk-close').focus();}
+      else{desk.removeAttribute('role');desk.removeAttribute('aria-modal');if(deskReturnFocus?.isConnected){deskReturnFocus.focus({preventScroll:true});deskReturnFocus=null;}}
+    }
+    function renderStudioDeskContext(){
+      const pending=[...selectedStudyFiles.map(file=>file.name),...selectedStudyWebsites];
+      const saved=[...new Set(activeQuestions.map(q=>q.sourceDoc).filter(Boolean))];
+      const sources=pending.length?pending:saved;
+      document.getElementById('desk-current-source').textContent=sources[0]||'Add your material';
+      document.getElementById('desk-source-context').textContent=sources.length?(pending.length?sources.length+' source'+(sources.length===1?'':'s')+' selected':activeQuestions.length+' questions · Saved on this device'):'Drop notes here, or choose a file below.';
+      const select=document.getElementById('study-source-select');
+      const unique=[...new Set(QUESTION_BANK.map(q=>q.sourceDoc).filter(Boolean))];
+      select.replaceChildren();
+      const all=document.createElement('option');all.value='';all.textContent='All saved sources';select.appendChild(all);
+      unique.forEach(source=>{const option=document.createElement('option');option.value=source;option.textContent=source;select.appendChild(option);});
+      if(sprintSourceIds){const sourceIds=new Set(sprintSourceIds);const selectedSources=[...new Set(QUESTION_BANK.filter(q=>sourceIds.has(q.id)).map(q=>q.sourceDoc).filter(Boolean))];if(selectedSources.length===1)select.value=selectedSources[0];}
+      document.getElementById('header-course-title').textContent=studioCourseTitle;
+      document.getElementById('desk-course-title').textContent=studioCourseTitle;
+    }
+    function saveCourseTitle(){
+      const value=document.getElementById('course-title-input').value.trim();
+      if(!value){document.getElementById('course-title-input').focus();return;}
+      studioCourseTitle=value;
+      try{localStorage.setItem('studioza_course_title_v1',value);}catch(error){}
+      renderStudioDeskContext();document.getElementById('course-picker').hidePopover();
+    }
+    function selectStudySource(source){
+      if(documentGenerationInProgress){renderStudioDeskContext();return;}
+      if(Object.keys(userAnswers).length&&!confirm('Change the study source? This resets the current sprint answers; your question bank stays saved.')){renderStudioDeskContext();return;}
+      sprintSourceIds=source?QUESTION_BANK.filter(q=>q.sourceDoc===source).map(q=>q.id):null;
+      const settings=readSprintSettingsSafe();if(settings){activeSprintSize=settings.questions;activeSprintMinutes=settings.minutes;activeLectureFilter=['analogy','all','scenario'][settings.mode];isCustomSprint=true;}
+      isShuffled=true;buildSprintPool();renderAll();document.getElementById('course-picker').hidePopover();
+    }
+    function initStudioza(){
+      try{studioCourseTitle=localStorage.getItem('studioza_course_title_v1')||'Your practice';}catch(error){}
+      document.getElementById('course-title-input').value=studioCourseTitle;
+      renderStudioDeskContext();syncStudioMode();
+      document.addEventListener('keydown',event=>{
+        if(!document.body.classList.contains('desk-is-open'))return;
+        if(event.key==='Escape'){event.preventDefault();toggleStudyDesk(false);return;}
+        if(event.key!=='Tab')return;
+        const targets=[...document.getElementById('study-setup').querySelectorAll('button:not([disabled]),input:not([disabled]),summary,select:not([disabled]),[tabindex="0"]')].filter(element=>element.getClientRects().length);
+        const first=targets[0],last=targets[targets.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      });
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -2163,6 +1841,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       renderAll();
       draftSettingsChanged();
       initSetupPanelSizing();
+      initStudioza();
       document.addEventListener('click', (event) => {
         const picker = document.getElementById('brain-hook-picker');
         const panel = document.getElementById('brain-hook-options');
