@@ -14,63 +14,105 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     (() => {
-      const state = { token: '', resolver: null };
-      window.onTurnstileSuccess = token => {
-        if (state.resolver) {
-          const pending = state.resolver;
-          state.resolver = null;
-          clearTimeout(pending.timeout);
-          pending.resolve(token);
-        } else {
-          state.token = token;
+      const state = { widgetId:null, pending:null, readyResolve:null, readyReject:null };
+      const apiReady = new Promise((resolve, reject) => {
+        state.readyResolve = resolve; state.readyReject = reject;
+      });
+      apiReady.catch(() => {});
+      window.onStudyTurnstileReady = () => state.readyResolve();
+      window.onStudyTurnstileLoadError = () => state.readyReject(new Error('The security check could not load. Check your connection or content blocker, then refresh and retry.'));
+      function removeWidget() {
+        const id = state.widgetId;
+        state.widgetId = null;
+        if (id !== null && window.turnstile) {
+          try { window.turnstile.remove(id); } catch (error) {}
         }
-      };
-      window.onTurnstileExpired = () => { state.token = ''; };
-      window.onTurnstileError = () => {
-        state.token = '';
-        const status = document.getElementById('ai-gen-status');
-        if (status) status.textContent = 'Security verification had a problem. Please retry the check.';
-        if (state.resolver) {
-          const pending = state.resolver;
-          state.resolver = null;
-          clearTimeout(pending.timeout);
-          pending.reject(new Error('Cloudflare security verification failed. Please retry.'));
-        }
-      };
+      }
+      function settle(error, token) {
+        const pending = state.pending;
+        if (!pending) return;
+        state.pending = null;
+        clearTimeout(pending.timeout);
+        removeWidget();
+        const dialog = document.getElementById('ai-security-dialog');
+        if (dialog?.open) dialog.close();
+        if (error) pending.reject(error); else pending.resolve(token);
+      }
+      window.cancelAiSecurityCheck = () => settle(new Error('Security check cancelled. Your files are still selected. Retry generation when ready.'));
       window.resetTurnstileWidget = () => {
-        state.token = '';
-        if (window.turnstile) window.turnstile.reset();
+        // A previous request finishing must not interrupt a newer verification.
+        if (!state.pending) removeWidget();
       };
-      window.getTurnstileToken = () => {
-        if (state.token) {
-          const token = state.token;
-          state.token = '';
-          return Promise.resolve(token);
+      async function waitForApi() {
+        if (window.turnstile?.render) return;
+        let timeout;
+        try {
+          await Promise.race([apiReady, new Promise((resolve, reject) => {
+            timeout = setTimeout(() => reject(new Error('The security check did not load. Check your connection or content blocker, then refresh and retry.')), 15000);
+          })]);
+        } finally { clearTimeout(timeout); }
+        if (!window.turnstile?.render) throw new Error('The security check is unavailable. Refresh and retry.');
+      }
+      window.getTurnstileToken = () => new Promise((resolve, reject) => {
+        if (state.pending) {
+          reject(new Error('Another security check is already open. Finish or cancel it before retrying this action.'));
+          return;
         }
-        const status = document.getElementById('ai-gen-status');
-        if (status) status.textContent = 'Complete the Cloudflare security check to continue…';
-        if (!window.turnstile) {
-          return Promise.reject(new Error('Cloudflare security check did not load. Refresh the page and try again.'));
+        const dialog = document.getElementById('ai-security-dialog');
+        if (!dialog) {
+          reject(new Error('The security check could not open. Refresh and retry.'));
+          return;
         }
-        return new Promise((resolve, reject) => {
-          const pending = { resolve, reject, timeout: null };
-          pending.timeout = setTimeout(() => {
-            if (state.resolver === pending) state.resolver = null;
-            reject(new Error('Security check timed out. Complete the Cloudflare check and try again.'));
-          }, 120000);
-          state.resolver = pending;
+        const pending = { resolve, reject, timeout:null };
+        state.pending = pending;
+        pending.timeout = setTimeout(() => settle(new Error('The security check expired. Retry generation to open a fresh check. Your files are still selected.')), 120000);
+        try { dialog.showModal(); } catch (error) {
+          settle(new Error('The security check could not open. Close other pop-ups and retry.')); return;
+        }
+        waitForApi().then(() => {
+          if (state.pending !== pending) return;
+          removeWidget();
           try {
-            window.turnstile.execute('.cf-turnstile');
+            state.widgetId = window.turnstile.render('#ai-security-widget', {
+              sitekey:'0x4AAAAAAFnDFAKMEwULwt1q',
+              action:'generate',
+              theme:'dark',
+              size:window.matchMedia('(max-width:380px)').matches ? 'compact' : 'flexible',
+              execution:'execute',
+              appearance:'execute',
+              retry:'never',
+              'refresh-expired':'manual',
+              'refresh-timeout':'manual',
+              callback:token => {
+                if (state.pending !== pending) return;
+                if (typeof token === 'string' && token) settle(null, token);
+                else settle(new Error('The security check returned no verification. Please retry.'));
+              },
+              'error-callback':code => {
+                if (state.pending === pending) settle(new Error('Cloudflare could not verify this browser (' + code + '). Retry; if this continues, open the site in Chrome or Edge.'));
+                return true;
+              },
+              'expired-callback':() => {
+                if (state.pending === pending) settle(new Error('Security verification expired. Retry generation for a fresh check. Your files are still selected.'));
+              },
+              'timeout-callback':() => {
+                if (state.pending === pending) settle(new Error('The security check expired. Retry generation to open a fresh check. Your files are still selected.'));
+              },
+              'unsupported-callback':() => {
+                if (state.pending === pending) settle(new Error('This browser cannot run the security check. Open the site in Chrome or Edge and retry.'));
+              }
+            });
+            window.turnstile.execute(state.widgetId);
           } catch (error) {
-            clearTimeout(pending.timeout);
-            state.resolver = null;
-            reject(new Error('Cloudflare security check could not start. Refresh the page and try again.'));
+            settle(new Error('The security check could not start. Refresh and retry.'));
           }
+        }).catch(error => {
+          if (state.pending === pending) settle(error);
         });
-      };
+      });
     })();
   </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onStudyTurnstileReady" onerror="onStudyTurnstileLoadError()" async defer></script>
 
   <script>
     tailwind.config = {
@@ -174,6 +216,8 @@
     .ai-panel-loading > summary::after { content:""; flex:none; width:.8rem; height:.8rem; border:2px solid #475569; border-top-color:#7dd3fc; border-radius:50%; animation:ai-request-spin .9s linear infinite; }
     @keyframes ai-request-spin { to { transform:rotate(360deg); } }
     @media (prefers-reduced-motion:reduce) { .ai-panel-loading > summary::after { animation:none; border-color:#7dd3fc; } .ai-request-fill, .ai-request-button.is-ai-loading::before { transition:none; } }
+    #ai-security-dialog { width:min(26rem,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; margin:auto; padding:1.25rem; border:1px solid #475569; border-radius:1rem; background:#0f172a; color:#f1f5f9; box-shadow:0 20px 60px #0008; }
+    #ai-security-dialog::backdrop { background:#020617b3; }
     #ai-gen-status:empty { display:none; }
     .study-search-icon { display:inline-block; flex:none; width:1rem; height:1rem; visibility:visible; opacity:1; }
     @media (max-width:1100px) {
@@ -189,6 +233,13 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
+
+  <dialog id="ai-security-dialog" aria-labelledby="ai-security-title" aria-describedby="ai-security-help" oncancel="event.preventDefault();cancelAiSecurityCheck()">
+    <h2 id="ai-security-title" class="text-lg font-bold text-white">Security check</h2>
+    <p id="ai-security-help" class="mt-2 text-sm text-slate-300">Complete the check below if asked. This window closes automatically when you are verified.</p>
+    <div id="ai-security-widget" class="my-4" style="min-height:65px"></div>
+    <button type="button" onclick="cancelAiSecurityCheck()" class="min-h-11 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700">Cancel</button>
+  </dialog>
 
   <!-- TOP COMMAND BAR -->
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
@@ -293,7 +344,6 @@
         <div id="btn-generate-ai-batch-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating practice questions" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p class="mt-1 text-xs text-slate-400">Generating…</p></div>
       </div>
       <span id="ai-gen-status" role="status" aria-live="polite" class="block text-xs text-slate-400"></span>
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnDFAKMEwULwt1q" data-action="generate" data-execution="execute" data-appearance="interaction-only" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError"></div>
     </div>
   </details>
 
