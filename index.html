@@ -609,8 +609,8 @@
       const job = aiLoadingJobs.get(buttonId);
       if (!job) return;
       // Google does not report completion percentages. Keep the waiting fill below full.
-      const waitingFill = 5 + 80 * (1 - Math.exp(-(Date.now() - job.started) / 30000));
-      job.fill = Math.min(92, Math.max(job.fill, minimum, waitingFill));
+      const waitingFill = job.determinate ? job.fill : 5 + 80 * (1 - Math.exp(-(Date.now() - job.started) / 30000));
+      job.fill = Math.min(95, Math.max(job.fill, minimum, waitingFill));
       job.button.style.setProperty('--ai-progress', job.fill + '%');
       job.progress.style.setProperty('--ai-progress', job.fill + '%');
     }
@@ -1678,9 +1678,9 @@
         }
         const hooks = getBrainHooks();
         const interestInstruction = hooks.length
-          ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the Python concept explicit and the explanation accurate.'
+          ? 'For theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate.'
           : 'Use clear, familiar everyday examples for theory questions.';
-        const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test writing, tracing, predicting output, or debugging Python code. Theory questions should test concepts from the documents. Use only the course material and introductory Python facts needed to interpret it. ${interestInstruction}
+        const prompt = `Create exactly 100 four-option multiple-choice questions from the attached course documents, with exactly 60 practical questions and 40 theory questions. Practical questions should test application through scenarios, procedures, calculations, or worked examples. Include code questions only when the documents teach programming. Theory questions should test concepts from the documents. Use only the supplied course material and facts needed to interpret it. ${interestInstruction}
 For every question, set questionType to "practical" or "theory" and sourceDoc to exactly one of the supplied file names. Set correct to the zero-based index (0–3) of the single correct option. Include a concise explanation grounded in the source. Do not repeat questions. Keep prompts and explanations concise (at most 45 words each), options short, and code snippets at most 12 lines. Return only the compact JSON array matching the response schema, without Markdown fences or surrounding commentary.
 ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`;
         const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
@@ -1694,9 +1694,9 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           contents: [{ role: 'user', parts: [...parts, { text: prompt }] }],
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
-        if (status) status.textContent = 'Sending your documents and interests for one 100-question generation…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, progressButtonId: 'btn-generate-document-sprint' });
-        if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The response did not contain all 100 questions. Nothing in your current question bank was changed. Try smaller or more focused documents.');
+        if (status) status.textContent = 'Uploading once, then creating checked question batches…';
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, progressButtonId: 'btn-generate-document-sprint' });
+        if (!Array.isArray(generated) || generated.length !== 100) throw new Error('The study service returned ' + (Array.isArray(generated) ? generated.length : 0) + ' of 100 questions. No partial set was loaded. Your files are still selected; please retry.');
         const practical = generated.filter(q => q?.questionType === 'practical').length;
         const theory = generated.filter(q => q?.questionType === 'theory').length;
         const valid = generated.every(q => q && names.includes(q.sourceDoc) && ['practical','theory'].includes(q.questionType) &&
@@ -1888,6 +1888,58 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         .map(value => String(value).slice(0, 500)).join(' ').slice(0, 1500);
     }
 
+    async function readDocumentSprintStream(response, buttonId) {
+      if (!response.body) throw new Error('The study service did not open a generation stream. Your files are still selected.');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '', result = null, bytes = 0, finished = false;
+      function consume(line) {
+        if (!line.trim()) return;
+        let event;
+        try { event = JSON.parse(line); } catch (error) {
+          throw new Error('The generation connection returned an unreadable update. Your files are still selected; no partial sprint was loaded.');
+        }
+        if (event.type === 'error') throw new Error(event.error?.message || 'Question generation stopped. Your files are still selected.');
+        if (event.type === 'progress' && Number.isInteger(event.completed) && event.completed >= 0 && event.completed <= 100) {
+          const job = aiLoadingJobs.get(buttonId);
+          if (job) {
+            job.determinate = true;
+            updateAiLoading(buttonId, 5 + event.completed * 0.9);
+            const caption = job.progress.querySelector('p');
+            if (caption) caption.textContent = event.completed + ' / 100 questions ready';
+          }
+          const status = document.getElementById('document-gen-status');
+          if (status) status.textContent = typeof event.message === 'string' ? event.message : event.completed + ' of 100 questions checked';
+        }
+        if (event.type === 'result') {
+          if (!Array.isArray(event.questions)) throw new Error('The study service returned an invalid question set.');
+          result = event.questions;
+        }
+      }
+      try {
+        while (true) {
+          const part = await reader.read();
+          if (part.done) break;
+          bytes += part.value.byteLength;
+          if (bytes > 2 * 1024 * 1024) throw new Error('The question response exceeded the safe size limit. Your files and existing bank are unchanged.');
+          buffer += decoder.decode(part.value, { stream:true });
+          let newline;
+          while ((newline = buffer.indexOf('\n')) !== -1) {
+            consume(buffer.slice(0, newline));
+            buffer = buffer.slice(newline + 1);
+          }
+        }
+        buffer += decoder.decode();
+        if (buffer.trim()) consume(buffer);
+        if (!result) throw new Error('The generation connection ended before all questions were ready. Your files are still selected; please retry.');
+        finished = true;
+        return result;
+      } finally {
+        if (!finished) { try { await reader.cancel(); } catch (error) {} }
+        reader.releaseLock();
+      }
+    }
+
     async function callGemini(prompt, schema, modelId, callOptions = {}) {
       const requestBody = callOptions.requestBody || { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
@@ -1898,7 +1950,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
@@ -1908,6 +1960,10 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
             continue;
           }
           throw new Error('Could not reach the Gemini Worker after ' + (attempt + 1) + (attempt ? ' attempts' : ' attempt') + '. Check your connection and try again.');
+        }
+        if (response.ok && (response.headers.get('Content-Type') || '').includes('application/x-ndjson')) {
+          try { return await readDocumentSprintStream(response, callOptions.progressButtonId); }
+          finally { resetTurnstileWidget(); }
         }
         let responseText = '';
         try { responseText = await response.text(); } finally { resetTurnstileWidget(); }
