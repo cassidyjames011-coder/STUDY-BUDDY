@@ -212,7 +212,7 @@
         button.title = activeQuestionOperations > 0 ? 'Wait for question generation to finish' : 'Clear uploaded files and AI-generated questions';
       }
     }
-    function clearUploadHistory() {
+    async function clearUploadHistory() {
       const status = document.getElementById('upload-clear-status');
       if (activeQuestionOperations > 0 || studyFileReadInProgress) { if (status) status.textContent = 'Wait for question generation to finish, then clear your uploads.'; return; }
       const generatedIds = new Set(QUESTION_BANK.filter(q => q.isAI || q.isDocumentGenerated).map(q => q.id));
@@ -220,7 +220,7 @@
         if (status) status.textContent = 'No upload history to clear.';
         return;
       }
-      if (!window.confirm('Clear uploaded files and all AI-generated questions, including their saved answers and progress? Your starter question bank, interests, and preferences will stay.')) return;
+      if (!await confirmStudyAction('Clear upload history?', 'Clear uploaded files and all AI-generated questions, including saved answers and progress? Interests and preferences will stay.', 'Clear upload history')) return;
       const activeUploads = activeQuestions.some(q => generatedIds.has(q.id));
       selectedStudyFiles.length = 0;
       selectedStudyWebsites.length = 0;
@@ -1164,7 +1164,7 @@
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
       const generationInterests = getBrainHooks();
-      if(!generationInterests.length&&!confirm('No interests selected. Create questions without personalisation?'))return;
+      if(!generationInterests.length&&!await confirmStudyAction('No interests selected', 'Create questions without personalisation?', 'Create without interests'))return;
       const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), websites:selectedStudyWebsites.slice(), interests:generationInterests, count:target, mode:settings.mode });
       if (pendingDocumentFingerprint !== fingerprint) {
         pendingDocumentQuestions = [];
@@ -1549,7 +1549,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
     }
     function renderStudioSourceCarousel(){
       const cards=getStudioSourceCards();
-      const items=cards.length?cards:[{name:'Add your material',kind:'Source material',meta:'Upload notes or add a website.'}];
+      const items=cards.length?cards:[{name:'Add your material',kind:'Source material',meta:'Upload notes or questions.'}];
       const busy=documentGenerationInProgress||studyFileReadInProgress;
       const pages=Math.ceil(items.length/2);
       studioSourcePage=Math.min(studioSourcePage,pages-1);
@@ -1698,9 +1698,9 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       try{localStorage.setItem('studioza_course_title_v1',value);}catch(error){}
       renderStudioDeskContext();document.getElementById('course-picker').hidePopover();
     }
-    function selectStudySource(source){
+    async function selectStudySource(source){
       if(documentGenerationInProgress){renderStudioDeskContext();return;}
-      if(Object.keys(userAnswers).length&&!confirm('Change the study source? This resets the current sprint answers; your question bank stays saved.')){renderStudioDeskContext();return;}
+      if(Object.keys(userAnswers).length&&!await confirmStudyAction('Change study source?', 'This resets the current sprint answers; your question bank stays saved.', 'Change source')){renderStudioDeskContext();return;}
       sprintSourceIds=source?QUESTION_BANK.filter(q=>q.sourceDoc===source).map(q=>q.id):null;
       const settings=readSprintSettingsSafe();if(settings){activeSprintSize=settings.questions;activeSprintMinutes=settings.minutes;activeLectureFilter=['analogy','all','scenario'][settings.mode];isCustomSprint=true;}
       isShuffled=true;buildSprintPool();renderAll();document.getElementById('course-picker').hidePopover();
@@ -1802,5 +1802,19 @@ for(const type of ["error","cancel","click","submit","change","dragover","dragle
 // Device-local retention and an explicit complete study-data reset. No unrelated origin keys are cleared.
 const STUDIOZA_STORAGE_KEYS=['exam_sprint_questions_v2','exam_sprint_weak_ids_v2','exam_sprint_reskins_v2','exam_sprint_progress_v2','dcu_dyslexia_v2','exam_sprint_brain_hooks_v1','studioza_course_title_v1','studioza_saved_at_v1','baa1118_gemini_api_key','baa1118_ai_questions_v1','exam_sprint_reskins_v1','exam_sprint_progress_v1','baa1118_weak_ids_v1'];
 function expireSavedStudyData(){try{const saved=Number(localStorage.getItem('studioza_saved_at_v1'));if(saved&&Date.now()-saved>30*24*60*60*1000)STUDIOZA_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));else if(!saved&&localStorage.getItem('exam_sprint_questions_v2'))localStorage.setItem('studioza_saved_at_v1',String(Date.now()));}catch(error){}}
-function clearAllStudyData(){if(activeQuestionOperations||studyFileReadInProgress){document.getElementById('upload-clear-status').textContent='Wait for generation to finish first.';return;}if(!confirm('Clear all Studioza study data on this device, including questions, progress, interests and preferences?'))return;try{STUDIOZA_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));location.reload();}catch(error){document.getElementById('upload-clear-status').textContent='Browser storage could not be cleared. Use your browser site-data settings.';}}
+async function clearAllStudyData(){if(activeQuestionOperations||studyFileReadInProgress){document.getElementById('upload-clear-status').textContent='Wait for generation to finish first.';return;}if(!await confirmStudyAction('Clear all saved study data?', 'Remove Studioza questions, progress, interests and preferences from this browser?', 'Clear all study data'))return;try{STUDIOZA_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));location.reload();}catch(error){document.getElementById('upload-clear-status').textContent='Browser storage could not be cleared. Use your browser site-data settings.';}}
+function confirmStudyAction(title,message,label){const dialog=document.getElementById('study-confirm-dialog');if(dialog.open)return Promise.resolve(false);dialog.querySelector('h2').textContent=title;dialog.querySelector('p').textContent=message;dialog.querySelector('[value="continue"]').textContent=label;dialog.returnValue='cancel';const opener=document.activeElement;return new Promise(resolve=>{dialog.addEventListener('close',()=>{opener?.focus?.({preventScroll:true});resolve(dialog.returnValue==='continue');},{once:true});dialog.showModal();});}
+function validateStudyBackup(backup){
+ if(!backup||backup.format!=='studioza-local-backup-v1'||!backup.saved||typeof backup.saved!=='object')throw Error('Choose a Studioza saved-study backup.');
+ const raw=backup.saved['exam_sprint_questions_v2'];if(typeof raw!=='string'||raw.length>2000000)throw Error('The backup question bank is missing or too large.');
+ const bank=JSON.parse(raw);if(!Array.isArray(bank)||bank.length>5000||!bank.every(q=>q&&typeof q.id==='string'&&/^[A-Za-z0-9_-]{1,160}$/.test(q.id)&&typeof q.sourceDoc==='string'&&validDocumentQuestion(q,[q.sourceDoc]))||new Set(bank.map(q=>q.id)).size!==bank.length)throw Error('The backup contains invalid study questions.');
+ const values={'exam_sprint_questions_v2':JSON.stringify(bank),'studioza_saved_at_v1':String(Date.now())};
+ for(const key of ['exam_sprint_progress_v2','exam_sprint_weak_ids_v2','exam_sprint_brain_hooks_v1'])if(typeof backup.saved[key]==='string'&&backup.saved[key].length<=2000000){JSON.parse(backup.saved[key]);values[key]=backup.saved[key];}
+ const hooks=JSON.parse(values.exam_sprint_brain_hooks_v1||'[]');if(!Array.isArray(hooks)||hooks.length>3||!hooks.every(x=>typeof x==='string'&&x.length<=40))throw Error('The backup interests are invalid.');
+ if(typeof backup.saved.studioza_course_title_v1==='string'&&backup.saved.studioza_course_title_v1.length<=60)values.studioza_course_title_v1=backup.saved.studioza_course_title_v1;
+ if(['true','false'].includes(backup.saved.dcu_dyslexia_v2))values.dcu_dyslexia_v2=backup.saved.dcu_dyslexia_v2;
+ return values;
+}
+async function restoreStudyBackup(file){const status=document.getElementById('upload-clear-status');if(!file)return;if(activeQuestionOperations||studyFileReadInProgress){status.textContent='Wait for generation to finish first.';return;}try{if(file.size>8*1024*1024)throw Error('The backup is too large.');const values=validateStudyBackup(JSON.parse(await file.text()));if(!await confirmStudyAction('Restore this backup?','Replace Studioza study data in this browser with this backup? Other websites are not affected.','Restore backup'))return;const previous=Object.fromEntries(STUDIOZA_STORAGE_KEYS.map(key=>[key,localStorage.getItem(key)]));try{STUDIOZA_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));for(const [key,value]of Object.entries(values))localStorage.setItem(key,value);}catch(error){for(const [key,value]of Object.entries(previous)){try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}catch{}}throw Error('The backup could not be saved. Check your browser storage settings.');}location.reload();}catch(error){status.textContent=error.message||'This backup could not be read.';}}
+window.addEventListener('DOMContentLoaded',()=>{document.getElementById('btn-restore-study-data').addEventListener('click',()=>{const input=document.getElementById('restore-study-input');input.value='';input.click();});document.getElementById('restore-study-input').addEventListener('change',event=>restoreStudyBackup(event.target.files[0]));});
 window.addEventListener('DOMContentLoaded',()=>{document.getElementById('btn-clear-all-study-data').addEventListener('click',clearAllStudyData);if(location.hostname==='studioza-ai-staging.cassidyjames011.workers.dev'){const notice=document.createElement('p');notice.className='staging-notice';notice.textContent='Staging test only — synthetic answers, no real AI. Use test material only.';document.querySelector('.studio-header').appendChild(notice);}});
