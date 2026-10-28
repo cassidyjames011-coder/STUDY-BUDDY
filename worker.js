@@ -1,113 +1,53 @@
 import { DurableObject } from "cloudflare:workers";
+import { RELEASE_ID } from "./release.js";
 
-const MODEL = "gemini-3.5-flash-lite";
-const DAILY_LIMIT = 100;
-const MAX_BODY_BYTES = 12_000_000;
-const ALLOWED_HOSTNAME = "cassidyjames011-coder.github.io";
-
-function json(data, status, origin) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": origin,
-      "Vary": "Origin",
-      "Cache-Control": "no-store"
-    }
-  });
+const MODEL="gemini-3.5-flash-lite", MAX_BODY_BYTES=12000000, MAX_SOURCE_BYTES=8*1024*1024;
+const DOCUMENT_SPRINT_VERSION="secure-study-v1";
+const APP_CSP="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests";
+const BASE_HEADERS={"X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer","Permissions-Policy":"camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()","Strict-Transport-Security":"max-age=31536000","Cache-Control":"no-store"};
+class PublicError extends Error{constructor(code,message,status=400){super(message);this.code=code;this.status=status;}}
+function headersFor(origin,requestId,app=false){const h=new Headers({...BASE_HEADERS,"Content-Security-Policy":app?APP_CSP:"default-src 'none'; frame-ancestors 'none'; base-uri 'none'","X-Request-ID":requestId,"X-Studioza-Release":RELEASE_ID,"X-Study-Sprint-Version":DOCUMENT_SPRINT_VERSION,"Vary":"Origin"});if(origin){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Expose-Headers','X-Request-ID, X-Studioza-Release, X-Study-Sprint-Version');}return h;}
+function respond(data,status,origin,requestId){const headers=headersFor(origin,requestId);headers.set('Content-Type','application/json; charset=utf-8');return new Response(JSON.stringify(data),{status,headers});}
+function logEvent(event,requestId,status,extra={}){console.log(JSON.stringify({event,requestId,status,release:RELEASE_ID,...extra}));}
+async function boundedText(response,limit){
+ if(Number(response.headers.get('Content-Length')||0)>limit)throw new PublicError('BODY_LIMIT','The request or response is too large.',413);
+ if(!response.body)return '';
+ const reader=response.body.getReader(),parts=[];let bytes=0;
+ try{while(true){const part=await reader.read();if(part.done)break;bytes+=part.value.byteLength;if(bytes>limit)throw new PublicError('BODY_LIMIT','The request or response is too large.',413);parts.push(part.value);}}
+ finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+ const result=new Uint8Array(bytes);let at=0;for(const part of parts){result.set(part,at);at+=part.length;}
+ return new TextDecoder('utf-8',{fatal:true}).decode(result);
+}
+function isPlainObject(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
+function requireKeys(value,keys){if(!isPlainObject(value)||Object.keys(value).some(k=>!keys.includes(k)))throw new PublicError('SCHEMA','The study request contains unsupported fields.');}
+function checkedPdf(data){
+ if(typeof data!=='string'||data.length>Math.ceil(MAX_SOURCE_BYTES/3)*4||!data.length||!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(data))throw new PublicError('PDF_INVALID','Choose a readable PDF file.');
+ const bytes=atob(data);if(bytes.length<20||!/^%PDF-(?:1\.[0-7]|2\.0)/.test(bytes.slice(0,8))||!bytes.slice(-1024).includes('%%EOF'))throw new PublicError('PDF_INVALID','This file is not a readable PDF. Export a fresh PDF or use Word/TXT.');
+ return bytes.length;
+}
+function validatePayload(payload){
+ requireKeys(payload,['task','turnstileToken','documentCount','documentMode','documentInterests','documents','documentQuestions']);
+ if(payload.task!=='document-sprint')throw new PublicError('TASK','Only study question generation is supported.');
+ if(typeof payload.turnstileToken!=='string'||!payload.turnstileToken.length||payload.turnstileToken.length>2048)throw new PublicError('SECURITY_REQUIRED','Please complete the security check.');
+ if(!Number.isInteger(payload.documentCount)||payload.documentCount<1||payload.documentCount>50||!['theory','mixed','practical'].includes(payload.documentMode))throw new PublicError('SETTINGS','Choose 1–50 questions and a question type.');
+ if(!Array.isArray(payload.documents)||payload.documents.length<1||payload.documents.length>10)throw new PublicError('SOURCES','Choose 1–10 documents. Website imports are temporarily unavailable; upload a PDF or text copy.');
+ const names=[],parts=[];let size=0;
+ for(const doc of payload.documents){
+  requireKeys(doc,['name','text','mimeType','data']);
+  if(typeof doc.name!=='string'||!doc.name.trim()||doc.name.length>512||/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/.test(doc.name)||names.includes(doc.name))throw new PublicError('SOURCE_NAME','Choose unique, readable document names.');
+  names.push(doc.name);
+  if(doc.mimeType==='application/pdf'&&doc.text===undefined){size+=checkedPdf(doc.data);parts.push({text:'DOCUMENT: '+doc.name},{inlineData:{mimeType:'application/pdf',data:doc.data}});}
+  else if(doc.mimeType===undefined&&doc.data===undefined&&typeof doc.text==='string'&&doc.text.trim()){size+=new TextEncoder().encode(doc.text).byteLength;parts.push({text:'DOCUMENT: '+doc.name+'\n'+doc.text});}
+  else throw new PublicError('SOURCE_CONTENT','Each source must contain readable text or a valid PDF.');
+  if(size>MAX_SOURCE_BYTES)throw new PublicError('SOURCE_LIMIT','The total document limit is 8 MB.',413);
+ }
+ const interests=payload.documentInterests??[];
+ if(!Array.isArray(interests)||interests.length>3||!interests.every(x=>typeof x==='string'&&x.trim()&&x.length<=40))throw new PublicError('INTERESTS','Choose up to three interests.');
+ const seed=payload.documentQuestions??[];
+ if(!Array.isArray(seed)||seed.length>payload.documentCount||!seed.every(q=>validDocumentQuestion(q,names)&&q.prompt.length<=4000&&q.explanation.length<=8000&&q.options.every(x=>x.length<=2000)))throw new PublicError('PROGRESS','Saved generation progress is invalid. Start a fresh request.');
+ return {body:{contents:[{role:'user',parts}]},names,interests:[...new Set(interests)],seed};
 }
 
-const DOCUMENT_SPRINT_VERSION = "checked-batches-v6-deeper-analogies";
-
-
-function validateWebsiteUrl(value) {
-  if(typeof value!=="string"||value.length>512)throw new Error("Use a public HTTPS website URL of at most 512 characters.");
-  let url;try{url=new URL(value);}catch{throw new Error("Enter a valid website URL.");}
-  const host=url.hostname.toLowerCase().replace(/\.$/,"");
-  if(url.protocol!=="https:"||url.username||url.password||(url.port&&url.port!=="443")||
-      !host.includes(".")||host.includes(":")||/^\d+(?:\.\d+)*$/.test(host)||
-      /(?:^|\.)(?:localhost|local|internal|lan|home|test|invalid|example|onion)$/.test(host))
-    throw new Error("Only public HTTPS websites are supported.");
-  url.hash="";return url;
-}
-
-function isPublicWebsiteAddress(address) {
-  if(address.includes(":")) {
-    if(!/^[0-9a-f:]+$/i.test(address)||address.includes("."))return false;
-    const [first,second="0"]=address.toLowerCase().split(":");
-    const a=parseInt(first,16),b=parseInt(second||"0",16);
-    return a>=0x2000&&a<0x4000&&a!==0x2002&&a!==0x3fff&&!(a===0x2001&&(b<=0x1ff||b===0xdb8));
-  }
-  const octets=address.split(".").map(Number);
-  if(octets.length!==4||octets.some(n=>!Number.isInteger(n)||n<0||n>255))return false;
-  const [a,b,c]=octets;
-  return !(a===0||a===10||a===127||a>=224||a===169&&b===254||
-    a===172&&b>=16&&b<=31||a===192&&(b===168||b===0&&(c===0||c===2)||b===88&&c===99)||
-    a===100&&b>=64&&b<=127||a===198&&(b===18||b===19||b===51&&c===100)||a===203&&b===0&&c===113);
-}
-
-async function verifyPublicWebsiteHost(hostname,signal) {
-  const answers=await Promise.all(["A","AAAA"].map(async type=>{
-    const response=await fetch("https://cloudflare-dns.com/dns-query?name="+encodeURIComponent(hostname)+"&type="+type,{
-      headers:{Accept:"application/dns-json"},redirect:"manual",signal
-    });
-    if(!response.ok)throw new Error("The website address could not be checked. Try again later.");
-    const data=await response.json();
-    if(data.Status!==0&&data.Status!==3)throw new Error("The website address could not be checked.");
-    return (data.Answer||[]).filter(item=>item.type===1||item.type===28).map(item=>item.data);
-  }));
-  const addresses=answers.flat();
-  if(!addresses.length||addresses.some(address=>!isPublicWebsiteAddress(address)))throw new Error("The link must point to a public website.");
-}
-
-function websiteHtmlToText(html) {
-  const entities={amp:"&",lt:"<",gt:">",quot:'"',apos:"'",nbsp:" ",ndash:"–",mdash:"—",lsquo:"‘",rsquo:"’",ldquo:"“",rdquo:"”",hellip:"…",bull:"•"};
-  let text=html.replace(/<!--[\s\S]*?-->/g,"").replace(/<(script|style|noscript|svg|nav|footer|header|form)\b[^>]*>[\s\S]*?<\/\1\s*>/gi," ");
-  text=text.replace(/<\/(?:p|div|h[1-6]|li|tr|section|article|blockquote)\s*>|<br\b[^>]*>/gi,"\n").replace(/<[^>]*>/g," ");
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(match,value)=>{
-    if(value[0]!=="#")return entities[value.toLowerCase()]||match;
-    const code=value[1].toLowerCase()==="x"?parseInt(value.slice(2),16):parseInt(value.slice(1),10);
-    return code>0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)?String.fromCodePoint(code):" ";
-  }).replace(/[ \t]+/g," ").replace(/ *\n */g,"\n").replace(/\n{3,}/g,"\n\n").trim();
-}
-
-async function readWebsiteText(value,parentSignal) {
-  const abort=new AbortController(),cancel=()=>abort.abort();
-  if(parentSignal?.aborted)throw new Error("Question generation was cancelled.");
-  parentSignal?.addEventListener("abort",cancel,{once:true});
-  const timer=setTimeout(cancel,15000);
-  let response;
-  try {
-    let url=validateWebsiteUrl(value);
-    for(let hop=0;hop<4;hop++){
-      await verifyPublicWebsiteHost(url.hostname,abort.signal);
-      response=await fetch(url.href,{method:"GET",redirect:"manual",credentials:"omit",headers:{
-        Accept:"text/html,application/xhtml+xml,text/plain;q=0.9"
-      },signal:abort.signal});
-      if([301,302,303,307,308].includes(response.status)){
-        const location=response.headers.get("Location");await response.body?.cancel();
-        if(!location||hop===3)throw new Error("The website redirected too many times.");
-        url=validateWebsiteUrl(new URL(location,url).href);continue;
-      }
-      break;
-    }
-    if(!response.ok)throw new Error("The website returned "+response.status+". Use a publicly accessible page or upload a PDF copy.");
-    const type=(response.headers.get("Content-Type")||"").toLowerCase();
-    if(!type.includes("text/html")&&!type.includes("application/xhtml+xml")&&!type.includes("text/plain"))throw new Error("This link is not a readable web page. Download the document and upload it instead.");
-    if(Number(response.headers.get("Content-Length")||0)>2*1024*1024)throw new Error("This web page is too large. Upload a focused PDF or text excerpt instead.");
-    if(!response.body)throw new Error("The web page was empty.");
-    const reader=response.body.getReader(),decoder=new TextDecoder();let bytes=0,content="";
-    try{while(true){const part=await reader.read();if(part.done)break;bytes+=part.value.byteLength;if(bytes>2*1024*1024)throw new Error("This web page is too large. Upload a focused excerpt instead.");content+=decoder.decode(part.value,{stream:true});}content+=decoder.decode();}
-    finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
-    const text=type.includes("text/plain")?content.trim():websiteHtmlToText(content);
-    if(text.length<100)throw new Error("This page has too little readable text. If it needs sign-in or JavaScript, save it as PDF and upload that instead.");
-    if(text.length>160000)throw new Error("This page has too much text for one source. Upload a focused excerpt instead.");
-    return text;
-  } catch(error){
-    if(abort.signal.aborted)throw new Error(parentSignal?.aborted?"Question generation was cancelled.":"Reading the website timed out. Try another page or upload a PDF copy.");
-    throw error;
-  } finally {clearTimeout(timer);parentSignal?.removeEventListener("abort",cancel);if(response?.body&&!response.body.locked)await response.body.cancel().catch(()=>{});}
-}
 
 function documentQuestionSchema(sources, types = ["practical","theory"]) {
   return { type:"ARRAY", items:{ type:"OBJECT", properties:{
@@ -180,7 +120,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
     return { ...content, parts };
   }).filter(content => content.parts.length);
 
-  for (let attempt = 0; questions.length < target && attempt < 16; attempt++) {
+  for (let attempt = 0; questions.length < target && attempt < 8; attempt++) {
     if (signal.aborted) throw new Error("Question generation was cancelled.");
     if (attempt > 0) {
       const reservation = await quota.reserve();
@@ -222,9 +162,9 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
         method:"POST", headers:{ "Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY },
         body:JSON.stringify(requestBody), signal:abort.signal
       });
-      const data = await upstream.json();
+      const data = JSON.parse(await boundedText(upstream, 1500000));
       if (!upstream.ok) {
-        const error = new Error(data?.error?.message || "Google could not create this batch.");
+        const error = new Error("The AI service could not complete this batch.");
         error.status = upstream.status; throw error;
       }
       batch = readDocumentBatch(data);
@@ -253,444 +193,69 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
   return questions;
 }
 
-function documentSprintStream(body, sources, env, quota, reservation, origin, ctx, seed, interests, target, mode, websites = []) {
-  const abort = new AbortController();
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    start(controller) {
-      const emit = event => {
-        if (!abort.signal.aborted) controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
-      };
-      const work = (async () => {
-        try {
-          emit({ type:"progress", completed:0, total:target, message:"Preparing checked question batches…" });
-          const websiteParts=[];
-          for(const url of websites){
-            emit({type:"progress",completed:0,total:target,message:"Reading website: "+new URL(url).hostname+"…"});
-            let text;
-            try{text=await readWebsiteText(url,abort.signal);}catch(error){throw new Error("Could not read "+url+": "+error.message);}
-            websiteParts.push({text:"DOCUMENT: "+url+"\n"+text});
-          }
-          const sourceBody=websiteParts.length?{...body,contents:[...body.contents,{role:"user",parts:websiteParts}]}:body;
-          const questions = await collectDocumentSprint(sourceBody, sources, env, quota, reservation, emit, abort.signal, seed, interests, target, mode);
-          emit({ type:"result", questions });
-        } catch (error) {
-          if (!abort.signal.aborted) emit({ type:"error", error:{ message:error.message || "Question generation was interrupted. Your files and existing bank are unchanged.", status:error.status || 502 } });
-        } finally {
-          if (!abort.signal.aborted) controller.close();
-        }
-      })();
-      if (ctx?.waitUntil) ctx.waitUntil(work);
-    },
-    cancel() { abort.abort(); }
+
+export class DailyQuota extends DurableObject{
+ constructor(ctx,env){super(ctx,env);this.env=env;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS daily_quota (day TEXT PRIMARY KEY, count INTEGER NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS ai_attempts (id TEXT PRIMARY KEY, created_at INTEGER NOT NULL)');}
+ async reserve(){
+  const now=Date.now(),day=new Date(now).toISOString().slice(0,10);
+  const daily=this.env.APP_ENV==='staging'?3:100,burst=this.env.APP_ENV==='staging'?3:10;
+  return this.ctx.storage.transactionSync(()=>{
+   this.ctx.storage.sql.exec('DELETE FROM ai_attempts WHERE created_at <= ?',now-60000);
+   const recent=this.ctx.storage.sql.exec('SELECT COUNT(*) AS count FROM ai_attempts').toArray()[0]?.count||0;
+   if(recent>=burst)return {allowed:false,reason:'burst',remaining:0};
+   const count=this.ctx.storage.sql.exec('SELECT count FROM daily_quota WHERE day = ?',day).toArray()[0]?.count||0;
+   if(count>=daily)return {allowed:false,reason:'daily',remaining:0};
+   this.ctx.storage.sql.exec('INSERT INTO ai_attempts (id,created_at) VALUES (?,?)',crypto.randomUUID(),now);
+   this.ctx.storage.sql.exec('INSERT INTO daily_quota (day,count) VALUES (?,1) ON CONFLICT(day) DO UPDATE SET count = count + 1',day);
+   this.ctx.storage.sql.exec('DELETE FROM daily_quota WHERE day < ?',day);
+   return {allowed:true,remaining:daily-count-1};
   });
-  return new Response(stream, { headers:{
-    "Content-Type":"application/x-ndjson; charset=utf-8", "Access-Control-Allow-Origin":origin,
-    "Vary":"Origin", "Cache-Control":"no-store", "X-Study-Sprint-Version":DOCUMENT_SPRINT_VERSION
-  } });
+ }
 }
-
-export class DailyQuota extends DurableObject {
-  constructor(ctx, env) {
-    super(ctx, env);
-
-    ctx.storage.sql.exec(`
-      CREATE TABLE IF NOT EXISTS daily_quota (
-        day TEXT PRIMARY KEY,
-        count INTEGER NOT NULL
-      )
-    `);
-  }
-
-  async reserve() {
-    const day = new Date().toISOString().slice(0, 10);
-
-    return this.ctx.storage.transactionSync(() => {
-      const row = this.ctx.storage.sql
-        .exec(
-          "SELECT count FROM daily_quota WHERE day = ?",
-          day
-        )
-        .toArray()[0];
-
-      const count = row ? row.count : 0;
-
-      if (count >= DAILY_LIMIT) {
-        return { allowed: false, remaining: 0 };
-      }
-
-      this.ctx.storage.sql.exec(
-        `INSERT INTO daily_quota (day, count)
-         VALUES (?, 1)
-         ON CONFLICT(day)
-         DO UPDATE SET count = count + 1`,
-        day
-      );
-
-      this.ctx.storage.sql.exec(
-        "DELETE FROM daily_quota WHERE day < ?",
-        day
-      );
-
-      return {
-        allowed: true,
-        remaining: DAILY_LIMIT - count - 1
-      };
-    });
-  }
+function mockQuestions(target,mode,names){return Array.from({length:target},(_,i)=>({questionType:mode==='theory'?'theory':mode==='practical'?'practical':i<Math.round(target*.6)?'practical':'theory',sourceDoc:names[i%names.length],topic:'Staging test',prompt:'STAGING ONLY: Which option is the synthetic test answer for item '+(i+1)+'?',options:['Synthetic correct answer','Synthetic distractor B','Synthetic distractor C','Synthetic distractor D'],correct:0,explanation:'This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.',analogyTheme:null}));}
+function generationStream(payload,prepared,env,quota,reservation,origin,ctx,requestId){
+ const abort=new AbortController(),encoder=new TextEncoder();let stream;
+ stream=new ReadableStream({start(controller){const emit=event=>{if(!abort.signal.aborted)controller.enqueue(encoder.encode(JSON.stringify({...event,requestId})+'\n'));};
+  const deadline=setTimeout(()=>abort.abort(),180000);
+  const work=(async()=>{try{
+   emit({type:'progress',completed:0,total:payload.documentCount,message:'Preparing your questions…'});
+   let questions;
+   if(env.APP_ENV==='staging'&&env.MOCK_AI==='true')questions=mockQuestions(payload.documentCount,payload.documentMode,prepared.names);
+   else questions=await collectDocumentSprint(prepared.body,prepared.names,env,quota,reservation,emit,abort.signal,prepared.seed,prepared.interests,payload.documentCount,payload.documentMode);
+   emit({type:'result',questions});logEvent('generation_complete',requestId,200,{questions:questions.length,upstream:!(env.APP_ENV==='staging'&&env.MOCK_AI==='true')});
+  }catch(error){const status=error.status===429?429:502;logEvent('generation_failed',requestId,status,{reason:abort.signal.aborted?'deadline':status===429?'quota':'upstream_or_format'});if(!abort.signal.aborted)emit({type:'error',error:{code:status===429?'LIMIT':'GENERATION_FAILED',status,message:status===429?'The AI request limit was reached. Your files and current questions are unchanged.':'The AI service could not finish this request. Your files and current questions are unchanged. Please retry later.'}});}
+  finally{clearTimeout(deadline);if(!abort.signal.aborted)controller.close();else controller.error(new Error('Generation stopped. Please retry later.'));}})();ctx?.waitUntil?.(work);
+ },cancel(){abort.abort();}});
+ const headers=headersFor(origin,requestId);headers.set('Content-Type','application/x-ndjson; charset=utf-8');return new Response(stream,{headers});
 }
-
-export default {
-  async fetch(request, env, ctx) {
-    const allowedOrigin = env.ALLOWED_ORIGIN;
-
-    if (!allowedOrigin || !env.APPROVED_MODELS) {
-      return new Response("Worker configuration is incomplete.", {
-        status: 500
-      });
-    }
-
-    const origin = request.headers.get("Origin");
-
-    if (origin !== allowedOrigin) {
-      return new Response("Origin not allowed.", { status: 403 });
-    }
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: {
-          "Access-Control-Allow-Origin": allowedOrigin,
-          "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "86400",
-          "X-Study-Sprint-Version": DOCUMENT_SPRINT_VERSION,
-          "Access-Control-Expose-Headers": "X-Study-Sprint-Version",
-          "Vary": "Origin"
-        }
-      });
-    }
-
-    if (request.method !== "POST") {
-      return json(
-        { error: "Method not allowed." },
-        405,
-        allowedOrigin
-      );
-    }
-
-    if (
-      !env.GEMINI_API_KEY ||
-      !env.TURNSTILE_SECRET_KEY ||
-      !env.DAILY_QUOTA ||
-      !env.RATE_LIMITER
-    ) {
-      return json(
-        { error: "Worker secrets or bindings are missing." },
-        500,
-        allowedOrigin
-      );
-    }
-
-    if (
-      !(request.headers.get("Content-Type") || "")
-        .toLowerCase()
-        .includes("application/json")
-    ) {
-      return json(
-        { error: "Content-Type must be application/json." },
-        415,
-        allowedOrigin
-      );
-    }
-
-    const contentLength = Number(
-      request.headers.get("Content-Length") || 0
-    );
-
-    if (contentLength > MAX_BODY_BYTES) {
-      return json({ error: "Request is too large." }, 413, allowedOrigin);
-    }
-
-    let payload;
-
-    try {
-      const raw = await request.text();
-
-      if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) {
-        return json({ error: "Request is too large." }, 413, allowedOrigin);
-      }
-
-      payload = JSON.parse(raw);
-    } catch {
-      return json({ error: "Invalid JSON." }, 400, allowedOrigin);
-    }
-
-    const token = payload?.turnstileToken;
-    const body = payload?.body;
-
-    if (
-      typeof token !== "string" ||
-      token.length === 0 ||
-      token.length > 2048
-    ) {
-      return json(
-        { error: "Please complete the security check." },
-        400,
-        allowedOrigin
-      );
-    }
-
-    if (
-      !body ||
-      typeof body !== "object" ||
-      !Array.isArray(body.contents) ||
-      body.contents.length === 0 ||
-      body.contents.length > 100
-    ) {
-      return json({ error: "Invalid Gemini request." }, 400, allowedOrigin);
-    }
-
-    const isDocumentSprint = payload.task === "document-sprint";
-    if (payload.task !== undefined && !isDocumentSprint) {
-      return json({ error:"Unsupported study task." }, 400, allowedOrigin);
-    }
-    let documentSources = [];
-    if (isDocumentSprint) {
-      if (!Number.isInteger(payload.documentCount) || payload.documentCount < 1 || payload.documentCount > 50 ||
-          !["theory","mixed","practical"].includes(payload.documentMode)) {
-        return json({ error:"Refresh the site and choose 1–50 questions and a question type." }, 400, allowedOrigin);
-      }
-      const sources = body.generationConfig?.responseSchema?.items?.properties?.sourceDoc?.enum;
-      if (!Array.isArray(sources) || sources.length < 1 || sources.length > 10 ||
-          !sources.every(name => typeof name === "string" && name.trim() && name.length <= 512)) {
-        return json({ error:"Choose 1–10 named study documents." }, 400, allowedOrigin);
-      }
-      documentSources = [...new Set(sources)];
-      if(payload.documentWebsites!==undefined && (!Array.isArray(payload.documentWebsites)||payload.documentWebsites.length>10||
-        !payload.documentWebsites.every(url=>typeof url==="string"&&documentSources.includes(url))||
-        new Set(payload.documentWebsites).size!==payload.documentWebsites.length)){
-        return json({error:"Add up to 10 unique website and file sources in total."},400,allowedOrigin);
-      }
-      try{for(const url of payload.documentWebsites||[])validateWebsiteUrl(url);}catch(error){return json({error:error.message},400,allowedOrigin);}
-      if (payload.documentQuestions !== undefined &&
-          (!Array.isArray(payload.documentQuestions) || payload.documentQuestions.length > payload.documentCount)) {
-        return json({ error:"Invalid saved generation progress." }, 400, allowedOrigin);
-      }
-      if (payload.documentInterests !== undefined &&
-          (!Array.isArray(payload.documentInterests) || payload.documentInterests.length > 3 ||
-           !payload.documentInterests.every(interest => typeof interest === "string" && interest.length <= 40))) {
-        return json({ error:"Choose up to three interests." }, 400, allowedOrigin);
-      }
-    }
-
-    // Bound document uploads before the request reaches Google; accept PDFs only as inline binary parts.
-    let inlinePdfCount = 0;
-    let inlinePdfBytes = 0;
-    for (const content of body.contents) {
-      if (!content || !Array.isArray(content.parts)) continue;
-      for (const part of content.parts) {
-        if (part?.inlineData === undefined) continue;
-        const inline = part.inlineData;
-        if (!inline || inline.mimeType !== "application/pdf" || typeof inline.data !== "string" ||
-            !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(inline.data)) {
-          return json({ error: "Only valid PDF document attachments are supported." }, 400, allowedOrigin);
-        }
-        inlinePdfCount += 1;
-        inlinePdfBytes += Math.floor(inline.data.length * 3 / 4);
-        if (inlinePdfCount > 10 || inlinePdfBytes > 8 * 1024 * 1024) {
-          return json({ error: "Document upload limit is 10 PDFs and 8 MB total." }, 413, allowedOrigin);
-        }
-      }
-    }
-
-    const approvedModels = env.APPROVED_MODELS
-      .split(",")
-      .map((model) => model.trim())
-      .filter(Boolean);
-
-    if (!approvedModels.includes(MODEL)) {
-      return json(
-        { error: "The configured model is not approved." },
-        500,
-        allowedOrigin
-      );
-    }
-
-    const permittedFields = new Set([
-      "contents",
-      "systemInstruction",
-      "generationConfig",
-      "safetySettings",
-      "tools",
-      "toolConfig",
-      "responseSchema"
-    ]);
-
-    if (Object.keys(body).some((key) => !permittedFields.has(key))) {
-      return json(
-        { error: "Unsupported request fields." },
-        400,
-        allowedOrigin
-      );
-    }
-
-    // Apply burst rate limiting.
-    let rate;
-
-    try {
-      rate = await env.RATE_LIMITER.limit({
-        key: "exam-study-app"
-      });
-    } catch {
-      return json(
-        { error: "Rate-limit service unavailable." },
-        503,
-        allowedOrigin
-      );
-    }
-
-    if (!rate.success) {
-      return json(
-        { error: "Too many requests. Please wait a minute." },
-        429,
-        allowedOrigin
-      );
-    }
-
-    // Verify Cloudflare Turnstile.
-    let verification;
-
-    try {
-      const verifyResponse = await fetch(
-        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: new URLSearchParams({
-            secret: env.TURNSTILE_SECRET_KEY,
-            response: token
-          })
-        }
-      );
-
-      if (!verifyResponse.ok) {
-        return json(
-          { error: "Security verification is unavailable." },
-          502,
-          allowedOrigin
-        );
-      }
-
-      verification = await verifyResponse.json();
-    } catch {
-      return json(
-        { error: "Security verification is unavailable." },
-        502,
-        allowedOrigin
-      );
-    }
-
-    if (
-      !verification.success ||
-      verification.hostname !== ALLOWED_HOSTNAME ||
-      verification.action !== "generate"
-    ) {
-      return json(
-        { error: "Security verification failed. Please try again." },
-        403,
-        allowedOrigin
-      );
-    }
-
-    // Reserve one request against the shared daily quota.
-    const quotaId = env.DAILY_QUOTA.idFromName("global-daily-quota");
-    const quota = env.DAILY_QUOTA.get(quotaId);
-
-    let reservation;
-
-    try {
-      reservation = await quota.reserve();
-    } catch {
-      return json(
-        { error: "Daily quota service is unavailable." },
-        503,
-        allowedOrigin
-      );
-    }
-
-    if (!reservation.allowed) {
-      return json(
-        { error: "The daily request limit has been reached. Try again tomorrow." },
-        429,
-        allowedOrigin
-      );
-    }
-
-    if (isDocumentSprint) {
-      return documentSprintStream(body, documentSources, env, quota, reservation, allowedOrigin, ctx, payload.documentQuestions || [], payload.documentInterests || [], payload.documentCount, payload.documentMode, payload.documentWebsites || []);
-    }
-
-    // Construct a restricted Gemini request.
-    const upstreamBody = {
-      contents: body.contents
-    };
-
-    for (const field of [
-      "systemInstruction",
-      "generationConfig",
-      "safetySettings",
-      "tools",
-      "toolConfig"
-    ]) {
-      if (body[field] !== undefined) {
-        upstreamBody[field] = body[field];
-      }
-    }
-
-    // Support apps that send responseSchema as a separate field.
-    if (body.responseSchema !== undefined) {
-      upstreamBody.generationConfig = {
-        ...(upstreamBody.generationConfig || {}),
-        responseMimeType: "application/json",
-        responseSchema: body.responseSchema
-      };
-    }
-
-    try {
-      const upstream = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": env.GEMINI_API_KEY
-          },
-          body: JSON.stringify(upstreamBody)
-        }
-      );
-
-      const result = await upstream.text();
-
-      return new Response(result, {
-        status: upstream.status,
-        headers: {
-          "Content-Type":
-            upstream.headers.get("Content-Type") || "application/json",
-          "Access-Control-Allow-Origin": allowedOrigin,
-          "Vary": "Origin",
-          "Cache-Control": "no-store",
-          "X-Daily-Quota-Remaining": String(reservation.remaining)
-        }
-      });
-    } catch {
-      return json(
-        { error: "Gemini is temporarily unavailable." },
-        502,
-        allowedOrigin
-      );
-    }
-  }
-};
+async function handle(request,env,ctx,requestId){
+ const url=new URL(request.url);
+ if(url.pathname!=='/api/generate'){
+  if(!['GET','HEAD'].includes(request.method))return respond({error:{code:'NOT_FOUND',message:'Not found.'},requestId},404,null,requestId);
+  if(!env.ASSETS)return respond({error:{code:'NOT_FOUND',message:'Not found.'},requestId},404,null,requestId);
+  const asset=await env.ASSETS.fetch(request),headers=headersFor(null,requestId,true);for(const [key,value]of asset.headers)if(['content-type','etag','last-modified'].includes(key))headers.set(key,value);
+  return new Response(asset.body,{status:asset.status,headers});
+ }
+ const origin=request.headers.get('Origin');
+ if(!env.ALLOWED_ORIGIN||origin!==env.ALLOWED_ORIGIN)return respond({error:{code:'ORIGIN',message:'Origin not allowed.'},requestId},403,null,requestId);
+ if(request.method==='OPTIONS'){const headers=headersFor(origin,requestId);headers.set('Access-Control-Allow-Methods','POST, OPTIONS');headers.set('Access-Control-Allow-Headers','Content-Type');return new Response(null,{status:204,headers});}
+ if(request.method!=='POST')return respond({error:{code:'METHOD',message:'Method not allowed.'},requestId},405,origin,requestId);
+ if(!env.TURNSTILE_SECRET_KEY||!env.DAILY_QUOTA||!env.RATE_LIMITER||(!env.GEMINI_API_KEY&&!(env.APP_ENV==='staging'&&env.MOCK_AI==='true'))||!env.APPROVED_MODELS?.split(',').map(s=>s.trim()).includes(MODEL)||(env.APP_ENV!=='staging'&&(env.MOCK_AI==='true'||/^[123]x0+AA$/.test(env.TURNSTILE_SECRET_KEY))))throw new PublicError('CONFIGURATION','The study service is temporarily unavailable.',503);
+ if(!(request.headers.get('Content-Type')||'').toLowerCase().split(';')[0].trim().match(/^application\/json$/))throw new PublicError('CONTENT_TYPE','Content-Type must be application/json.',415);
+ let payload;try{payload=JSON.parse(await boundedText(request,MAX_BODY_BYTES));}catch(error){if(error instanceof PublicError)throw error;throw new PublicError('JSON','Invalid JSON.');}
+ const prepared=validatePayload(payload);
+ let rate;try{rate=await env.RATE_LIMITER.limit({key:'studioza-generation'});}catch{throw new PublicError('RATE_UNAVAILABLE','The study service is temporarily unavailable.',503);}
+ if(!rate.success)throw new PublicError('RATE','Too many requests. Please wait a minute.',429);
+ let verification;try{const response=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:payload.turnstileToken}),signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();verification=JSON.parse(await boundedText(response,16000));}catch{throw new PublicError('SECURITY_UNAVAILABLE','Security verification is temporarily unavailable. Please retry later.',502);}
+ const host=new URL(env.ALLOWED_ORIGIN).hostname;
+ const testWidget=env.APP_ENV==='staging'&&env.MOCK_AI==='true'&&env.TURNSTILE_SECRET_KEY==='1x0000000000000000000000000000000AA';
+ // The public dummy service does not bind hostname/action; only mock-only staging may use it.
+ if(!verification.success||(!testWidget&&(verification.hostname!==host||verification.action!=='generate')))throw new PublicError('SECURITY_FAILED','Security verification failed. Complete a fresh check and retry.',403);
+ const quota=env.DAILY_QUOTA.get(env.DAILY_QUOTA.idFromName(env.APP_ENV==='staging'?'staging-'+RELEASE_ID:'global-daily-quota'));
+ let reservation;try{reservation=await quota.reserve();}catch{throw new PublicError('QUOTA_UNAVAILABLE','The study service is temporarily unavailable.',503);}
+ if(!reservation.allowed)throw new PublicError('QUOTA',reservation.reason==='burst'?'Too many requests. Please wait a minute.':'The daily AI request limit has been reached. Try again tomorrow (UTC).',429);
+ logEvent('generation_reserved',requestId,200,{upstream:!(env.APP_ENV==='staging'&&env.MOCK_AI==='true')});
+ return generationStream(payload,prepared,env,quota,reservation,origin,ctx,requestId);
+}
+export {headersFor};
+export default{async fetch(request,env,ctx){const requestId=crypto.randomUUID();try{const response=await handle(request,env,ctx,requestId);if(response.status>=400)logEvent('request_rejected',requestId,response.status,{upstream:false});return response;}catch(error){const known=error instanceof PublicError,status=known?error.status:500;logEvent('request_rejected',requestId,status,{reason:known?error.code:'internal',upstream:false});return respond({error:{code:known?error.code:'INTERNAL',message:known?error.message:'The study service is temporarily unavailable.'},requestId},status,request.headers.get('Origin')===env.ALLOWED_ORIGIN?env.ALLOWED_ORIGIN:null,requestId);}}};

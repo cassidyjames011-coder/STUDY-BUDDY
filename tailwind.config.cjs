@@ -1,0 +1,1 @@
+module.exports={content:['./src/index.html','./src/app.js'],darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','Lexend','system-ui','sans-serif'],mono:['JetBrains Mono','monospace']},colors:{slate:{850:'#152033',925:'#0b1120'}}}},plugins:[]};
