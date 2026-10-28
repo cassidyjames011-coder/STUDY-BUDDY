@@ -123,3 +123,4 @@
 
 .upload-safety{display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.5;color:#e4d8e9;margin-bottom:12px}.upload-safety input{min-height:20px!important;width:20px;height:20px;flex:none;accent-color:#e76f51}.upload-safety a{color:#ffd1c3;text-decoration:underline}.studio-footer a{color:inherit;text-decoration:underline}
 .privacy-page{max-width:780px;margin:40px auto;padding:24px;font-size:16px;line-height:1.75}.privacy-page h1{font:600 36px Georgia,serif;margin:24px 0}.privacy-page h2{font-size:21px;margin:28px 0 8px}.privacy-page a{color:#754060;text-decoration:underline}
+.staging-notice{padding:8px 18px;background:#2d193c;color:#fffcf7;text-align:center;font-size:12px}
