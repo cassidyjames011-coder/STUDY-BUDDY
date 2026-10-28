@@ -249,7 +249,8 @@ async function handle(request,env,ctx,requestId){
  let verification;try{const response=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:payload.turnstileToken}),signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();verification=JSON.parse(await boundedText(response,16000));}catch{throw new PublicError('SECURITY_UNAVAILABLE','Security verification is temporarily unavailable. Please retry later.',502);}
  const host=new URL(env.ALLOWED_ORIGIN).hostname;
  const testWidget=env.APP_ENV==='staging'&&env.MOCK_AI==='true'&&env.TURNSTILE_SECRET_KEY==='1x0000000000000000000000000000000AA';
- if(!verification.success||verification.hostname!==(testWidget?'localhost':host)||verification.action!==(testWidget?'test':'generate'))throw new PublicError('SECURITY_FAILED','Security verification failed. Complete a fresh check and retry.',403);
+ // The public dummy service does not bind hostname/action; only mock-only staging may use it.
+ if(!verification.success||(!testWidget&&(verification.hostname!==host||verification.action!=='generate')))throw new PublicError('SECURITY_FAILED','Security verification failed. Complete a fresh check and retry.',403);
  const quota=env.DAILY_QUOTA.get(env.DAILY_QUOTA.idFromName(env.APP_ENV==='staging'?'staging-'+RELEASE_ID:'global-daily-quota'));
  let reservation;try{reservation=await quota.reserve();}catch{throw new PublicError('QUOTA_UNAVAILABLE','The study service is temporarily unavailable.',503);}
  if(!reservation.allowed)throw new PublicError('QUOTA',reservation.reason==='burst'?'Too many requests. Please wait a minute.':'The daily AI request limit has been reached. Try again tomorrow (UTC).',429);
