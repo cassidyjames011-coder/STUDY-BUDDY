@@ -10,6 +10,8 @@
 [data-theme=dark] .answer-option.correct,[data-theme=dark] .question-explanation{background:#263A31}
 [data-theme=dark] .question-explanation.is-incorrect{background:#452A31}
 [data-theme=dark] .question-next,[data-theme=dark] .button-primary{color:#2D193C}
+[data-theme=dark] .answer-option.selected .answer-letter,[data-theme=dark] .answer-option.incorrect .answer-letter{color:#2D193C}
+[data-theme=dark] .answer-option.incorrect .answer-feedback{color:#FFB29B}
 [data-theme=dark] .question-code{background:#1D1823;color:#F7F1F5}
 [data-theme=dark] .timer-track{background:#403447}
 [data-theme=dark] .map-question.incorrect{background:#4B2C34;color:#FFD4C8;border-color:#D77E6A}
