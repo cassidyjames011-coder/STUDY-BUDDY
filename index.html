@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%20fill%3D%22none%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%232D193C%22%2F%3E%3Cpath%20d%3D%22M44%2023C52%2018%2067%2017%2072%2024C77%2031%2074%2039%2066%2044C62%2034%2053%2028%2044%2023Z%20M25%2064C29%2073%2039%2077%2049%2078C38%2086%2020%2081%2025%2064Z%22%20fill%3D%22%23E76F51%22%2F%3E%3Cpath%20d%3D%22M69%2019C59%209%2042%208%2031%2020C20%2032%2021%2045%2038%2055L57%2066C67%2072%2070%2080%2066%2087C82%2073%2081%2059%2064%2049L44%2037C34%2031%2036%2025%2043%2021C52%2015%2061%2015%2069%2019Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3Cpath%20d%3D%22M36%2038C29%2047%2036%2055%2050%2062L59%2067C70%2074%2064%2085%2053%2089C42%2094%2028%2088%2024%2080C34%2085%2046%2083%2052%2077C42%2076%2032%2072%2027%2066C21%2058%2024%2051%2029%2047C29%2056%2040%2062%2048%2065C34%2055%2029%2047%2036%2038Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3C%2Fsvg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Studioza — Your study desk</title>
+  <script src="./studioza-theme.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -262,6 +263,7 @@
 
 @media(min-width:1191px){.studio-footer{padding-bottom:20px}#study-session{overflow:hidden}}
 </style>
+  <link rel="stylesheet" href="./studioza-theme.css">
 </head>
 
 <body>
@@ -293,6 +295,7 @@
             <div class="preferences-panel">
         <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">
           <p class="px-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Study and accessibility</p>
+          <button id="btn-theme-toggle" type="button" class="theme-toggle" aria-pressed="false" title="Switch between light and dark themes"><span id="theme-toggle-icon" aria-hidden="true">☾</span><span id="label-theme-toggle">Dark mode</span></button>
           <button id="btn-feedback-mode" onclick="toggleFeedbackMode()" title="Switch between Instant Study Feedback and Exam Simulation Mode" class="px-2.5 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 text-indigo-300 transition"><i data-lucide="zap" class="w-4 h-4"></i><span id="label-feedback-mode">Mode: Instant Study</span></button>
           <button id="btn-chime-toggle" onclick="toggleChimes()" title="Toggle Harmonic Audio Chimes" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="bell" class="w-4 h-4 text-sky-400"></i><span id="label-chime">Chimes On</span></button>
           <button id="btn-noise-toggle" onclick="toggleBrownNoise()" title="Toggle Warm Brown Noise (ADD Distraction Shield)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="waves" class="w-4 h-4 text-amber-400"></i><span id="label-noise">Focus Noise: Off</span></button>
