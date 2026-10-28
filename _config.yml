@@ -1,0 +1,14 @@
+# GitHub Pages serves only the migration landing page, never the application build.
+exclude:
+  - public
+  - src
+  - scripts
+  - tests
+  - docs
+  - node_modules
+  - worker.js
+  - wrangler.jsonc
+  - package.json
+  - pnpm-lock.yaml
+  - release.js
+  - tailwind.config.cjs

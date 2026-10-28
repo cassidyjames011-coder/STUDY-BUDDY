@@ -1,0 +1,1 @@
+STUDIOZA TEST MATERIAL — NO PERSONAL DATA. Plants use light energy for photosynthesis. Water and carbon dioxide are inputs; glucose and oxygen are outputs. Cellular respiration releases usable energy from glucose. 

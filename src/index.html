@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="theme-color" content="#F5F1EA">
+  <meta name="description" content="Studioza turns your source material and interests into focused study sprints.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%20fill%3D%22none%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%232D193C%22%2F%3E%3Cpath%20d%3D%22M44%2023C52%2018%2067%2017%2072%2024C77%2031%2074%2039%2066%2044C62%2034%2053%2028%2044%2023Z%20M25%2064C29%2073%2039%2077%2049%2078C38%2086%2020%2081%2025%2064Z%22%20fill%3D%22%23E76F51%22%2F%3E%3Cpath%20d%3D%22M69%2019C59%209%2042%208%2031%2020C20%2032%2021%2045%2038%2055L57%2066C67%2072%2070%2080%2066%2087C82%2073%2081%2059%2064%2049L44%2037C34%2031%2036%2025%2043%2021C52%2015%2061%2015%2069%2019Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3Cpath%20d%3D%22M36%2038C29%2047%2036%2055%2050%2062L59%2067C70%2074%2064%2085%2053%2089C42%2094%2028%2088%2024%2080C34%2085%2046%2083%2052%2077C42%2076%2032%2072%2027%2066C21%2058%2024%2051%2029%2047C29%2056%2040%2062%2048%2065C34%2055%2029%2047%2036%2038Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3C%2Fsvg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studioza — Your study desk</title>
+  <!-- Styles and icons are built from pinned, self-hosted dependencies. -->
+  <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+
+  
+
+
+
+
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="./assets/studioza.css">
+<script src="./assets/lucide.min.js" defer></script>
+<script src="./assets/app.js" defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onStudyTurnstileReady" data-onerror="h0" defer></script>
+</head>
+
+<body>
+  <dialog id="ai-security-dialog" aria-labelledby="ai-security-title" aria-describedby="ai-security-help" data-oncancel="h1">
+    <h2 id="ai-security-title" class="text-lg font-bold text-white">Security check</h2>
+    <p id="ai-security-help" class="mt-2 text-sm text-slate-300">Complete the check below if asked. This window closes automatically when you are verified.</p>
+    <div id="ai-security-widget" class="my-4" style="min-height:65px"></div>
+    <button type="button" data-onclick="h2" class="min-h-11 rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700">Cancel</button>
+  </dialog>
+
+
+
+<dialog id="finish-sprint-dialog" aria-labelledby="finish-dialog-title" aria-describedby="finish-dialog-copy">
+  <h2 id="finish-dialog-title">Finish this sprint?</h2>
+  <p id="finish-dialog-copy"></p>
+  <div class="modal-actions"><button type="button" class="button-outline" data-onclick="h3" autofocus>Keep studying</button><button type="button" class="button-primary" data-onclick="h4">Finish sprint</button></div>
+</dialog>
+
+<header class="studio-header">
+  <div class="header-inner">
+    <a class="studio-brand" href="#question-deck-container" aria-label="Studioza study workspace"><span class="brand-mark"><svg aria-hidden="true" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="24" fill="#2D193C"/><path d="M44 23C52 18 67 17 72 24C77 31 74 39 66 44C62 34 53 28 44 23Z M25 64C29 73 39 77 49 78C38 86 20 81 25 64Z" fill="#E76F51"/><path d="M69 19C59 9 42 8 31 20C20 32 21 45 38 55L57 66C67 72 70 80 66 87C82 73 81 59 64 49L44 37C34 31 36 25 43 21C52 15 61 15 69 19Z" fill="#FFFCF7"/><path d="M36 38C29 47 36 55 50 62L59 67C70 74 64 85 53 89C42 94 28 88 24 80C34 85 46 83 52 77C42 76 32 72 27 66C21 58 24 51 29 47C29 56 40 62 48 65C34 55 29 47 36 38Z" fill="#FFFCF7"/></svg></span><span class="studio-wordmark">Studioza</span></a>
+    <button id="course-selector" class="course-selector" popovertarget="course-picker" aria-label="Choose study material"><span id="header-course-title">Your practice</span><span aria-hidden="true">⌄</span></button>
+    <span id="header-sprint-progress" class="header-progress">Sprint 00 / 00</span>
+    <div class="header-timer"><i data-lucide="clock-3" aria-hidden="true"></i><span id="header-time-remaining">00:00</span></div>
+    <button data-onclick="h5" id="btn-pause-timer" class="header-start" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" aria-hidden="true"></i><span id="label-pause-timer">Start</span></button>
+    <button type="button" id="btn-open-study-desk" class="desk-toggle" aria-label="Open study desk" data-onclick="h6" aria-controls="study-setup" aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>Study desk</span></button>
+    <details id="options-menu" class="preferences">
+      <summary aria-label="Study menu" title="Study menu"><i data-lucide="menu" aria-hidden="true"></i></summary>
+            <div class="preferences-panel">
+        <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">
+          <p class="px-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Study and accessibility</p>
+          <button id="btn-feedback-mode" data-onclick="h7" title="Switch between Instant Study Feedback and Exam Simulation Mode" class="px-2.5 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 text-indigo-300 transition"><i data-lucide="zap" class="w-4 h-4"></i><span id="label-feedback-mode">Mode: Instant Study</span></button>
+          <button id="btn-chime-toggle" data-onclick="h8" title="Toggle Harmonic Audio Chimes" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="bell" class="w-4 h-4 text-sky-400"></i><span id="label-chime">Chimes On</span></button>
+          <button id="btn-noise-toggle" data-onclick="h9" title="Toggle Warm Brown Noise (ADD Distraction Shield)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="waves" class="w-4 h-4 text-amber-400"></i><span id="label-noise">Focus Noise: Off</span></button>
+          <button id="btn-dyslexia-toggle" data-onclick="h10" title="Toggle Dyslexia-Friendly Warm Cream Contrast & Expanded Spacing" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium flex items-center gap-1.5 text-slate-200 transition"><i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i><span id="label-dyslexia">Dyslexia Mode</span></button>
+        </div>
+
+      <div class="preferences-history">
+        <button id="btn-clear-upload-history" type="button" data-onclick="h11" title="Clear uploaded files and generated questions">Clear upload history</button>
+        <button id="btn-clear-all-study-data" type="button">Clear all saved study data</button>
+<p id="upload-clear-status" role="status" aria-live="polite"></p>
+      </div>
+      </div>
+    </details>
+  </div>
+</header>
+<div id="course-picker" class="studio-popover" popover>
+  <h2>Your study material</h2>
+  <label for="course-title-input">Course name</label>
+  <form data-onsubmit="h12"><div class="course-name-row"><input id="course-title-input" type="text" maxlength="60" placeholder="e.g. Python Practice"><button class="button-primary" type="submit">Save</button></div></form>
+  <label for="study-source-select">Practice from</label>
+  <select id="study-source-select" data-onchange="h13"><option value="">All saved sources</option></select>
+  <p class="muted">Choose a saved source or add new material from your study desk.</p>
+  <button type="button" class="quiet-action" popovertarget="course-picker" popovertargetaction="hide">Done</button>
+</div>
+<button id="desk-backdrop" class="desk-backdrop" aria-label="Close study desk" data-onclick="h14" hidden></button>
+<div id="study-layout">
+  <aside id="study-setup" aria-label="Your study desk">
+    <div class="desk-top"><span class="eyebrow">Your study desk</span><button type="button" class="desk-close" data-onclick="h14" aria-label="Close study desk">×</button></div>
+    <h2 id="desk-course-title">Your practice</h2>
+    <button type="button" class="desk-course-select" data-onclick="h15">Choose study material <span aria-hidden="true">⌄</span></button>
+    <div id="documents-panel">
+      <div id="document-drop-zone" class="desk-source" data-ondragover="h16" data-ondragleave="h17" data-ondrop="h18">
+        <div class="source-heading"><i data-lucide="file-text" aria-hidden="true"></i><span>Source material</span><button type="button" data-onclick="h19">Change</button></div>
+        <div id="source-carousel" class="source-carousel" role="region" aria-roledescription="carousel" aria-label="Study sources" tabindex="0" data-onkeydown="h20">
+          <button id="source-previous" class="source-arrow source-arrow-previous" type="button" aria-label="Previous sources" data-onclick="h21" disabled>‹</button>
+          <div class="source-carousel-window"><div id="source-carousel-track"></div></div>
+          <button id="source-next" class="source-arrow source-arrow-next" type="button" aria-label="Next sources" data-onclick="h22" disabled>›</button>
+        </div>
+        <p id="source-page-indicator" class="source-page-indicator" role="status" aria-live="polite">No sources added</p>
+      </div>
+      <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" tabindex="-1" aria-label="Choose notes or questions" data-onchange="h23">
+      <button type="button" id="btn-upload-sources" class="desk-upload" data-onclick="h19"><i data-lucide="upload" aria-hidden="true"></i><span id="upload-sources-label">Upload source materials</span></button>
+      <p class="desk-file-types">Add files together or one at a time · Up to 10 sources, 8 MB total<br>PDF, Word, TXT, Markdown or JSON</p>
+      <ul id="study-file-list" hidden></ul>
+      <details class="desk-website" hidden><summary>Add a website <span aria-hidden="true">+</span></summary>
+        <form data-onsubmit="h24"><label for="study-website-url" class="sr-only">Website URL</label><div class="website-input-row"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article"><button id="btn-add-website" type="submit">Add</button></div></form>
+      </details>
+      <div class="desk-section-label"><label for="brain-hook-search">Your interests</label><button type="button" class="upload-info-button" popovertarget="document-upload-info" aria-label="About creating a sprint">i</button></div>
+      <div id="brain-hook-picker">
+        <div id="brain-hook-chips" aria-label="Selected interests"></div>
+        <div class="interest-search"><svg aria-hidden="true" class="study-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="brain-hook-search" type="search" autocomplete="off" placeholder="Add an interest…" aria-label="Search interests" aria-controls="brain-hook-options" aria-expanded="false" data-onfocus="h25" data-oninput="h26" data-onkeydown="h27"></div>
+        <div id="brain-hook-options" role="listbox" aria-label="Interests" class="hidden"></div>
+      </div>
+      <p id="brain-hook-requirement" aria-live="polite">Choose up to 3 interests.</p>
+      <span id="ai-gen-status" role="status" aria-live="polite"></span>
+      <div class="desk-section-label"><span id="mode-label">Question mix</span></div>
+      <div id="question-mode-control" class="mode-control" role="radiogroup" aria-labelledby="mode-label">
+        <button type="button" role="radio" data-mode="0" aria-checked="false" tabindex="-1" data-onclick="h28" data-onkeydown="h29">Theory</button>
+        <button type="button" role="radio" data-mode="1" aria-checked="true" tabindex="0" data-onclick="h30" data-onkeydown="h31">Mixed</button>
+        <button type="button" role="radio" data-mode="2" aria-checked="false" tabindex="-1" data-onclick="h32" data-onkeydown="h33">Practical</button>
+        <input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" hidden>
+      </div>
+      <div class="sprint-settings">
+        <label for="custom-test-minutes">Time <span>(minutes)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" data-oninput="h34" inputmode="numeric"></label>
+        <label for="custom-test-questions">Questions <span>(max 50)</span><input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" data-oninput="h34" inputmode="numeric"></label>
+      </div>
+    </div>
+    <div class="desk-action-area">
+      <label class="upload-safety"><input id="upload-safety" type="checkbox"> <span>My material is non-sensitive and I have permission to upload it. <a href="./privacy.html" target="_blank" rel="noopener">Privacy &amp; uploads</a></span></label>
+<button id="btn-generate-document-sprint" type="button" data-onclick="h35" disabled class="ai-request-button desk-create"><span class="ai-request-label">Create sprint</span><span aria-hidden="true">↗</span></button>
+      <div id="btn-generate-document-sprint-progress" hidden class="ai-request-progress" role="progressbar" aria-label="Creating sprint" aria-valuetext="Working; completion time varies"><div class="ai-request-track"><div class="ai-request-fill"></div></div><p>Creating your questions…</p></div>
+      <p id="document-gen-status" role="status" aria-live="polite">Add source material to create your sprint.</p>
+    </div>
+    <div class="desk-note"><i data-lucide="bookmark-check" aria-hidden="true"></i><p>Pick up where you left off.<br><span>Your progress is saved on this device.</span></p></div>
+  </aside>
+  <main id="study-session" aria-label="Question workspace">
+    <section id="sprint-completion-summary" hidden role="status" aria-live="polite"><span class="eyebrow">Session review</span><h2>Sprint complete</h2><p id="sprint-completion-copy"></p><button type="button" data-onclick="h36" class="button-outline">Restart this sprint</button></section>
+    <section id="question-deck-container" aria-label="Sprint questions"></section>
+  </main>
+  <aside id="telemetry-dashboard" aria-label="Sprint status">
+    <h2 class="eyebrow">Sprint status</h2>
+    <section id="sprint-timer-panel" class="status-section">
+      <h3 class="eyebrow">Sprint timer</h3>
+      <div id="metric-time-remaining" class="status-countdown">00:00</div>
+      <p id="timer-status-sub" class="muted">Ready when you are</p>
+      <div class="timer-track" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="100" id="timer-progress"><div id="bar-timer-remaining"></div></div>
+      <p id="metric-time-elapsed-label" class="status-meta">00:00 elapsed</p>
+      <div class="timer-secondary"><button type="button" data-onclick="h37" title="Add one minute">+1 min</button><button type="button" data-onclick="h36">Restart</button></div>
+    </section>
+    <section class="status-section">
+      <h3 class="sr-only">Sprint statistics</h3>
+      <div class="status-stat"><span>Accuracy</span><strong id="metric-accuracy-pct">—</strong></div>
+      <p id="metric-score-fraction" class="status-meta"></p>
+      <p id="score-mode-subtitle" class="sr-only"></p>
+      <div class="status-stat"><span>Questions completed</span><strong id="label-answered-count">0 / 0</strong></div>
+      <div class="status-stat"><span>Target pace</span><strong id="label-pace-target">—</strong></div>
+      <p id="badge-pace-status" class="status-meta">On pace</p>
+      <p id="badge-flagged-count" class="flag-count" hidden></p>
+    </section>
+    <section id="question-navigator" class="status-section" aria-label="Question map">
+      <h3 class="eyebrow">Question map</h3>
+      <div id="question-nav-grid"></div>
+      <div class="map-legend"><span><i class="map-dot answered"></i>Completed</span><span><i class="map-dot flagged"></i>Flagged</span></div>
+      <p class="status-meta">A–D to answer · ← → to move</p>
+    </section>
+    <button id="btn-finish-sprint" type="button" data-onclick="h38" class="button-outline hidden">Finish sprint</button>
+    <details id="source-breakdown-panel" class="source-breakdown"><summary>Source breakdown <span aria-hidden="true">+</span></summary><div id="source-mini-bars"></div></details>
+  </aside>
+</div>
+    <div id="document-upload-info" popover role="dialog" aria-labelledby="document-upload-info-title">
+      <h2 id="document-upload-info-title" class="text-lg font-bold">Create your sprint</h2>
+      <p>Upload notes or existing questions and choose up to 3 interests. They are sent together to create up to 50 new questions. Interests personalise Theory questions; Practical questions apply the uploaded material. Set the count and question type on your study desk. Mixed uses 60% practical and 40% theory.</p>
+      <p>Add up to 10 sources in total: files and public website links. Files can be PDF, Word (.docx), TXT, Markdown, or JSON, up to 8 MB combined. Word body text is read; images are not extracted. Save older .doc files as .docx or PDF first.</p>
+      <p>Files and links stay in this browser session until you request questions. They are then read and sent securely to Google AI through the study service. Websites must be publicly readable over HTTPS; sign-in pages and pages that require JavaScript may need to be saved as PDF instead.</p>
+      <button type="button" popovertarget="document-upload-info" popovertargetaction="hide" class="mt-4 min-h-11 rounded-xl bg-sky-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-sky-300">Got it</button>
+    </div>
+
+<footer class="studio-footer"><span>Studioza · A space to study. <a href="./privacy.html">Privacy &amp; uploads</a></span><button type="button" data-onclick="h39">Clear review history</button></footer>
+
+  
+</body>
+</html>

@@ -4,7 +4,8 @@
   "main": "worker.js",
   "compatibility_date": "2026-10-26",
   "vars": {
-    "ALLOWED_ORIGIN": "https://cassidyjames011-coder.github.io",
+    "ALLOWED_ORIGIN": "https://studioza.cassidyjames011.workers.dev",
+    "APP_ENV": "production",
     "APPROVED_MODELS": "gemini-3.5-flash-lite"
   },
   "durable_objects": {
@@ -21,6 +22,7 @@
       "new_sqlite_classes": ["DailyQuota"]
     }
   ],
+  "observability":{"enabled":true,"head_sampling_rate":1,"logs":{"enabled":true,"invocation_logs":false}},
   "ratelimits": [
     {
       "name": "RATE_LIMITER",
