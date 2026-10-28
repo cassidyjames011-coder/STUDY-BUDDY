@@ -333,8 +333,8 @@
         <p id="source-page-indicator" class="source-page-indicator" role="status" aria-live="polite">No sources added</p>
       </div>
       <input id="document-upload-input" type="file" accept=".pdf,.docx,.txt,.md,.json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,application/json" multiple class="sr-only" tabindex="-1" aria-label="Choose notes or questions" onchange="handleStudyFiles(this.files)">
-      <button type="button" class="desk-upload" onclick="openSourcePicker()"><i data-lucide="upload" aria-hidden="true"></i>Upload source materials</button>
-      <p class="desk-file-types">PDF, Word, TXT, Markdown or JSON · 8 MB total</p>
+      <button type="button" id="btn-upload-sources" class="desk-upload" onclick="openSourcePicker()"><i data-lucide="upload" aria-hidden="true"></i><span id="upload-sources-label">Upload source materials</span></button>
+      <p class="desk-file-types">Add files together or one at a time · Up to 10 sources, 8 MB total<br>PDF, Word, TXT, Markdown or JSON</p>
       <ul id="study-file-list" hidden></ul>
       <details class="desk-website"><summary>Add a website <span aria-hidden="true">+</span></summary>
         <form onsubmit="event.preventDefault();addStudyWebsite()"><label for="study-website-url" class="sr-only">Website URL</label><div class="website-input-row"><input id="study-website-url" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com/article"><button id="btn-add-website" type="submit">Add</button></div></form>
@@ -1437,6 +1437,10 @@
     }
     function renderStudyFiles() {
       const busy=documentGenerationInProgress||studyFileReadInProgress;
+      const uploadButton=document.getElementById('btn-upload-sources');
+      if(uploadButton)uploadButton.disabled=busy;
+      const uploadLabel=document.getElementById('upload-sources-label');
+      if(uploadLabel)uploadLabel.textContent=selectedStudyFiles.length+selectedStudyWebsites.length?'Add more source materials':'Upload source materials';
       const button=document.getElementById('btn-generate-document-sprint');
       if(button)button.disabled=!(selectedStudyFiles.length+selectedStudyWebsites.length)||busy;
       ['study-website-url','btn-add-website','document-upload-input'].forEach(id=>{const element=document.getElementById(id);if(element)element.disabled=busy;});
@@ -1952,10 +1956,13 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
     }
     function openSourcePicker(){
       if(documentGenerationInProgress||studyFileReadInProgress)return;
-      if(window.matchMedia('(max-width:760px)').matches)toggleStudyDesk(true);
-      document.getElementById('document-upload-input').click();
+      // Keep the native picker in the tap gesture and do not schedule drawer focus over it.
+      if(window.matchMedia('(max-width:760px)').matches&&!document.body.classList.contains('desk-is-open'))toggleStudyDesk(true,false);
+      const picker=document.getElementById('document-upload-input');
+      picker.value='';
+      picker.click();
     }
-    function toggleStudyDesk(show){
+    function toggleStudyDesk(show,focusDesk=true){
       const mobile=window.matchMedia('(max-width:760px)').matches;
       const open=!!show&&mobile,desk=document.getElementById('study-setup');
       if(open&&!document.body.classList.contains('desk-is-open'))deskReturnFocus=document.activeElement;
@@ -1966,7 +1973,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       ['study-session','telemetry-dashboard'].forEach(id=>{document.getElementById(id).inert=open;});
       document.querySelector('.studio-header').inert=open;
       document.querySelector('.studio-footer').inert=open;
-      if(open){desk.setAttribute('role','dialog');desk.setAttribute('aria-modal','true');requestAnimationFrame(()=>desk.querySelector('.desk-close').focus());}
+      if(open){desk.setAttribute('role','dialog');desk.setAttribute('aria-modal','true');if(focusDesk)requestAnimationFrame(()=>{if(document.body.classList.contains('desk-is-open'))desk.querySelector('.desk-close').focus();});}
       else{desk.removeAttribute('role');desk.removeAttribute('aria-modal');if(deskReturnFocus?.isConnected){deskReturnFocus.focus({preventScroll:true});deskReturnFocus=null;}}
     }
     function renderStudioDeskContext(){
