@@ -1,0 +1,11 @@
+# Adaptive question length — implementation and verification
+
+Changes: index.html, worker.js, question-length.js, question-length.test.cjs.
+
+Length now describes required work. The supplied nine-entry matrix controls the existing Worker generation pipeline. Theory scales from focused knowledge to explanation/comparison to analysis/evaluation. Practical scales from direct application to connected steps to extended problem solving. Mixed integrates concept and application within each MCQ; it retains the legacy practical questionType for compatibility and adds questionMode=mixed.
+
+The browser sends validated length, saves the preference, shows mode-specific guidance and approximate time, locks length during generation, and includes length in the retry fingerprint. Existing questions and four-option marking remain unchanged. The Worker validates mode and length, supplies authoritative instructions, requires matching metadata/task counts, reduces long-question batch sizes, and permits at most two consecutive correction attempts before a controlled error. Old clients without length use Medium.
+
+Verification: node --test question-length.test.cjs: 12 passed. Nine tests exercise actual batch construction and acceptance with simulated Google responses. Remaining tests cover invalid values and parity of frontend/backend matrices, two bounded corrections, inline JavaScript parsing and frontend integration. node --check worker.js and question-length.js passed.
+
+Limits: no live AI samples, browser/manual mobile checks, source-grounding rubric evaluation, or 270-question subject evaluation performed. Structural metadata checks do not prove semantic workload, factual grounding or numerical accuracy. The AI is instructed to verify these, but independent quality evaluation remains necessary. Prototype-based malicious selection values are rejected. No security/authentication settings changed. No production deployment performed. Deploy Worker and frontend together after authorisation; frontend should not precede Worker because metadata and mixed semantics change together. This repository has no deployment automation or bundled browser/test environment. question-length.js contains public UI configuration only; authoritative generation instructions remain in worker.js.

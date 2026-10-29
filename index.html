@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Studioza — Your study desk</title>
   <script src="./studioza-theme.js"></script>
+  <script src="./question-length.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -358,11 +359,12 @@
         <input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" hidden>
       </div>
       <div class="desk-section-label"><label for="question-length">Question length</label></div>
-      <select id="question-length" aria-label="Question length" style="width:100%;background:#3a2547;color:#fffcf7;border-color:#786283" onchange="draftSettingsChanged()">
+      <select id="question-length" aria-label="Question length" style="width:100%;background:#3a2547;color:#fffcf7;border-color:#786283" aria-describedby="question-length-guidance" onchange="saveQuestionLength();draftSettingsChanged()">
         <option value="short">Short</option>
         <option value="medium" selected>Medium</option>
         <option value="long">Long</option>
       </select>
+      <p id="question-length-guidance" class="muted" style="color:#d7c9df;font-size:11px;margin-top:8px" aria-live="polite"></p>
       <div class="sprint-settings">
         <label for="custom-test-minutes">Time <span>(minutes)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" oninput="draftSettingsChanged()" inputmode="numeric"></label>
         <label for="custom-test-questions">Questions <span>(max 50)</span><input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" oninput="draftSettingsChanged()" inputmode="numeric"></label>
@@ -1010,7 +1012,7 @@
       if (icon) icon.setAttribute('data-lucide', isTimerPaused || isSprintFinished ? 'play' : 'pause');
       if (status) status.textContent = !activeQuestions.length ? 'Add material to begin' : isSprintFinished ? 'Sprint complete' : !hasSprintStarted ? 'Ready when you are' : isTimerPaused ? 'Paused · Progress saved' : 'Your sprint is in progress';
       if (window.lucide) lucide.createIcons();
-      ['custom-test-minutes','custom-test-questions','sprint-mode'].forEach(id=>{document.getElementById(id).disabled=!isTimerPaused||documentGenerationInProgress;});
+      ['custom-test-minutes','custom-test-questions','sprint-mode','question-length'].forEach(id=>{document.getElementById(id).disabled=!isTimerPaused||documentGenerationInProgress;});
       syncStudioMode();
       persistSprintState();
     }
@@ -1469,14 +1471,16 @@
       if (!(selectedStudyFiles.length+selectedStudyWebsites.length) || documentGenerationInProgress || studyFileReadInProgress) return;
       let settings;
       try{settings=readSprintSettings();}catch(error){alert(error.message);return;}
+      const questionLength=document.getElementById('question-length').value;
+      try{getQuestionConfig(['theory','mixed','practical'][settings.mode],questionLength);}catch(error){alert(error.message);return;}
       const target=settings.questions;
-      const targetPractical=settings.mode===0?0:settings.mode===2?target:Math.round(target*0.6);
+      const targetPractical=settings.mode===0?0:settings.mode===2?target:target;
       const targetTheory=target-targetPractical;
       const button = document.getElementById('btn-generate-document-sprint');
       const status = document.getElementById('document-gen-status');
       const generationInterests = getBrainHooks();
       if(!generationInterests.length&&!confirm('No interests selected. Create questions without personalisation?'))return;
-      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), websites:selectedStudyWebsites.slice(), interests:generationInterests, count:target, mode:settings.mode });
+      const fingerprint = JSON.stringify({ files:selectedStudyFiles.map(file => [file.name,file.size,file.lastModified]), websites:selectedStudyWebsites.slice(), interests:generationInterests, count:target, mode:settings.mode, length:questionLength });
       if (pendingDocumentFingerprint !== fingerprint) {
         pendingDocumentQuestions = [];
         pendingDocumentFingerprint = fingerprint;
@@ -1515,19 +1519,13 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', items: { type: 'STRING' } },
           correct: { type: 'INTEGER' }, explanation: { type: 'STRING' }, analogyTheme: { type: 'STRING', nullable: true }
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
-        const questionLength = document.getElementById('question-length').value;
-        const lengthInstruction = {
-          short: 'Use short questions: direct prompts of 10–25 words with one focused task.',
-          medium: 'Use medium questions: prompts of 30–60 words with context and one or two reasoning steps.',
-          long: 'Use long questions: detailed prompts of 70–120 words with a substantial scenario and multiple reasoning steps.'
-        }[questionLength];
         const requestBody = {
           systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
-          contents: [{ role: 'user', parts: [...parts, {text:'QUESTION LENGTH REQUIREMENT: ' + lengthInstruction + ' Apply this to every generated question while preserving source accuracy and the selected theory/practical mix.'}, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text })), ...(parts.length||sourceNotes.length?[]:[{text:'Create questions from the website sources supplied with this request.'}])] }],
+          contents: [{ role: 'user', parts: [...parts, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text })), ...(parts.length||sourceNotes.length?[]:[{text:'Create questions from the website sources supplied with this request.'}])] }],
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentWebsites:generationWebsites, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentLength:questionLength, documentWebsites:generationWebsites, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
           onDocumentBatch:batch => {
             const seen = new Set(pendingDocumentQuestions.map(documentQuestionKey));
             for (const question of batch) {
@@ -1799,7 +1797,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode, documentLength:callOptions.documentLength }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
@@ -1939,7 +1937,19 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       if(progress)progress.textContent='Sprint '+String(activeQuestions.length?currentQIndex+1:0).padStart(2,'0')+' / '+String(activeQuestions.length).padStart(2,'0');
       const timer=document.getElementById('header-time-remaining');if(timer)timer.textContent=formatMinSec(remainingSprintSeconds);
     }
+    function saveQuestionLength(){
+      try{localStorage.setItem('studioza_question_length_v1',document.getElementById('question-length').value);}catch(error){}
+      updateQuestionLengthGuidance();
+    }
+    function updateQuestionLengthGuidance(){
+      const mode=['theory','mixed','practical'][Number(document.getElementById('sprint-mode').value)];
+      const length=document.getElementById('question-length').value;
+      const labels={theory:{short:'Quick definitions',medium:'Developed explanations',long:'Detailed analysis'},practical:{short:'Simple applications',medium:'Multi-step problems',long:'Extended problems'},mixed:{short:'Concept + application',medium:'Explain + apply',long:'Integrated case studies'}};
+      const config=getQuestionConfig(mode,length);
+      document.getElementById('question-length-guidance').textContent=labels[mode][length]+' · approximately '+config.timeMinutes.join('–')+' min per question';
+    }
     function syncStudioMode(){
+      updateQuestionLengthGuidance();
       const input=document.getElementById('sprint-mode');
       document.querySelectorAll('#question-mode-control button').forEach(button=>{
         const selected=Number(button.dataset.mode)===Number(input.value);
@@ -2019,6 +2029,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       isShuffled=true;buildSprintPool();renderAll();document.getElementById('course-picker').hidePopover();
     }
     function initStudioza(){
+      try{const saved=localStorage.getItem('studioza_question_length_v1');if(['short','medium','long'].includes(saved))document.getElementById('question-length').value=saved;}catch(error){}
       try{studioCourseTitle=localStorage.getItem('studioza_course_title_v1')||'Your practice';}catch(error){}
       document.getElementById('course-title-input').value=studioCourseTitle;
       renderStudioDeskContext();syncStudioMode();toggleStudyDesk(false);
