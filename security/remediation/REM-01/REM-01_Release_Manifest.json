@@ -1,0 +1,20 @@
+{
+  "verification": {
+    "production_deployment": "NOT_APPROVED",
+    "local_tests": "32 passed",
+    "staging_tests": "NOT_RUN",
+    "independent_review": "PENDING"
+  },
+  "worker": {
+    "deployed_version_id": null
+  },
+  "frontend": {
+    "deployment_id": null
+  },
+  "release_status": "incomplete_candidate",
+  "remediation_id": "REM-01",
+  "source": {
+    "repository": "cassidyjames011-coder/Studioza",
+    "commit_sha": null
+  }
+}

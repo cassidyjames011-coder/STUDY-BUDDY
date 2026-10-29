@@ -5,9 +5,21 @@ const MODEL="gemini-3.5-flash-lite", MAX_BODY_BYTES=12000000, MAX_SOURCE_BYTES=8
 const DOCUMENT_SPRINT_VERSION="secure-study-v1";
 const APP_CSP="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests";
 const BASE_HEADERS={"X-Content-Type-Options":"nosniff","X-Frame-Options":"DENY","Referrer-Policy":"no-referrer","Permissions-Policy":"camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()","Strict-Transport-Security":"max-age=31536000","Cache-Control":"no-store"};
-class PublicError extends Error{constructor(code,message,status=400){super(message);this.code=code;this.status=status;}}
+class PublicError extends Error{constructor(code,message,status=400,retryAfter=null){super(message);this.code=code;this.status=status;this.retryAfter=retryAfter;}}
 function headersFor(origin,requestId,app=false){const h=new Headers({...BASE_HEADERS,"Content-Security-Policy":app?APP_CSP:"default-src 'none'; frame-ancestors 'none'; base-uri 'none'","X-Request-ID":requestId,"X-Studioza-Release":RELEASE_ID,"X-Study-Sprint-Version":DOCUMENT_SPRINT_VERSION,"Vary":"Origin"});if(origin){h.set('Access-Control-Allow-Origin',origin);h.set('Access-Control-Expose-Headers','X-Request-ID, X-Studioza-Release, X-Study-Sprint-Version');}return h;}
-function respond(data,status,origin,requestId){const headers=headersFor(origin,requestId);headers.set('Content-Type','application/json; charset=utf-8');return new Response(JSON.stringify(data),{status,headers});}
+function respond(data,status,origin,requestId,retryAfter=null){const headers=headersFor(origin,requestId);headers.set('Content-Type','application/json; charset=utf-8');if(status===429&&Number.isInteger(retryAfter)&&retryAfter>0)headers.set('Retry-After',String(retryAfter));return new Response(JSON.stringify(data),{status,headers});}
+async function serveAsset(request,env,requestId){
+ if(!env.ASSETS)throw new PublicError('ASSET_UNAVAILABLE','The study service is temporarily unavailable.',503);
+ const asset=await env.ASSETS.fetch(request),headers=headersFor(null,requestId,true);
+ for(const [key,value]of asset.headers)if(['content-type','etag','last-modified','content-language'].includes(key))headers.set(key,value);
+ if([301,302,303,307,308].includes(asset.status)){
+  const location=asset.headers.get('Location');let destination;
+  try{if(!location)throw Error();destination=new URL(location,request.url);if(destination.origin!==new URL(request.url).origin)throw Error();}
+  catch{await asset.body?.cancel().catch(()=>{});throw new PublicError('ASSET_REDIRECT','The study page could not be opened. Please retry later.',502);}
+  headers.set('Location',destination.pathname+destination.search+destination.hash);
+ }
+ return new Response(request.method==='HEAD'?null:asset.body,{status:asset.status,headers});
+}
 function logEvent(event,requestId,status,extra={}){console.log(JSON.stringify({event,requestId,status,release:RELEASE_ID,...extra}));}
 async function boundedText(response,limit){
  if(Number(response.headers.get('Content-Length')||0)>limit)throw new PublicError('BODY_LIMIT','The request or response is too large.',413);
@@ -202,9 +214,9 @@ export class DailyQuota extends DurableObject{
   return this.ctx.storage.transactionSync(()=>{
    this.ctx.storage.sql.exec('DELETE FROM ai_attempts WHERE created_at <= ?',now-60000);
    const recent=this.ctx.storage.sql.exec('SELECT COUNT(*) AS count FROM ai_attempts').toArray()[0]?.count||0;
-   if(recent>=burst)return {allowed:false,reason:'burst',remaining:0};
+   if(recent>=burst){const oldest=this.ctx.storage.sql.exec('SELECT MIN(created_at) AS oldest FROM ai_attempts').toArray()[0].oldest;return {allowed:false,reason:'burst',remaining:0,retryAfter:Math.max(1,Math.ceil((oldest+60000-now)/1000))};}
    const count=this.ctx.storage.sql.exec('SELECT count FROM daily_quota WHERE day = ?',day).toArray()[0]?.count||0;
-   if(count>=daily)return {allowed:false,reason:'daily',remaining:0};
+   if(count>=daily)return {allowed:false,reason:'daily',remaining:0,retryAfter:Math.max(1,Math.ceil((Date.parse(day+'T00:00:00Z')+86400000-now)/1000))};
    this.ctx.storage.sql.exec('INSERT INTO ai_attempts (id,created_at) VALUES (?,?)',crypto.randomUUID(),now);
    this.ctx.storage.sql.exec('INSERT INTO daily_quota (day,count) VALUES (?,1) ON CONFLICT(day) DO UPDATE SET count = count + 1',day);
    this.ctx.storage.sql.exec('DELETE FROM daily_quota WHERE day < ?',day);
@@ -233,8 +245,7 @@ async function handle(request,env,ctx,requestId){
  if(url.pathname!=='/api/generate'){
   if(!['GET','HEAD'].includes(request.method))return respond({error:{code:'NOT_FOUND',message:'Not found.'},requestId},404,null,requestId);
   if(!env.ASSETS)return respond({error:{code:'NOT_FOUND',message:'Not found.'},requestId},404,null,requestId);
-  const asset=await env.ASSETS.fetch(request),headers=headersFor(null,requestId,true);for(const [key,value]of asset.headers)if(['content-type','etag','last-modified'].includes(key))headers.set(key,value);
-  return new Response(asset.body,{status:asset.status,headers});
+  return serveAsset(request,env,requestId);
  }
  const origin=request.headers.get('Origin');
  if(!env.ALLOWED_ORIGIN||origin!==env.ALLOWED_ORIGIN)return respond({error:{code:'ORIGIN',message:'Origin not allowed.'},requestId},403,null,requestId);
@@ -245,17 +256,17 @@ async function handle(request,env,ctx,requestId){
  let payload;try{payload=JSON.parse(await boundedText(request,MAX_BODY_BYTES));}catch(error){if(error instanceof PublicError)throw error;throw new PublicError('JSON','Invalid JSON.');}
  const prepared=validatePayload(payload);
  let rate;try{rate=await env.RATE_LIMITER.limit({key:'studioza-generation'});}catch{throw new PublicError('RATE_UNAVAILABLE','The study service is temporarily unavailable.',503);}
- if(!rate.success)throw new PublicError('RATE','Too many requests. Please wait a minute.',429);
+ if(!rate.success)throw new PublicError('RATE','Too many requests. Please wait a minute.',429,60);
  let verification;try{const response=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:payload.turnstileToken}),signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();verification=JSON.parse(await boundedText(response,16000));}catch{throw new PublicError('SECURITY_UNAVAILABLE','Security verification is temporarily unavailable. Please retry later.',502);}
  const host=new URL(env.ALLOWED_ORIGIN).hostname;
  const testWidget=env.APP_ENV==='staging'&&env.MOCK_AI==='true'&&env.TURNSTILE_SECRET_KEY==='1x0000000000000000000000000000000AA';
  // The public dummy service does not bind hostname/action; only mock-only staging may use it.
- if(!verification.success||(!testWidget&&(verification.hostname!==host||verification.action!=='generate')))throw new PublicError('SECURITY_FAILED','Security verification failed. Complete a fresh check and retry.',403);
+ if(verification.success!==true||(!testWidget&&(verification.hostname!==host||verification.action!=='generate')))throw new PublicError('SECURITY_FAILED','Security verification failed. Complete a fresh check and retry.',403);
  const quota=env.DAILY_QUOTA.get(env.DAILY_QUOTA.idFromName(env.APP_ENV==='staging'?'staging-'+RELEASE_ID:'global-daily-quota'));
  let reservation;try{reservation=await quota.reserve();}catch{throw new PublicError('QUOTA_UNAVAILABLE','The study service is temporarily unavailable.',503);}
- if(!reservation.allowed)throw new PublicError('QUOTA',reservation.reason==='burst'?'Too many requests. Please wait a minute.':'The daily AI request limit has been reached. Try again tomorrow (UTC).',429);
+ if(!reservation.allowed)throw new PublicError('QUOTA',reservation.reason==='burst'?'Too many requests. Please wait a minute.':'The daily AI request limit has been reached. Try again tomorrow (UTC).',429,Number.isInteger(reservation.retryAfter)&&reservation.retryAfter>0?reservation.retryAfter:60);
  logEvent('generation_reserved',requestId,200,{upstream:!(env.APP_ENV==='staging'&&env.MOCK_AI==='true')});
  return generationStream(payload,prepared,env,quota,reservation,origin,ctx,requestId);
 }
-export {headersFor};
-export default{async fetch(request,env,ctx){const requestId=crypto.randomUUID();try{const response=await handle(request,env,ctx,requestId);if(response.status>=400)logEvent('request_rejected',requestId,response.status,{upstream:false});return response;}catch(error){const known=error instanceof PublicError,status=known?error.status:500;logEvent('request_rejected',requestId,status,{reason:known?error.code:'internal',upstream:false});return respond({error:{code:known?error.code:'INTERNAL',message:known?error.message:'The study service is temporarily unavailable.'},requestId},status,request.headers.get('Origin')===env.ALLOWED_ORIGIN?env.ALLOWED_ORIGIN:null,requestId);}}};
+export {headersFor,serveAsset};
+export default{async fetch(request,env,ctx){const requestId=crypto.randomUUID();try{const response=await handle(request,env,ctx,requestId);if(response.status>=400)logEvent('request_rejected',requestId,response.status,{upstream:false});return response;}catch(error){const known=error instanceof PublicError,status=known?error.status:500;logEvent('request_rejected',requestId,status,{reason:known?error.code:'internal',upstream:false});return respond({error:{code:known?error.code:'INTERNAL',message:known?error.message:'The study service is temporarily unavailable.'},requestId},status,request.headers.get('Origin')===env.ALLOWED_ORIGIN?env.ALLOWED_ORIGIN:null,requestId,error.retryAfter);}}};

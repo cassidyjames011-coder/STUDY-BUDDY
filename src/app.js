@@ -479,8 +479,8 @@
       syncSprintSettingInputs(); buildSprintPool(); renderAll();
     }
 
-    function resetCurrentSprint() {
-  if((hasSprintStarted||Object.keys(userAnswers).length)&&!confirm('Restart this sprint? Your current answers and timer will reset.'))return;
+    async function resetCurrentSprint() {
+  if((hasSprintStarted||Object.keys(userAnswers).length)&&!await confirmStudyAction('Restart this sprint?', 'Your current answers and timer will reset.', 'Restart sprint'))return;
   buildSprintPool();renderAll();
 }
 
@@ -696,7 +696,7 @@
       persistSprintState();
     }
 
-    function togglePauseTimer() {
+    async function togglePauseTimer() {
       if(documentGenerationInProgress)return;
       if(!isTimerPaused){isTimerPaused=true;syncTimerControls();return;}
       let settings;
@@ -706,7 +706,7 @@
         const scope=['analogy','all','scenario'][settings.mode];
         const pool=QUESTION_BANK.filter(q=>(!sprintSourceIds||sprintSourceIds.includes(q.id))&&(scope==='all'||(scope==='analogy'?isTheoryQuestion(q):!isTheoryQuestion(q))));
         if(!pool.length){alert('No questions of this type are available. Choose another type or use AI Generator.');return;}
-        if(Object.keys(userAnswers).length&&!confirm('Start a new sprint with these settings? This resets the current sprint answers; your question bank stays saved.'))return;
+        if(Object.keys(userAnswers).length&&!await confirmStudyAction('Start a new sprint?', 'This resets the current sprint answers; your question bank stays saved.', 'Start new sprint'))return;
         activeSprintMinutes=settings.minutes;activeSprintSize=settings.questions;activeLectureFilter=scope;
         isCustomSprint=true;isShuffled=true;isSingleCardView=true;
         buildSprintPool();renderAll();
@@ -1809,7 +1809,11 @@ function validateStudyBackup(backup){
  const raw=backup.saved['exam_sprint_questions_v2'];if(typeof raw!=='string'||raw.length>2000000)throw Error('The backup question bank is missing or too large.');
  const bank=JSON.parse(raw);if(!Array.isArray(bank)||bank.length>5000||!bank.every(q=>q&&typeof q.id==='string'&&/^[A-Za-z0-9_-]{1,160}$/.test(q.id)&&typeof q.sourceDoc==='string'&&validDocumentQuestion(q,[q.sourceDoc]))||new Set(bank.map(q=>q.id)).size!==bank.length)throw Error('The backup contains invalid study questions.');
  const values={'exam_sprint_questions_v2':JSON.stringify(bank),'studioza_saved_at_v1':String(Date.now())};
- for(const key of ['exam_sprint_progress_v2','exam_sprint_weak_ids_v2','exam_sprint_brain_hooks_v1'])if(typeof backup.saved[key]==='string'&&backup.saved[key].length<=2000000){JSON.parse(backup.saved[key]);values[key]=backup.saved[key];}
+ const ids=new Set(bank.map(q=>q.id));
+ for(const key of ['exam_sprint_progress_v2','exam_sprint_weak_ids_v2','exam_sprint_brain_hooks_v1','exam_sprint_reskins_v2'])if(backup.saved[key]!==undefined){if(typeof backup.saved[key]!=='string'||backup.saved[key].length>2000000)throw Error('The backup contains invalid study data.');JSON.parse(backup.saved[key]);values[key]=backup.saved[key];}
+ if(values.exam_sprint_weak_ids_v2){const weak=JSON.parse(values.exam_sprint_weak_ids_v2);if(!weak||typeof weak!=='object'||Array.isArray(weak)||Object.keys(weak).length>bank.length||!Object.entries(weak).every(([id,value])=>ids.has(id)&&value===true))throw Error('The backup review history is invalid.');}
+ if(values.exam_sprint_progress_v2){const progress=JSON.parse(values.exam_sprint_progress_v2);if(!progress||Array.isArray(progress)||progress.version!==1||!Array.isArray(progress.questionIds)||progress.questionIds.length>50||new Set(progress.questionIds).size!==progress.questionIds.length||!progress.questionIds.every(id=>typeof id==='string'&&ids.has(id)))throw Error('The backup sprint progress is invalid.');}
+ if(values.exam_sprint_reskins_v2){const reskins=JSON.parse(values.exam_sprint_reskins_v2);if(!reskins||typeof reskins!=='object'||Array.isArray(reskins)||!Object.entries(reskins).every(([id,change])=>ids.has(id)&&change&&typeof change==='object'&&validDocumentQuestion({...bank.find(q=>q.id===id),...change},[bank.find(q=>q.id===id).sourceDoc])&&(change.analogyTheme===undefined||change.analogyTheme===null||typeof change.analogyTheme==='string')))throw Error('The backup personalisation is invalid.');}
  const hooks=JSON.parse(values.exam_sprint_brain_hooks_v1||'[]');if(!Array.isArray(hooks)||hooks.length>3||!hooks.every(x=>typeof x==='string'&&x.length<=40))throw Error('The backup interests are invalid.');
  if(typeof backup.saved.studioza_course_title_v1==='string'&&backup.saved.studioza_course_title_v1.length<=60)values.studioza_course_title_v1=backup.saved.studioza_course_title_v1;
  if(['true','false'].includes(backup.saved.dcu_dyslexia_v2))values.dcu_dyslexia_v2=backup.saved.dcu_dyslexia_v2;

@@ -21,6 +21,8 @@
 
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="./assets/studioza.css">
+<link rel="stylesheet" href="./assets/studioza-theme.css">
+<script src="./assets/studioza-theme.js" defer></script>
 <script src="./assets/lucide.min.js" defer></script>
 <script src="./assets/app.js" defer></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onStudyTurnstileReady" data-onerror="h0" defer></script>
@@ -55,6 +57,7 @@
     <button data-onclick="h5" id="btn-pause-timer" class="header-start" aria-label="Start"><i id="icon-pause-timer" data-lucide="play" aria-hidden="true"></i><span id="label-pause-timer">Start</span></button>
     <button type="button" id="btn-open-study-desk" class="desk-toggle" aria-label="Open study desk" data-onclick="h6" aria-controls="study-setup" aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i><span>Study desk</span></button>
     <details id="options-menu" class="preferences">
+      <button type="button" id="btn-theme-toggle" class="theme-toggle" aria-pressed="false"><span id="theme-toggle-icon" aria-hidden="true">☾</span><span id="label-theme-toggle">Dark mode</span></button>
       <summary aria-label="Study menu" title="Study menu"><i data-lucide="menu" aria-hidden="true"></i></summary>
             <div class="preferences-panel">
         <div class="options-popout absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-xl bg-slate-900 border border-slate-700 p-3 shadow-2xl space-y-2">

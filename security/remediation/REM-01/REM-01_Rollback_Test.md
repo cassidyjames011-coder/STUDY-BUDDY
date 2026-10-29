@@ -1,0 +1,1 @@
+# Rollback — NOT RUN. Capture full previous staging version, source and binding inventory before deployment. Restore only isolated staging, then verify version, hashes, routes and mock-only quota. No production drill is authorised. Prior production version prefix 4ca757bb is historical, not certified known-good.

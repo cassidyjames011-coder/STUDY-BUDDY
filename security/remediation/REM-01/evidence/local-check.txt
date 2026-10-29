@@ -1,0 +1,49 @@
+$ node scripts/build.mjs && node --test tests/*.test.mjs
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+Rebuilding...
+
+Done in 906ms.
+Built self-hosted assets; release 6fe7940f7d33de58a150
+✔ SEC-02: unknown routes and methods never invoke security or AI (67.8538ms)
+✔ SEC-02: reject generic proxy, caller tools/system fields, unknown source fields and invalid settings (31.4821ms)
+✔ Server-side token enforcement/binding: no quota or AI on missing/failed/wrong action/host token (13.936ms)
+✔ CORS: exact origin only; no wildcard and all responses no-store/nosniff/frame-deny (4.2472ms)
+✔ Malformed JSON and wrong content type are safe, bounded 4xx failures (3.9316ms)
+✔ Streaming request body limit rejects >12,000,000 bytes (40.2991ms)
+✔ SEC-08: empty/renamed/corrupt PDFs rejected; ordinary PDF fixture accepted (7.1363ms)
+✔ 10-document and 8MiB source boundaries stop before provider (97.0821ms)
+✔ Website fetching is disabled at API schema, not merely hidden in UI (3.3877ms)
+✔ SEC-06: synthetic upstream diagnostic never leaves Worker in stream or log (9.2174ms)
+✔ Malformed/truncated/duplicate-answer model output never emits result (23.8528ms)
+✔ Valid model output is source-bound and uses server-owned instructions/config (5.8969ms)
+✔ Security service/rate/quota failures fail closed before AI (12.9083ms)
+✔ Production cannot enable dummy secret or mock AI through config accident (10.3943ms)
+✔ Real SQLite quota transaction enforces strict rolling burst and 100/day atomically (25.6326ms)
+✔ Staging quota has independent 3-attempt limit (4.2782ms)
+✔ SEC-03/04: output has no inline executable scripts/handlers or executable CDN dependency (2.532ms)
+✔ Renderer escapes hostile HTML-like data including source/id/code/options (9.1541ms)
+✔ All five file types prepare the new documents contract; failure preserves bank (23.5678ms)
+✔ Complete reset removes only Studioza keys and expiry removes stale study data (2.6257ms)
+✔ Cancelling the in-page confirmation preserves saved study data (2.9375ms)
+✔ Automatic previews use independent namespaces and mock-only public test configuration (1.0391ms)
+✔ Local backup validation accepts study data but never restores credentials or unrelated keys (5.9845ms)
+✔ Privacy asset canonical redirects preserve a safe same-origin Location (3.3811ms)
+✔ Quota rejection gives retry guidance without disclosing submitted source (3.4012ms)
+✔ Backup validation rejects structurally invalid weak-history and progress before writing (10.5681ms)
+✔ Asset redirect validation rejects external or missing targets and HEAD carries no body (11.1209ms)
+✔ Frontend binding failures are safe 503 errors with response protections and no exception details (6.395ms)
+✔ Strict Siteverify success and schema boundary cases fail closed (31.9609ms)
+✔ Quota schema upgrade retains the existing production daily counter (3.0498ms)
+✔ Valid backup restores answers, timer, interests and validated personalisation (3.1074ms)
+✔ Cancelling restart or changed-settings confirmation preserves existing answers (8.2032ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 822.7336
