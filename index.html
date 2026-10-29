@@ -357,6 +357,12 @@
         <button type="button" role="radio" data-mode="2" aria-checked="false" tabindex="-1" onclick="setSprintMode(2)" onkeydown="handleModeKey(event,2)">Practical</button>
         <input id="sprint-mode" type="range" min="0" max="2" step="1" value="1" aria-label="Question type" hidden>
       </div>
+      <div class="desk-section-label"><label for="question-length">Question length</label></div>
+      <select id="question-length" aria-label="Question length" style="width:100%;background:#3a2547;color:#fffcf7;border-color:#786283" onchange="draftSettingsChanged()">
+        <option value="short">Short</option>
+        <option value="medium" selected>Medium</option>
+        <option value="long">Long</option>
+      </select>
       <div class="sprint-settings">
         <label for="custom-test-minutes">Time <span>(minutes)</span><input id="custom-test-minutes" type="number" min="1" max="90" step="1" value="30" oninput="draftSettingsChanged()" inputmode="numeric"></label>
         <label for="custom-test-questions">Questions <span>(max 50)</span><input id="custom-test-questions" type="number" min="1" max="50" step="1" value="50" oninput="draftSettingsChanged()" inputmode="numeric"></label>
@@ -1509,9 +1515,15 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           code: { type: 'STRING', nullable: true }, options: { type: 'ARRAY', items: { type: 'STRING' } },
           correct: { type: 'INTEGER' }, explanation: { type: 'STRING' }, analogyTheme: { type: 'STRING', nullable: true }
         }, required: ['questionType','sourceDoc','topic','prompt','options','correct','explanation'] } };
+        const questionLength = document.getElementById('question-length').value;
+        const lengthInstruction = {
+          short: 'Use short questions: direct prompts of 10–25 words with one focused task.',
+          medium: 'Use medium questions: prompts of 30–60 words with context and one or two reasoning steps.',
+          long: 'Use long questions: detailed prompts of 70–120 words with a substantial scenario and multiple reasoning steps.'
+        }[questionLength];
         const requestBody = {
           systemInstruction: { parts: [{ text: 'You create careful, accurate university study questions. Follow the source-grounding and exact-count requirements. Never invent unsupported course-specific facts.' }] },
-          contents: [{ role: 'user', parts: [...parts, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text })), ...(parts.length||sourceNotes.length?[]:[{text:'Create questions from the website sources supplied with this request.'}])] }],
+          contents: [{ role: 'user', parts: [...parts, {text:'QUESTION LENGTH REQUIREMENT: ' + lengthInstruction + ' Apply this to every generated question while preserving source accuracy and the selected theory/practical mix.'}, ...sourceNotes.map(note => ({ text:'DOCUMENT: ' + note.name + '\n' + note.text })), ...(parts.length||sourceNotes.length?[]:[{text:'Create questions from the website sources supplied with this request.'}])] }],
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
