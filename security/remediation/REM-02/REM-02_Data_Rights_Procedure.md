@@ -1,0 +1,5 @@
+# REM-02 — Data Rights Procedure
+
+Review date: 29 October 2026. Source: a2c626ac41ba334933ef31043c2f8c8513f39865 (GitHub main). Candidate only; not deployed. Independent reviewer: Pending.
+
+Owner must establish a private inbox and assign a rights-request owner before launch. Log receipt/minimal request reference securely; verify identity proportionately without asking for full identity documents by default. Assess applicable rights and normally respond within one month; any lawful extension (up to two further months) requires timely explanation. Search only app-controlled records and authorised provider tools; browser-only records may require user-side export/clearing. Global quota has no user mapping; IP/security and Google records cannot be reliably correlated from current app records. Ask providers through contractual support routes; do not invent a deletion API or collect additional identifiers solely to promise deletion. Document actions, limitations, exceptions and response; minimise and set retention for the request log. Provider deletion needs evidence. Local clear-all does not erase provider logs or downloaded backups.

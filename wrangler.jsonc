@@ -5,7 +5,8 @@
   "compatibility_date": "2026-10-26",
   "vars": {
     "ALLOWED_ORIGIN": "https://cassidyjames011-coder.github.io",
-    "APPROVED_MODELS": "gemini-3.5-flash-lite"
+    "APPROVED_MODELS": "gemini-3.5-flash-lite",
+    "PRIVACY_REVIEW_APPROVED": "false"
   },
   "durable_objects": {
     "bindings": [
@@ -18,7 +19,9 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["DailyQuota"]
+      "new_sqlite_classes": [
+        "DailyQuota"
+      ]
     }
   ],
   "ratelimits": [

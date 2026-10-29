@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%20fill%3D%22none%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%232D193C%22%2F%3E%3Cpath%20d%3D%22M44%2023C52%2018%2067%2017%2072%2024C77%2031%2074%2039%2066%2044C62%2034%2053%2028%2044%2023Z%20M25%2064C29%2073%2039%2077%2049%2078C38%2086%2020%2081%2025%2064Z%22%20fill%3D%22%23E76F51%22%2F%3E%3Cpath%20d%3D%22M69%2019C59%209%2042%208%2031%2020C20%2032%2021%2045%2038%2055L57%2066C67%2072%2070%2080%2066%2087C82%2073%2081%2059%2064%2049L44%2037C34%2031%2036%2025%2043%2021C52%2015%2061%2015%2069%2019Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3Cpath%20d%3D%22M36%2038C29%2047%2036%2055%2050%2062L59%2067C70%2074%2064%2085%2053%2089C42%2094%2028%2088%2024%2080C34%2085%2046%2083%2052%2077C42%2076%2032%2072%2027%2066C21%2058%2024%2051%2029%2047C29%2056%2040%2062%2048%2065C34%2055%2029%2047%2036%2038Z%22%20fill%3D%22%23FFFCF7%22%2F%3E%3C%2Fsvg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Studioza — Your study desk</title>
-  <script src="./studioza-theme.js"></script>
+  <script src="./privacy-controls.js"></script><script src="./studioza-theme.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Lexend (Dyslexia-optimized) & JetBrains Mono (High-legibility code/timers) -->
@@ -1480,10 +1480,10 @@
       startAiLoading('btn-generate-document-sprint');
       try {
         const generationWebsites=selectedStudyWebsites.slice();
-        const names = [...selectedStudyFiles.map(file => file.name),...generationWebsites];
+        const names = [...selectedStudyFiles.map((file,index) => "Source "+(index+1)),...generationWebsites];
         const parts = [];
         const sourceNotes = [];
-        for (const file of selectedStudyFiles) {
+        for (const [sourceIndex, file] of selectedStudyFiles.entries()) {
           updateAiLoading('btn-generate-document-sprint', 10);
           const mimeType = studyFileType(file);
           if (mimeType === 'application/pdf') {
@@ -1491,7 +1491,7 @@
           } else {
             const text = mimeType==='application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? (studyFileTextCache.get(file) || await extractDocxText(await file.arrayBuffer())) : (await file.text()).trim();
             if (!text) throw new Error(file.name + ' is empty. Remove it or upload a file with readable text.');
-            sourceNotes.push({ name: file.name, text });
+            sourceNotes.push({ name: "Source "+(sourceIndex+1), text });
           }
         }
         const preparedBytes=sourceNotes.reduce((sum,note)=>sum+new TextEncoder().encode(note.text).byteLength,0)+selectedStudyFiles.filter(file=>studyFileType(file)==='application/pdf').reduce((sum,file)=>sum+file.size,0);
@@ -1552,7 +1552,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         toggleStudyDesk(false);
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
-        console.error('Document question generation:', error);
+        console.warn('Document generation failed.');
         if (status) status.textContent = (pendingDocumentQuestions.length ? pendingDocumentQuestions.length + ' / '+target+' checked questions kept for retry. Press Create again to continue. ' : '') + (error.message || 'Could not create the sprint. Your existing questions remain available.');
       } finally {
         documentGenerationInProgress = false;
@@ -1778,6 +1778,8 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
     }
 
     async function callGemini(prompt, schema, modelId, callOptions = {}) {
+      if(!document.getElementById('privacy-ack')?.checked)throw new Error('Read the privacy notice and confirm suitable material before AI processing.');
+      if(callOptions.documentWebsites?.length)throw new Error('Website imports are unavailable pending privacy review.');
       const requestBody = callOptions.requestBody || { systemInstruction: { parts: [{ text: prompt }] }, contents: [{ role: 'user', parts: [{ text: 'Return the requested JSON now.' }] }], generationConfig: { responseMimeType: 'application/json', responseSchema: schema } };
       const endpoint = 'https://floral-wood-c42bbaa1118-gemini-proxy.cassidyjames011.workers.dev/';
       const maxRetries = Number.isInteger(callOptions.maxRetries) ? callOptions.maxRetries : 3;
@@ -1787,7 +1789,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, privacyAcknowledgement: "REM-02-v1", turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
@@ -2045,5 +2047,6 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { const options=document.getElementById('options-menu'); if(options) options.open=false; } });
     });
   </script>
-</body>
+<aside aria-label="Privacy controls" style="padding:1rem"><a href="./privacy.html">Privacy notice — draft, approval pending</a><p>AI processing sends source contents to Cloudflare and Google. PDFs include embedded metadata. Use only synthetic or non-sensitive material you may share.</p><label><input type="checkbox" id="privacy-ack"> I am 18 or older and will not submit identification, health or financial records, credentials, confidential material, third-party personal data, or restricted copyrighted material.</label><p>Clear saved data removes this browser's study data; it does not delete provider records.</p><button type="button" id="privacy-clear">Clear all Studioza data on this device</button><span id="privacy-clear-status" role="status"></span></aside></body>
 </html>
+

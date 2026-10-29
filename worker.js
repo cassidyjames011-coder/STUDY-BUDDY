@@ -275,7 +275,7 @@ function documentSprintStream(body, sources, env, quota, reservation, origin, ct
           const questions = await collectDocumentSprint(sourceBody, sources, env, quota, reservation, emit, abort.signal, seed, interests, target, mode);
           emit({ type:"result", questions });
         } catch (error) {
-          if (!abort.signal.aborted) emit({ type:"error", error:{ message:error.message || "Question generation was interrupted. Your files and existing bank are unchanged.", status:error.status || 502 } });
+          if (!abort.signal.aborted) emit({ type:"error", error:{ message:"Question generation was interrupted. Please retry later.", status:error.status || 502 } });
         } finally {
           if (!abort.signal.aborted) controller.close();
         }
@@ -371,6 +371,9 @@ export default {
       });
     }
 
+    if (request.method === 'POST' && env.PRIVACY_REVIEW_APPROVED !== 'true') {
+      return json({error:'AI processing is unavailable pending operator and independent privacy approval.'},503,allowedOrigin);
+    }
     if (request.method !== "POST") {
       return json(
         { error: "Method not allowed." },
@@ -426,6 +429,8 @@ export default {
       return json({ error: "Invalid JSON." }, 400, allowedOrigin);
     }
 
+    if(payload?.privacyAcknowledgement !== 'REM-02-v1')return json({error:'Privacy acknowledgement required.'},400,allowedOrigin);
+    if(payload?.documentWebsites?.length)return json({error:'Website imports are unavailable pending privacy review.'},400,allowedOrigin);
     const token = payload?.turnstileToken;
     const body = payload?.body;
 
@@ -672,6 +677,7 @@ export default {
         }
       );
 
+      if(!upstream.ok){await upstream.body?.cancel();return json({error:'The AI service could not complete this request.'},502,allowedOrigin);}
       const result = await upstream.text();
 
       return new Response(result, {
@@ -694,3 +700,4 @@ export default {
     }
   }
 };
+

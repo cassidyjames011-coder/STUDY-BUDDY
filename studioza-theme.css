@@ -21,3 +21,4 @@
 .theme-toggle{display:flex!important;align-items:center;gap:7px;min-height:38px;padding:8px 10px!important;border:1px solid var(--border)!important;border-radius:8px;background:#F0E9DF!important;color:#2D193C!important;font-size:12px;font-weight:600}
 [data-theme=dark] .theme-toggle{background:#382D42!important;border-color:#6C5875!important;color:#F7F1F5!important}
 .theme-toggle:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+

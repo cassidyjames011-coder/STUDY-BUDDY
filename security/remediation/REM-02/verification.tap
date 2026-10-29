@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: privacy gate refuses POST before any credentials or upstream processing
+ok 1 - privacy gate refuses POST before any credentials or upstream processing
+  ---
+  duration_ms: 72.4074
+  type: 'test'
+  ...
+# Subtest: legacy expiry clears only owned app keys and explicit deletion clears them again
+ok 2 - legacy expiry clears only owned app keys and explicit deletion clears them again
+  ---
+  duration_ms: 2.5732
+  type: 'test'
+  ...
+# Subtest: 30-day expiry applies before app restoration
+ok 3 - 30-day expiry applies before app restoration
+  ---
+  duration_ms: 2.171
+  type: 'test'
+  ...
+# Subtest: HTML inline scripts parse and minimisation preserves source-label correspondence
+ok 4 - HTML inline scripts parse and minimisation preserves source-label correspondence
+  ---
+  duration_ms: 6.5506
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 364.8281
