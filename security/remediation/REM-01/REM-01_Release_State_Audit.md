@@ -13,3 +13,5 @@ Observed 2026-10-29. Investigation remains in progress.
 | Quota | DAILY_QUOTA / DailyQuota; production object name global-daily-quota; staging uses release-specific object names | Source only; provider namespace ID pending |
 
 Release drift is confirmed. No independent approval exists in this evidence package.
+
+Update: production full version f2582d71-225a-4598-9939-56ba4d14ab18; previous staging e61fcfb4-43c9-423c-9a19-7e96a2b23fef; new staging 7015a82e-4063-4359-98df-7e4b6f529825. Deployment-tool login succeeded. Served HTML comparisons recorded in evidence/integrity.json.

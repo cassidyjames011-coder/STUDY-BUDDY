@@ -1,2 +1,4 @@
 # Test results
 2026-10-29: pnpm check passed, 32/32 regression tests. See evidence/local-check.txt and local-check.exit. pnpm audit --audit-level=high returned no known vulnerabilities, exit 0. API and frontend Wrangler dry-run bundling passed before dark-mode asset addition; repeat against final source required. Repeated build executed; equivalence comparison pending. Secret scanning, provider binding checks, Pages byte comparison, browser checks, staging verification and rollback not yet complete. DEP-03: BLOCKED. GOV-01: BLOCKED (ownership, governance/provider retention evidence and independent signoff missing; REM-02 dependency).
+
+Update: staging synthetic tests passed, operational rollback and candidate restoration executed. See Staging_Verification and Rollback_Test for limits. Source candidate b00930739424f6b05ba03e36cc7f52c74117deae.

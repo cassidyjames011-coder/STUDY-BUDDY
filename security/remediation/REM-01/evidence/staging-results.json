@@ -1,0 +1,82 @@
+{
+  "time": "2026-10-29T11:19:48.705Z",
+  "environment": "Cloudflare deployed isolated staging; public dummy Turnstile key; MOCK_AI=true; no real Gemini request",
+  "release": "6fe7940f7d33de58a150",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-store",
+    "cf-ray": "a521c990fbce88f0-DUB",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-security-policy": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests",
+    "content-type": "text/html",
+    "date": "Thu, 29 Oct 2026 11:19:48 GMT",
+    "etag": "W/\"2a2f36b50988f8a671d340776e12aa8f\"",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
+    "referrer-policy": "no-referrer",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=FF9sgzpskbSId5wpvrBFez0oKi8BM4UkcJFvHHFwXqVo5AyhP6Bon3LB2pWjBI07tePfLDkY5geR%2FufMeZT49vqxyfyM%2FU3dE%2FPekFXYHaDotwkySNfduH5ET5FH8M%2FBE9ARhJr%2FZ8xnXn6qRHRszM%2Fhw0dTWHGYxkRxmijrtVhXKQ%3D%3D\"}]}",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=31536000",
+    "transfer-encoding": "chunked",
+    "vary": "Origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-request-id": "0ccbe186-299f-484a-98a1-bb074f1c52c9",
+    "x-studioza-release": "6fe7940f7d33de58a150",
+    "x-study-sprint-version": "secure-study-v1"
+  },
+  "requests": [
+    {
+      "request": 1,
+      "status": 429,
+      "requestId": "528abcf3-c7f3-440d-a85a-f309300b33c6",
+      "body": "{\"error\":{\"code\":\"QUOTA\",\"message\":\"Too many requests. Please wait a minute.\"},\"requestId\":\"528abcf3-c7f3-440d-a85a-f309300b33c6\"}"
+    },
+    {
+      "request": 2,
+      "status": 200,
+      "requestId": "5af629b1-87ef-41ed-ad42-6bb24e9731ad",
+      "body": "{\"type\":\"progress\",\"completed\":0,\"total\":2,\"message\":\"Preparing your questions…\",\"requestId\":\"5af629b1-87ef-41ed-ad42-6bb24e9731ad\"}\n{\"type\":\"result\",\"questions\":[{\"questionType\":\"practical\",\"sourceDoc\":\"synthetic-one.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 1?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null},{\"questionType\":\"theory\",\"sourceDoc\":\"synthetic-two.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 2?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null}],\"requestId\":\"5af629b1-87ef-41ed-ad42-6bb24e9731ad\"}\n"
+    },
+    {
+      "request": 3,
+      "status": 200,
+      "requestId": "f3f95da7-229b-4be4-9ddf-5c99263f7b99",
+      "body": "{\"type\":\"progress\",\"completed\":0,\"total\":2,\"message\":\"Preparing your questions…\",\"requestId\":\"f3f95da7-229b-4be4-9ddf-5c99263f7b99\"}\n{\"type\":\"result\",\"questions\":[{\"questionType\":\"practical\",\"sourceDoc\":\"synthetic-one.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 1?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null},{\"questionType\":\"theory\",\"sourceDoc\":\"synthetic-two.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 2?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null}],\"requestId\":\"f3f95da7-229b-4be4-9ddf-5c99263f7b99\"}\n"
+    },
+    {
+      "request": 4,
+      "status": 429,
+      "requestId": "7cf725da-97b9-4424-8809-de5f8ded22b4",
+      "body": "{\"error\":{\"code\":\"QUOTA\",\"message\":\"Too many requests. Please wait a minute.\"},\"requestId\":\"7cf725da-97b9-4424-8809-de5f8ded22b4\"}"
+    },
+    {
+      "request": 5,
+      "status": 200,
+      "requestId": "7ef5366a-4e73-45fa-94b7-099fbfa86435",
+      "body": "{\"type\":\"progress\",\"completed\":0,\"total\":2,\"message\":\"Preparing your questions…\",\"requestId\":\"7ef5366a-4e73-45fa-94b7-099fbfa86435\"}\n{\"type\":\"result\",\"questions\":[{\"questionType\":\"practical\",\"sourceDoc\":\"synthetic-one.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 1?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null},{\"questionType\":\"theory\",\"sourceDoc\":\"synthetic-two.txt\",\"topic\":\"Staging test\",\"prompt\":\"STAGING ONLY: Which option is the synthetic test answer for item 2?\",\"options\":[\"Synthetic correct answer\",\"Synthetic distractor B\",\"Synthetic distractor C\",\"Synthetic distractor D\"],\"correct\":0,\"explanation\":\"This is a synthetic staging response. It does not assess the quality or grounding of real Gemini output.\",\"analogyTheme\":null}],\"requestId\":\"7ef5366a-4e73-45fa-94b7-099fbfa86435\"}\n"
+    },
+    {
+      "name": "unknown route",
+      "status": 404,
+      "allowOrigin": null,
+      "requestId": "a81a8f15-3587-4b15-8689-b0963dd72bdc",
+      "body": "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"Not found.\"},\"requestId\":\"a81a8f15-3587-4b15-8689-b0963dd72bdc\"}"
+    },
+    {
+      "name": "missing token",
+      "status": 400,
+      "allowOrigin": "https://studioza-ai-staging.cassidyjames011.workers.dev",
+      "requestId": "804812bb-3713-4e7f-8c91-163f733988df",
+      "body": "{\"error\":{\"code\":\"TASK\",\"message\":\"Only study question generation is supported.\"},\"requestId\":\"804812bb-3713-4e7f-8c91-163f733988df\"}"
+    },
+    {
+      "name": "unapproved origin",
+      "status": 403,
+      "allowOrigin": null,
+      "requestId": "0fcfda03-0722-40be-8394-14d5020513dc",
+      "body": "{\"error\":{\"code\":\"ORIGIN\",\"message\":\"Origin not allowed.\"},\"requestId\":\"0fcfda03-0722-40be-8394-14d5020513dc\"}"
+    }
+  ]
+}

@@ -1,20 +1,73 @@
 {
+  "release_status": "candidate_pending_review",
+  "configuration": {
+    "quota_namespace_id": null,
+    "quota_class": "DailyQuota",
+    "staging_fingerprint": "3bf497368e363e3304bef504c61843e0b1c408426d14c1981d02ddd4a0a15fe5",
+    "quota_binding": "DAILY_QUOTA"
+  },
+  "remediation_id": "REM-01",
   "verification": {
+    "dependency_audit": "no known vulnerabilities",
+    "rollback": "previous staging version restored then candidate restored",
+    "independent_review": "PENDING",
     "production_deployment": "NOT_APPROVED",
     "local_tests": "32 passed",
-    "staging_tests": "NOT_RUN",
-    "independent_review": "PENDING"
+    "staging_tests": "3 allowed / 2 quota rejections"
   },
-  "worker": {
-    "deployed_version_id": null
-  },
-  "frontend": {
-    "deployment_id": null
-  },
-  "release_status": "incomplete_candidate",
-  "remediation_id": "REM-01",
   "source": {
     "repository": "cassidyjames011-coder/Studioza",
-    "commit_sha": null
+    "commit_sha": "b00930739424f6b05ba03e36cc7f52c74117deae"
+  },
+  "frontend": {
+    "deployment_id": null,
+    "staging_html_verified": true,
+    "files": [
+      {
+        "sha256": "94c4c5655d556177cf357f858b8b4c26b9f2989b33ae785f38d7ffd9ea16efaa",
+        "path": "public\\assets\\app.js"
+      },
+      {
+        "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc",
+        "path": "public\\assets\\LUCIDE-LICENSE"
+      },
+      {
+        "sha256": "3411692820cb8d47543f69496aa25fd603a358f4498046f41c508a5a3342210e",
+        "path": "public\\assets\\lucide.min.js"
+      },
+      {
+        "sha256": "b4b60d865cf1c5e8c5e23b513b29be186436dde37104bf905f1e5cb3b5a9e036",
+        "path": "public\\assets\\studioza-theme.css"
+      },
+      {
+        "sha256": "5606b77df671df58c9b1116e05e604156466cb6ddc8af9ee5cba402316666104",
+        "path": "public\\assets\\studioza-theme.js"
+      },
+      {
+        "sha256": "75a3198c6c41781d3eb84425dfd14b338ac83243fc7fb3441a258090983d88e6",
+        "path": "public\\assets\\studioza.css"
+      },
+      {
+        "sha256": "6c5e09afec253d457155a3a6b86be440ad18b5cc539f61d53035a0bf5405f437",
+        "path": "public\\assets\\tailwind.css"
+      },
+      {
+        "sha256": "58e194df4f1a43756e940a613054045905590ba2f21e49d412aca8236f76002b",
+        "path": "public\\build-info.json"
+      },
+      {
+        "sha256": "807abd8a1b160b8a0903238c38674f7b0cf5ed45454cbc0e3fa8e1145bb55f7f",
+        "path": "public\\index.html"
+      },
+      {
+        "sha256": "1e71231db7b3aa681ae4c25f3ddd7c17704dde28c47d6c95c6455bd6a5497b10",
+        "path": "public\\privacy.html"
+      }
+    ]
+  },
+  "worker": {
+    "source_sha256": "8841a0ad66fe9be4d5b77c953bd00161a9a3749fd786a86e5434ebfbcf30d0f0",
+    "environment": "mock-only staging",
+    "deployed_version_id": "7015a82e-4063-4359-98df-7e4b6f529825"
   }
 }
