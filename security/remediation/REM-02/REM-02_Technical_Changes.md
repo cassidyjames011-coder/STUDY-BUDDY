@@ -1,0 +1,5 @@
+# REM-02 — Technical Changes
+
+Review date: 29 October 2026. Source: a2c626ac41ba334933ef31043c2f8c8513f39865 (GitHub main). Candidate only; not deployed. Independent reviewer: Pending.
+
+Candidate changes index.html, worker.js, wrangler.jsonc; adds privacy-controls.js and privacy.html. Worker defaults closed unless PRIVACY_REVIEW_APPROVED is exactly true; requires versioned acknowledgement; blocks website imports; suppresses raw upstream HTTP errors and streamed exception messages. Frontend requires acknowledgement for every AI call, replaces document source filenames with Source N, removes one exception-object log. Scoped local data expires on next page load after 30 days; first load clears legacy app keys. Clear-all removes only listed app keys and reloads to release tab state. PDFs still include all bytes/metadata; content detection/redaction is not claimed. Never enable gate simply because tests pass. Existing REM-01 work remains separate. No production deployment, account setting mutation or real student document used.
