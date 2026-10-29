@@ -1467,6 +1467,11 @@
       }
       return btoa(binary);
     }
+    async function sourceMaterialKey(files,websites) {
+      const digest=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+      const hashes=[];for(const file of files)hashes.push(await digest(await file.arrayBuffer()));
+      return digest(new TextEncoder().encode(JSON.stringify({files:hashes.sort(),websites:websites.slice().sort()})));
+    }
     async function generateDocumentQuestionBatch() {
       if (!(selectedStudyFiles.length+selectedStudyWebsites.length) || documentGenerationInProgress || studyFileReadInProgress) return;
       let settings;
@@ -1506,6 +1511,9 @@
         }
         const preparedBytes=sourceNotes.reduce((sum,note)=>sum+new TextEncoder().encode(note.text).byteLength,0)+selectedStudyFiles.filter(file=>studyFileType(file)==='application/pdf').reduce((sum,file)=>sum+file.size,0);
         if(preparedBytes>MAX_STUDY_BYTES)throw new Error('The extracted text and PDFs exceed 8 MB. Use fewer or more focused sources.');
+        const materialKey=await sourceMaterialKey(selectedStudyFiles,generationWebsites);
+        const recentQuestions=QUESTION_BANK.filter(q=>q.isDocumentGenerated&&q.sourceMaterialKey===materialKey&&names.includes(q.sourceDoc)).slice(-50)
+          .map(q=>({questionType:q.questionType,sourceDoc:q.sourceDoc,topic:q.topic,prompt:q.prompt,code:q.code,options:q.options,correct:q.correct,explanation:q.explanation,fingerprint:q.fingerprint}));
         const hooks = generationInterests;
         const interestInstruction = hooks.length
           ? 'Only for theory questions, use these student interests for memorable examples where they fit: ' + hooks.join(', ') + '. Keep the course concept explicit and the explanation accurate. Do not introduce these interests into practical questions.'
@@ -1525,7 +1533,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           generationConfig: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3, maxOutputTokens: 32768 }
         };
         if (status) status.textContent = 'Uploading once, then creating checked question batches…';
-        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentLength:questionLength, documentWebsites:generationWebsites, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
+        const generated = await callGemini(prompt, schema, GEMINI_MODEL_ID, { requestBody, maxRetries: 0, documentSprint: true, documentHistory:recentQuestions, documentLength:questionLength, documentWebsites:generationWebsites, documentQuestions:pendingDocumentQuestions.slice(), documentInterests:generationInterests, documentCount:target, documentMode:['theory','mixed','practical'][settings.mode],
           onDocumentBatch:batch => {
             const seen = new Set(pendingDocumentQuestions.map(documentQuestionKey));
             for (const question of batch) {
@@ -1537,29 +1545,34 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
             }
           },
           progressButtonId: 'btn-generate-document-sprint' });
-        if (!Array.isArray(generated) || generated.length !== target) throw new Error('The study service returned ' + (Array.isArray(generated) ? generated.length : 0) + ' of ' + target + ' questions. No partial set was loaded. Your files are still selected; please retry.');
+        if(!Array.isArray(generated)||generated.length>target)throw new Error('The study service returned an invalid question set.');
+        const finalCount=generated.length;
+        const validation=generated.validation;
+        if(!finalCount)throw new Error('No distinct questions passed validation. The remaining questions would repeat existing content. Upload more material, reduce the question count, or try a shorter length.');
         const practical = generated.filter(q => q?.questionType === 'practical').length;
         const theory = generated.filter(q => q?.questionType === 'theory').length;
         const valid = generated.every(q => validDocumentQuestion(q, names)) &&
-          new Set(generated.map(documentQuestionKey)).size === target;
-        if (!valid || practical !== targetPractical || theory !== targetTheory) throw new Error('The response missed a required question, source, answer, or the selected question-type split. Your current sprint is unchanged. Please retry once.');
+          new Set(generated.map(documentQuestionKey)).size === finalCount;
+        if (!valid || (settings.mode===0 ? theory!==finalCount : practical!==finalCount)) throw new Error('The response missed a required question, source, answer, or the selected question-type split. Your current sprint is unchanged. Please retry once.');
         const stamp = Date.now().toString(36);
         const questions = generated.map((q, index) => ({
-          ...q, id: `DOC-${stamp}-${index + 1}`, lecture: Math.min(5, Math.max(1, Number(q.lecture) || 1)),
+          ...q, sourceMaterialKey:materialKey, id: `DOC-${stamp}-${index + 1}`, lecture: Math.min(5, Math.max(1, Number(q.lecture) || 1)),
           isAI: true, isDocumentGenerated: true, isAnalogyTheory: q.questionType === 'theory'
         }));
         QUESTION_BANK.push(...questions);
         try { localStorage.setItem('exam_sprint_questions_v2', JSON.stringify(QUESTION_BANK.filter(q => q.isAI))); } catch (error) {}
         sprintSourceIds=questions.map(q=>q.id);
-        activeSprintSize=target;activeSprintMinutes=settings.minutes;isCustomSprint=true;isShuffled=true;isSingleCardView=true;
+        activeSprintSize=finalCount;activeSprintMinutes=settings.minutes;isCustomSprint=true;isShuffled=true;isSingleCardView=true;
         activeLectureFilter=['analogy','all','scenario'][settings.mode];buildSprintPool();
         currentQIndex = 0; userAnswers = {}; flaggedQuestions = {}; timeSpentPerQuestion = {};
         isSprintFinished = false; hasSprintStarted = false; isTimerPaused = true; totalSprintSeconds = settings.minutes*60; remainingSprintSeconds = totalSprintSeconds; elapsedSprintSeconds = 0;
         const scope = document.getElementById('scope-filter-select'); if (scope) scope.value = 'ai';
         generationSucceeded = true;
         pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
-        if (status) status.textContent = 'Your next sprint is ready. '+practical+' practical · '+theory+' theory. Select Start when you’re ready.';
-        toggleStudyDesk(false);
+        const shortfall=finalCount<target;
+        const validationNote=validation?.semanticUnavailable?' Semantic review was unavailable for part of this run; structured duplicate checks were used.':validation?.uncertainAssessments?' Some assessment comparisons were uncertain.':'';
+        if(status)status.textContent=(shortfall?'Studioza generated '+finalCount+' distinct questions from your material out of '+target+' requested. The remaining questions did not pass validation. Upload additional material or reduce the question count. ':'Your next sprint is ready. '+finalCount+' questions passed duplicate checks. ')+validationNote+' Select Start when you’re ready.';
+        if(!shortfall&&!validationNote)toggleStudyDesk(false);
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {
         console.error('Document question generation:', error);
@@ -1735,7 +1748,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
       if (!response.body) throw new Error('The study service did not open a generation stream. Your files are still selected.');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = '', result = null, bytes = 0, finished = false;
+      let buffer = '', result = null, bytes = 0, finished = false, generationValidation=null;
       function consume(line) {
         if (!line.trim()) return;
         let event;
@@ -1758,6 +1771,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
           if (!Array.isArray(event.questions) || event.questions.length > target) throw new Error('The study service returned an invalid batch.');
           if (onBatch) onBatch(event.questions);
         }
+        if(event.type==='validation')generationValidation=event.metrics;
         if (event.type === 'result') {
           if (!Array.isArray(event.questions)) throw new Error('The study service returned an invalid question set.');
           result = event.questions;
@@ -1780,6 +1794,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (buffer.trim()) consume(buffer);
         if (!result) throw new Error('The generation connection ended before all questions were ready. Your files are still selected; please retry.');
         finished = true;
+        result.validation=generationValidation;
         return result;
       } finally {
         if (!finished) { try { await reader.cancel(); } catch (error) {} }
@@ -1797,7 +1812,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         if (callOptions.progressButtonId) updateAiLoading(callOptions.progressButtonId, 25);
         let response;
         try {
-          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode, documentLength:callOptions.documentLength }) });
+          response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: requestBody, turnstileToken: token, task:callOptions.documentSprint ? 'document-sprint' : undefined, documentQuestions:callOptions.documentSprint ? callOptions.documentQuestions : undefined, documentInterests:callOptions.documentSprint ? callOptions.documentInterests : undefined, documentHistory:callOptions.documentHistory, documentWebsites:callOptions.documentWebsites, documentCount:callOptions.documentCount, documentMode:callOptions.documentMode, documentLength:callOptions.documentLength }) });
         } catch (networkError) {
           resetTurnstileWidget();
           if (attempt < maxRetries) {
