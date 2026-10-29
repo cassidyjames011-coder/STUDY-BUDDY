@@ -1,0 +1,1133 @@
+[
+  {
+    "id": "exact",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "punctuation",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Explain the business benefits of cloud computing!",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "case",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "EXPLAIN THE BUSINESS BENEFITS OF CLOUD COMPUTING.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "paraphrase",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "What business gains motivate an organisation to migrate its infrastructure to cloud services?",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "synonyms",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Describe the commercial advantages of adopting cloud services.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "currency-and-numbers",
+    "duplicate": true,
+    "a": {
+      "prompt": "Acme pays €50 and sells for €80. Calculate profit margin.",
+      "questionType": "practical",
+      "options": [
+        "37.5 percent",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Beta pays $60 and sells for $90. Calculate profit margin.",
+      "questionType": "practical",
+      "options": [
+        "33.3 percent",
+        "a",
+        "b",
+        "c"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    }
+  },
+  {
+    "id": "changed-names-and-context",
+    "duplicate": true,
+    "a": {
+      "prompt": "Acme pays €50 and sells for €80. Calculate profit margin.",
+      "questionType": "practical",
+      "options": [
+        "37.5 percent",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "In a London office Gamma markets a service. Determine its profit margin from cost and sales.",
+      "questionType": "practical",
+      "options": [
+        "37.5 percent",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    }
+  },
+  {
+    "id": "changed-variable",
+    "duplicate": true,
+    "a": {
+      "prompt": "Trace a loop summing array x.",
+      "questionType": "practical",
+      "options": [
+        "The sum of array entries",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Initialise total, visit every entry and add its value.",
+      "fingerprint": {
+        "primaryConcept": "trace array sum",
+        "learningObjective": "trace array sum",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "trace array sum",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "The sum of array entries",
+        "reasoning": "Initialise total, visit every entry and add its value.",
+        "method": "array_sum",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "initialise_total",
+          "iterate",
+          "add"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Trace a loop summing array y.",
+      "questionType": "practical",
+      "options": [
+        "The sum of array entries",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Initialise total, visit every entry and add its value.",
+      "fingerprint": {
+        "primaryConcept": "trace array sum",
+        "learningObjective": "trace array sum",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "trace array sum",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "The sum of array entries",
+        "reasoning": "Initialise total, visit every entry and add its value.",
+        "method": "array_sum",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "initialise_total",
+          "iterate",
+          "add"
+        ]
+      }
+    }
+  },
+  {
+    "id": "sentence-reordering",
+    "duplicate": true,
+    "a": {
+      "prompt": "Explain how natural selection changes allele frequencies.",
+      "questionType": "theory",
+      "options": [
+        "Heritable traits affecting reproduction alter allele frequencies.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Connect heritable variation with differential reproductive success.",
+      "fingerprint": {
+        "primaryConcept": "explain natural selection",
+        "learningObjective": "explain natural selection",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain natural selection",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Heritable traits affecting reproduction alter allele frequencies.",
+        "reasoning": "Connect heritable variation with differential reproductive success.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Allele frequencies shift over generations. How does natural selection cause this?",
+      "questionType": "theory",
+      "options": [
+        "Heritable traits affecting reproduction alter allele frequencies.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Connect heritable variation with differential reproductive success.",
+      "fingerprint": {
+        "primaryConcept": "explain natural selection",
+        "learningObjective": "explain natural selection",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain natural selection",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Heritable traits affecting reproduction alter allele frequencies.",
+        "reasoning": "Connect heritable variation with differential reproductive success.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "long-complete-sequence",
+    "duplicate": true,
+    "a": {
+      "prompt": "Calculate margin, compare two tax rates and justify a pricing decision.",
+      "questionType": "practical",
+      "options": [
+        "Compare margins after tax then choose sustainable pricing.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Calculate profits, compare tax sensitivity and justify pricing.",
+      "fingerprint": {
+        "primaryConcept": "evaluate pricing with tax sensitivity",
+        "learningObjective": "evaluate pricing with tax sensitivity",
+        "cognitiveSkill": "evaluate",
+        "assessmentAction": "evaluate pricing with tax sensitivity",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Compare margins after tax then choose sustainable pricing.",
+        "reasoning": "Calculate profits, compare tax sensitivity and justify pricing.",
+        "method": "pricing_analysis",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "calculate_margin",
+          "compare_tax",
+          "justify_pricing"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Using a new company, justify pricing after calculating profit and comparing two tax rates.",
+      "questionType": "practical",
+      "options": [
+        "Compare margins after tax then choose sustainable pricing.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Calculate profits, compare tax sensitivity and justify pricing.",
+      "fingerprint": {
+        "primaryConcept": "evaluate pricing with tax sensitivity",
+        "learningObjective": "evaluate pricing with tax sensitivity",
+        "cognitiveSkill": "evaluate",
+        "assessmentAction": "evaluate pricing with tax sensitivity",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Compare margins after tax then choose sustainable pricing.",
+        "reasoning": "Calculate profits, compare tax sensitivity and justify pricing.",
+        "method": "pricing_analysis",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "calculate_margin",
+          "compare_tax",
+          "justify_pricing"
+        ]
+      }
+    }
+  },
+  {
+    "id": "distinct-0",
+    "duplicate": false,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Explain the disadvantages of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Provider dependence creates operational risk.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Evaluate dependencies and their consequences.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud drawbacks",
+        "learningObjective": "explain cloud drawbacks",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud drawbacks",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Provider dependence creates operational risk.",
+        "reasoning": "Evaluate dependencies and their consequences.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-1",
+    "duplicate": false,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Compare SaaS and IaaS.",
+      "questionType": "theory",
+      "options": [
+        "SaaS provides applications while IaaS supplies infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Distinguish responsibilities in different service models.",
+      "fingerprint": {
+        "primaryConcept": "compare cloud service models",
+        "learningObjective": "compare cloud service models",
+        "cognitiveSkill": "analyse",
+        "assessmentAction": "compare cloud service models",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "SaaS provides applications while IaaS supplies infrastructure.",
+        "reasoning": "Distinguish responsibilities in different service models.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-2",
+    "duplicate": false,
+    "a": {
+      "prompt": "Explain the business benefits of cloud computing.",
+      "questionType": "theory",
+      "options": [
+        "Elastic capacity matches demand and reduces idle infrastructure.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Match variable demand to elastic capacity to reduce idle costs.",
+      "fingerprint": {
+        "primaryConcept": "explain cloud benefits",
+        "learningObjective": "explain cloud benefits",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain cloud benefits",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Elastic capacity matches demand and reduces idle infrastructure.",
+        "reasoning": "Match variable demand to elastic capacity to reduce idle costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Evaluate cloud security controls.",
+      "questionType": "theory",
+      "options": [
+        "Least privilege restricts access.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Identify threats then select access controls.",
+      "fingerprint": {
+        "primaryConcept": "evaluate cloud security",
+        "learningObjective": "evaluate cloud security",
+        "cognitiveSkill": "evaluate",
+        "assessmentAction": "evaluate cloud security",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Least privilege restricts access.",
+        "reasoning": "Identify threats then select access controls.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-3",
+    "duplicate": false,
+    "a": {
+      "prompt": "Acme pays €50 and sells for €80. Calculate profit margin.",
+      "questionType": "practical",
+      "options": [
+        "37.5 percent",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Interpret how fixed cost increases affect break-even volume.",
+      "questionType": "practical",
+      "options": [
+        "Required break-even volume increases.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Hold contribution constant and relate fixed costs to required sales.",
+      "fingerprint": {
+        "primaryConcept": "interpret fixed cost impact",
+        "learningObjective": "interpret fixed cost impact",
+        "cognitiveSkill": "analyse",
+        "assessmentAction": "interpret fixed cost impact",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Required break-even volume increases.",
+        "reasoning": "Hold contribution constant and relate fixed costs to required sales.",
+        "method": "break_even",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "interpret_cost_effect"
+        ]
+      }
+    }
+  },
+  {
+    "id": "distinct-4",
+    "duplicate": false,
+    "a": {
+      "prompt": "Acme pays €50 and sells for €80. Calculate profit margin.",
+      "questionType": "practical",
+      "options": [
+        "37.5 percent",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Subtract cost from sales and divide profit by sales.",
+      "fingerprint": {
+        "primaryConcept": "calculate profit margin",
+        "learningObjective": "calculate profit margin",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate profit margin",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "37.5 percent",
+        "reasoning": "Subtract cost from sales and divide profit by sales.",
+        "method": "profit_margin",
+        "formulaFamily": "margin",
+        "requiredOperations": [
+          "subtract_cost",
+          "divide_by_sales"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Calculate break-even sales volume.",
+      "questionType": "practical",
+      "options": [
+        "Fixed cost divided by unit contribution.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Divide fixed costs by price less variable cost.",
+      "fingerprint": {
+        "primaryConcept": "calculate break-even volume",
+        "learningObjective": "calculate break-even volume",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "calculate break-even volume",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Fixed cost divided by unit contribution.",
+        "reasoning": "Divide fixed costs by price less variable cost.",
+        "method": "break_even",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "calculate_contribution",
+          "divide_fixed_cost"
+        ]
+      }
+    }
+  },
+  {
+    "id": "distinct-5",
+    "duplicate": false,
+    "a": {
+      "prompt": "Trace a loop summing array x.",
+      "questionType": "practical",
+      "options": [
+        "The sum of array entries",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Initialise total, visit every entry and add its value.",
+      "fingerprint": {
+        "primaryConcept": "trace array sum",
+        "learningObjective": "trace array sum",
+        "cognitiveSkill": "apply",
+        "assessmentAction": "trace array sum",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "The sum of array entries",
+        "reasoning": "Initialise total, visit every entry and add its value.",
+        "method": "array_sum",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "initialise_total",
+          "iterate",
+          "add"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Analyse the runtime of summing an array.",
+      "questionType": "theory",
+      "options": [
+        "Linear time in the number of entries.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Count one constant-time addition per entry.",
+      "fingerprint": {
+        "primaryConcept": "analyse array sum complexity",
+        "learningObjective": "analyse array sum complexity",
+        "cognitiveSkill": "analyse",
+        "assessmentAction": "analyse array sum complexity",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Linear time in the number of entries.",
+        "reasoning": "Count one constant-time addition per entry.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-6",
+    "duplicate": false,
+    "a": {
+      "prompt": "Explain how natural selection changes allele frequencies.",
+      "questionType": "theory",
+      "options": [
+        "Heritable traits affecting reproduction alter allele frequencies.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Connect heritable variation with differential reproductive success.",
+      "fingerprint": {
+        "primaryConcept": "explain natural selection",
+        "learningObjective": "explain natural selection",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain natural selection",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Heritable traits affecting reproduction alter allele frequencies.",
+        "reasoning": "Connect heritable variation with differential reproductive success.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Explain how genetic drift changes allele frequencies.",
+      "questionType": "theory",
+      "options": [
+        "Random sampling alters frequencies, especially in small populations.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Distinguish chance sampling from differential reproductive success.",
+      "fingerprint": {
+        "primaryConcept": "explain genetic drift",
+        "learningObjective": "explain genetic drift",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain genetic drift",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Random sampling alters frequencies, especially in small populations.",
+        "reasoning": "Distinguish chance sampling from differential reproductive success.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-7",
+    "duplicate": false,
+    "a": {
+      "prompt": "Calculate margin, compare two tax rates and justify a pricing decision.",
+      "questionType": "practical",
+      "options": [
+        "Compare margins after tax then choose sustainable pricing.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Calculate profits, compare tax sensitivity and justify pricing.",
+      "fingerprint": {
+        "primaryConcept": "evaluate pricing with tax sensitivity",
+        "learningObjective": "evaluate pricing with tax sensitivity",
+        "cognitiveSkill": "evaluate",
+        "assessmentAction": "evaluate pricing with tax sensitivity",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Compare margins after tax then choose sustainable pricing.",
+        "reasoning": "Calculate profits, compare tax sensitivity and justify pricing.",
+        "method": "pricing_analysis",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "calculate_margin",
+          "compare_tax",
+          "justify_pricing"
+        ]
+      }
+    },
+    "b": {
+      "prompt": "Calculate margin, compare tax rates and evaluate financing risk.",
+      "questionType": "practical",
+      "options": [
+        "Assess debt risk alongside after-tax margins.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Calculate profits, compare taxes then evaluate financing constraints.",
+      "fingerprint": {
+        "primaryConcept": "evaluate pricing and financing",
+        "learningObjective": "evaluate pricing and financing",
+        "cognitiveSkill": "evaluate",
+        "assessmentAction": "evaluate pricing and financing",
+        "questionStructure": "calculation",
+        "scenarioType": null,
+        "expectedAnswer": "Assess debt risk alongside after-tax margins.",
+        "reasoning": "Calculate profits, compare taxes then evaluate financing constraints.",
+        "method": "pricing_analysis",
+        "formulaFamily": "",
+        "requiredOperations": [
+          "calculate_margin",
+          "compare_tax",
+          "evaluate_financing"
+        ]
+      }
+    }
+  },
+  {
+    "id": "distinct-8",
+    "duplicate": false,
+    "a": {
+      "prompt": "Define economies of scale.",
+      "questionType": "theory",
+      "options": [
+        "Average costs fall as output expands.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Spread fixed costs over greater output.",
+      "fingerprint": {
+        "primaryConcept": "define economies of scale",
+        "learningObjective": "define economies of scale",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "define economies of scale",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Average costs fall as output expands.",
+        "reasoning": "Spread fixed costs over greater output.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Analyse diseconomies of scale.",
+      "questionType": "theory",
+      "options": [
+        "Coordination costs can increase average costs.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Relate organisational complexity to rising unit costs.",
+      "fingerprint": {
+        "primaryConcept": "analyse diseconomies of scale",
+        "learningObjective": "analyse diseconomies of scale",
+        "cognitiveSkill": "analyse",
+        "assessmentAction": "analyse diseconomies of scale",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Coordination costs can increase average costs.",
+        "reasoning": "Relate organisational complexity to rising unit costs.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  },
+  {
+    "id": "distinct-9",
+    "duplicate": false,
+    "a": {
+      "prompt": "Explain the causes of the industrial revolution.",
+      "questionType": "theory",
+      "options": [
+        "Energy, capital and technology supported mechanisation.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Connect enabling conditions to production changes.",
+      "fingerprint": {
+        "primaryConcept": "explain industrialisation causes",
+        "learningObjective": "explain industrialisation causes",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain industrialisation causes",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Energy, capital and technology supported mechanisation.",
+        "reasoning": "Connect enabling conditions to production changes.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    },
+    "b": {
+      "prompt": "Explain the consequences of the industrial revolution.",
+      "questionType": "theory",
+      "options": [
+        "Urbanisation and factory employment expanded.",
+        "Alternative B",
+        "Alternative C",
+        "Alternative D"
+      ],
+      "correct": 0,
+      "explanation": "Trace changes in production to social outcomes.",
+      "fingerprint": {
+        "primaryConcept": "explain industrialisation consequences",
+        "learningObjective": "explain industrialisation consequences",
+        "cognitiveSkill": "understand",
+        "assessmentAction": "explain industrialisation consequences",
+        "questionStructure": "explanation",
+        "scenarioType": null,
+        "expectedAnswer": "Urbanisation and factory employment expanded.",
+        "reasoning": "Trace changes in production to social outcomes.",
+        "method": "",
+        "formulaFamily": "",
+        "requiredOperations": []
+      }
+    }
+  }
+]

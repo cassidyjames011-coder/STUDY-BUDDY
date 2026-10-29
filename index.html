@@ -1571,7 +1571,7 @@ ${sourceNotes.map(note => `\n\nDOCUMENT: ${note.name}\n${note.text}`).join('')}`
         pendingDocumentQuestions = []; pendingDocumentFingerprint = '';
         const shortfall=finalCount<target;
         const validationNote=validation?.semanticUnavailable?' Semantic review was unavailable for part of this run; structured duplicate checks were used.':validation?.uncertainAssessments?' Some assessment comparisons were uncertain.':'';
-        if(status)status.textContent=(shortfall?'Studioza generated '+finalCount+' distinct questions from your material out of '+target+' requested. The remaining questions did not pass validation. Upload additional material or reduce the question count. ':'Your next sprint is ready. '+finalCount+' questions passed duplicate checks. ')+validationNote+' Select Start when you’re ready.';
+        if(status)status.textContent=(shortfall?'Studioza generated '+finalCount+' distinct questions from your material out of '+target+' requested. '+(validation?.stopReason==='DAILY_LIMIT'?'The daily AI request limit was reached. Try again tomorrow. ':validation?.stopReason?'The AI service could not finish the remaining questions. Try again later. ':'The remaining questions did not pass validation. Upload additional material or reduce the question count. '):'Your next sprint is ready. '+finalCount+' questions passed duplicate checks. ')+validationNote+' Select Start when you’re ready.';
         if(!shortfall&&!validationNote)toggleStudyDesk(false);
         playHarmonicChime('complete'); updateFilterPills(); renderAll();
       } catch (error) {

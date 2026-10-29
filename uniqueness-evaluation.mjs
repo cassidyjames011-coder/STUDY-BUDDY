@@ -1,0 +1,35 @@
+// Human-labelled, controlled assessment pairs. This evaluates the deterministic
+// structured fallback, not a general semantic-model accuracy benchmark.
+import fs from 'node:fs';
+import * as UQ from './question-uniqueness.mjs';
+const make=(prompt,objective,answer,reasoning,skill='understand',extra={})=>({prompt,questionType:extra.method?'practical':'theory',options:[answer,'Alternative B','Alternative C','Alternative D'],correct:0,explanation:reasoning,fingerprint:{primaryConcept:objective,learningObjective:objective,cognitiveSkill:skill,assessmentAction:objective,questionStructure:extra.method?'calculation':'explanation',scenarioType:null,expectedAnswer:answer,reasoning,method:'',formulaFamily:'',requiredOperations:[],...extra}});
+const cloud=make('Explain the business benefits of cloud computing.','explain cloud benefits','Elastic capacity matches demand and reduces idle infrastructure.','Match variable demand to elastic capacity to reduce idle costs.');
+const margin=make('Acme pays €50 and sells for €80. Calculate profit margin.','calculate profit margin','37.5 percent','Subtract cost from sales and divide profit by sales.','apply',{method:'profit_margin',formulaFamily:'margin',requiredOperations:['subtract_cost','divide_by_sales']});
+const algorithm=make('Trace a loop summing array x.','trace array sum','The sum of array entries','Initialise total, visit every entry and add its value.','apply',{method:'array_sum',requiredOperations:['initialise_total','iterate','add']});
+const biology=make('Explain how natural selection changes allele frequencies.','explain natural selection','Heritable traits affecting reproduction alter allele frequencies.','Connect heritable variation with differential reproductive success.');
+const long=make('Calculate margin, compare two tax rates and justify a pricing decision.','evaluate pricing with tax sensitivity','Compare margins after tax then choose sustainable pricing.','Calculate profits, compare tax sensitivity and justify pricing.','evaluate',{method:'pricing_analysis',requiredOperations:['calculate_margin','compare_tax','justify_pricing']});
+const duplicates=[
+  ['exact',cloud,{...cloud}],['punctuation',cloud,{...cloud,prompt:'Explain the business benefits of cloud computing!'}],['case',cloud,{...cloud,prompt:cloud.prompt.toUpperCase()}],
+  ['paraphrase',cloud,{...cloud,prompt:'What business gains motivate an organisation to migrate its infrastructure to cloud services?'}],
+  ['synonyms',cloud,{...cloud,prompt:'Describe the commercial advantages of adopting cloud services.'}],
+  ['currency-and-numbers',margin,{...margin,prompt:'Beta pays $60 and sells for $90. Calculate profit margin.',options:['33.3 percent','a','b','c']}],
+  ['changed-names-and-context',margin,{...margin,prompt:'In a London office Gamma markets a service. Determine its profit margin from cost and sales.'}],
+  ['changed-variable',algorithm,{...algorithm,prompt:'Trace a loop summing array y.'}],
+  ['sentence-reordering',biology,{...biology,prompt:'Allele frequencies shift over generations. How does natural selection cause this?'}],
+  ['long-complete-sequence',long,{...long,prompt:'Using a new company, justify pricing after calculating profit and comparing two tax rates.'}]
+];
+const distinct=[
+  [cloud,make('Explain the disadvantages of cloud computing.','explain cloud drawbacks','Provider dependence creates operational risk.','Evaluate dependencies and their consequences.')],
+  [cloud,make('Compare SaaS and IaaS.','compare cloud service models','SaaS provides applications while IaaS supplies infrastructure.','Distinguish responsibilities in different service models.','analyse')],
+  [cloud,make('Evaluate cloud security controls.','evaluate cloud security','Least privilege restricts access.','Identify threats then select access controls.','evaluate')],
+  [margin,make('Interpret how fixed cost increases affect break-even volume.','interpret fixed cost impact','Required break-even volume increases.','Hold contribution constant and relate fixed costs to required sales.','analyse',{method:'break_even',requiredOperations:['interpret_cost_effect']})],
+  [margin,make('Calculate break-even sales volume.','calculate break-even volume','Fixed cost divided by unit contribution.','Divide fixed costs by price less variable cost.','apply',{method:'break_even',requiredOperations:['calculate_contribution','divide_fixed_cost']})],
+  [algorithm,make('Analyse the runtime of summing an array.','analyse array sum complexity','Linear time in the number of entries.','Count one constant-time addition per entry.','analyse')],
+  [biology,make('Explain how genetic drift changes allele frequencies.','explain genetic drift','Random sampling alters frequencies, especially in small populations.','Distinguish chance sampling from differential reproductive success.')],
+  [long,make('Calculate margin, compare tax rates and evaluate financing risk.','evaluate pricing and financing','Assess debt risk alongside after-tax margins.','Calculate profits, compare taxes then evaluate financing constraints.','evaluate',{method:'pricing_analysis',requiredOperations:['calculate_margin','compare_tax','evaluate_financing']})],
+  [make('Define economies of scale.','define economies of scale','Average costs fall as output expands.','Spread fixed costs over greater output.'),make('Analyse diseconomies of scale.','analyse diseconomies of scale','Coordination costs can increase average costs.','Relate organisational complexity to rising unit costs.','analyse')],
+  [make('Explain the causes of the industrial revolution.','explain industrialisation causes','Energy, capital and technology supported mechanisation.','Connect enabling conditions to production changes.'),make('Explain the consequences of the industrial revolution.','explain industrialisation consequences','Urbanisation and factory employment expanded.','Trace changes in production to social outcomes.')]
+];
+export const pairs=[...duplicates.map(([id,a,b])=>({id,duplicate:true,a,b})),...distinct.map(([a,b],i)=>({id:'distinct-'+i,duplicate:false,a,b}))];
+export async function evaluate(){let tp=0,tn=0,fp=0,fn=0;const results=[];for(const pair of pairs){const c=UQ.createValidationContext(10);UQ.acceptQuestion(pair.a,await UQ.validateQuestion(pair.a,c),c);const r=await UQ.validateQuestion(pair.b,c);const predicted=!r.accepted;if(predicted&&pair.duplicate)tp++;else if(predicted)fp++;else if(pair.duplicate)fn++;else tn++;results.push({id:pair.id,label:pair.duplicate,predictedDuplicate:predicted,reason:r.reason||null});}return {scope:'Controlled structured-fingerprint fallback only; not an AI semantic accuracy claim',pairs:pairs.length,tp,tn,fp,fn,precision:tp/(tp+fp||1),recall:tp/(tp+fn||1),results};}
+if(process.argv[1]?.endsWith('uniqueness-evaluation.mjs')){fs.writeFileSync('uniqueness-labelled-pairs.json',JSON.stringify(pairs,null,2));const result=await evaluate();fs.writeFileSync('uniqueness-evaluation-results.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));if(result.fp||result.fn)process.exitCode=1;}

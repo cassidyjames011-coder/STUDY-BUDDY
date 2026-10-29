@@ -1,0 +1,132 @@
+{
+  "scope": "Controlled structured-fingerprint fallback only; not an AI semantic accuracy claim",
+  "pairs": 20,
+  "tp": 10,
+  "tn": 10,
+  "fp": 0,
+  "fn": 0,
+  "precision": 1,
+  "recall": 1,
+  "results": [
+    {
+      "id": "exact",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "EXACT_DUPLICATE"
+    },
+    {
+      "id": "punctuation",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "EXACT_DUPLICATE"
+    },
+    {
+      "id": "case",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "EXACT_DUPLICATE"
+    },
+    {
+      "id": "paraphrase",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "SEMANTIC_DUPLICATE"
+    },
+    {
+      "id": "synonyms",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "SEMANTIC_DUPLICATE"
+    },
+    {
+      "id": "currency-and-numbers",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "PRACTICAL_DUPLICATE"
+    },
+    {
+      "id": "changed-names-and-context",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "PRACTICAL_DUPLICATE"
+    },
+    {
+      "id": "changed-variable",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "PRACTICAL_DUPLICATE"
+    },
+    {
+      "id": "sentence-reordering",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "SEMANTIC_DUPLICATE"
+    },
+    {
+      "id": "long-complete-sequence",
+      "label": true,
+      "predictedDuplicate": true,
+      "reason": "PRACTICAL_DUPLICATE"
+    },
+    {
+      "id": "distinct-0",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-1",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-2",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-3",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-4",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-5",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-6",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-7",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-8",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    },
+    {
+      "id": "distinct-9",
+      "label": false,
+      "predictedDuplicate": false,
+      "reason": null
+    }
+  ]
+}

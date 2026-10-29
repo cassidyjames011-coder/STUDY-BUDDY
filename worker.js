@@ -281,6 +281,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
   let practical=0,theory=0,batchSize=length==='long'?5:length==='medium'?10:20,stalled=0;
   let rejections=[], replacementRounds=0, needsReplacement=false;
   async function accept(items) {
+    const validationStarted=Date.now();
     const candidates=[];
     for(const q of items.slice(0,Math.min(50,target*10))){
       validation.metrics.generatedCandidates++;
@@ -289,7 +290,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
       if(!check.accepted){rejections.push({reason:check.reason,objective:q.fingerprint.learningObjective});continue;}
       candidates.push(q);
     }
-    if(!candidates.length)return [];
+    if(!candidates.length){validation.metrics.validationProcessingMs+=Date.now()-validationStarted;return [];}
     const reviews=await reviewQuestionBatch(candidates,validation,env,quota,signal);
     const added=[],acceptedIds=new Set();
     for(let i=0;i<candidates.length;i++){
@@ -304,6 +305,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
       if(q.questionType==='practical')practical++;else theory++;
       if(questions.length===target)break;
     }
+    validation.metrics.validationProcessingMs+=Date.now()-validationStarted;
     return added;
   }
   // Keep source material separate from the whole-sprint instructions used by older clients.
@@ -330,8 +332,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
     if (attempt > 0) {
       const reservation = await quota.reserve();
       if (!reservation.allowed) {
-        const error = new Error("The daily AI request limit was reached after " + questions.length + " of " + target + " questions were checked. Your files and existing bank are unchanged.");
-        error.status = 429; throw error;
+        validation.metrics.stopReason='DAILY_LIMIT';break;
       }
     }
     const remaining = target - questions.length;
@@ -376,10 +377,10 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
       batch = readDocumentBatch(data);
     } catch (error) {
       if (signal.aborted) throw error;
-      if (error.status) throw error;
+      if (error.status) {if(!questions.length)throw error;validation.metrics.stopReason='GENERATION_UNAVAILABLE';break;}
       batchSize = Math.max(5, Math.floor(batchSize / 2));
       stalled++;
-      if (stalled >= 3) throw new Error("Google could not return a readable batch after several attempts. Your files are still selected; your question bank is unchanged.");
+      if (stalled >= 3) {validation.metrics.stopReason='UNREADABLE_BATCHES';break;}
       emit({ type:"progress", completed:questions.length, total:target, message:"Retrying a smaller batch; " + questions.length + " questions checked…" });
       continue;
     } finally {
@@ -387,7 +388,8 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
       signal.removeEventListener("abort", cancel);
     }
     const before = questions.length;
-    const added = await accept(batch);
+    let added;
+    try{added=await accept(batch);}catch(error){if(signal.aborted||error.status!==429)throw error;validation.metrics.stopReason='DAILY_LIMIT';break;}
     needsReplacement=added.length<count;
     if (added.length) emit({ type:"batch", questions:added });
     stalled = questions.length === before ? stalled + 1 : 0;
@@ -396,7 +398,7 @@ async function collectDocumentSprint(body, sources, env, quota, firstReservation
   }
   validation.metrics.finalAcceptedQuestionCount=questions.length;
   validation.metrics.validationCompleted=true;
-  validation.metrics.validationProcessingMs=Date.now()-validation.started;
+  validation.metrics.totalProcessingMs=Date.now()-validation.started;
   validation.metrics.semanticMode=validation.metrics.semanticUnavailable?'structured-fallback':'batched-assessment-review';
   emit({type:'validation',metrics:validation.metrics});
   // Metrics contain counts only, never prompts, source text, answers or student history.
